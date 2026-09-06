@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Денис — 24. День рождения</title>
+<meta name="description" content="Приглашение на день рождения Дениса">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎉</text></svg>">
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<main id="app">
+
+  <!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
+  <section class="screen active" id="screen-intro">
+    <div class="glow"></div>
+    <p class="eyebrow">Ты приглашён(а) на</p>
+    <h1 class="title">День рождения<br><span class="name">Дениса</span></h1>
+    <div class="age-badge"><span>24</span></div>
+    <p class="lede">Но сначала — небольшое испытание.<br>Поймай удачу, и адрес праздника откроется сам.</p>
+    <button class="btn btn-primary" id="start-btn">Начать игру</button>
+    <p class="scroll-hint">🎁 работает на телефоне и компьютере</p>
+  </section>
+
+  <!-- ЭКРАН 2: ИГРА -->
+  <section class="screen" id="screen-game">
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">Подарки</span>
+        <span class="hud-value" id="score">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Время</span>
+        <span class="hud-value" id="timer">20</span>
+      </div>
+    </div>
+    <canvas id="game-canvas"></canvas>
+    <p class="hint">Двигай пальцем или мышкой — лови подарки 🎁</p>
+  </section>
+
+  <!-- ЭКРАН 3: РЕЗУЛЬТАТ -->
+  <section class="screen" id="screen-result">
+    <div class="glow"></div>
+    <h2 class="result-title">Готово!</h2>
+    <p class="result-score">Поймано подарков: <span id="final-score">0</span></p>
+    <p class="result-text" id="result-text"></p>
+    <div class="loader"><div class="loader-bar"></div></div>
+    <p class="scroll-hint">открываю приглашение…</p>
+  </section>
+
+  <!-- ЭКРАН 4: ПРИГЛАШЕНИЕ -->
+  <section class="screen" id="screen-invite">
+    <div class="glow"></div>
+    <div class="invite-card">
+      <p class="invite-eyebrow">Ты справился(лась) — праздник ждёт</p>
+      <h2 class="invite-title">День рождения Дениса</h2>
+      <div class="invite-age">24 года</div>
+
+      <div class="invite-grid">
+        <div class="invite-row">
+          <span class="invite-icon">📅</span>
+          <div>
+            <span class="invite-label">Когда</span>
+            <span class="invite-value">18 сентября 2026, пятница · 15:30</span>
+          </div>
+        </div>
+        <div class="invite-row">
+          <span class="invite-icon">📍</span>
+          <div>
+            <span class="invite-label">Где</span>
+            <span class="invite-value">«3 Резиденция», Строитель<br>ул. Северная, 52</span>
+          </div>
+        </div>
+        <div class="invite-row">
+          <span class="invite-icon">👔</span>
+          <div>
+            <span class="invite-label">Дресс-код</span>
+            <span class="invite-value">По желанию</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="invite-actions">
+        <button class="btn btn-primary" id="add-calendar">Добавить в календарь</button>
+        <a class="btn btn-ghost" id="map-yandex" href="#" target="_blank" rel="noopener">Яндекс.Карты</a>
+        <a class="btn btn-ghost" id="map-google" href="#" target="_blank" rel="noopener">Google Maps</a>
+      </div>
+
+      <button class="replay-link" id="replay-btn">🔁 Сыграть ещё раз</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js"
+  }
+}
+</script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
