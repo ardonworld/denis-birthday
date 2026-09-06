@@ -5,7 +5,7 @@ import * as THREE from 'three';
    ========================================================= */
 const screens = {
   intro: document.getElementById('screen-intro'),
-  game: document.getElementById('screen-game'),
+  quest: document.getElementById('screen-quest'),
   result: document.getElementById('screen-result'),
   invite: document.getElementById('screen-invite'),
 };
@@ -37,27 +37,45 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position.set(0, 0, 9);
 
-// Свет — тёплый, "люксовый"
-scene.add(new THREE.AmbientLight(0x6b5a3a, 1.1));
-const key = new THREE.PointLight(0xffe1a8, 3.2, 30);
+// Свет — тёмный лес + янтарный отблеск (Jägermeister), тёплое золото (Riscal)
+scene.add(new THREE.AmbientLight(0x2f4a3a, 1.1));
+const key = new THREE.PointLight(0xffb35e, 3.4, 30);
 key.position.set(4, 5, 6);
 scene.add(key);
-const rim = new THREE.PointLight(0xd4af6a, 2, 30);
+const rim = new THREE.PointLight(0x2f6b4a, 2.4, 30);
 rim.position.set(-5, -3, 4);
 scene.add(rim);
+const wineLight = new THREE.PointLight(0x7a1f22, 1.4, 20);
+wineLight.position.set(0, -4, 3);
+scene.add(wineLight);
 
 const goldMat = new THREE.MeshPhysicalMaterial({
-  color: 0xd8b878,
+  color: 0xb8a06a,
   metalness: 1,
-  roughness: 0.28,
+  roughness: 0.3,
   clearcoat: 0.6,
 });
-const glassMat = new THREE.MeshPhysicalMaterial({
-  color: 0xffffff,
+const amberGlassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xffb35e,
   metalness: 0,
   roughness: 0.05,
   transmission: 1,
   thickness: 1.4,
+  ior: 1.5,
+  clearcoat: 1,
+});
+const forestMat = new THREE.MeshPhysicalMaterial({
+  color: 0x163f2c,
+  metalness: 0.6,
+  roughness: 0.35,
+  clearcoat: 0.5,
+});
+const wineGlassMat = new THREE.MeshPhysicalMaterial({
+  color: 0x7a1f22,
+  metalness: 0,
+  roughness: 0.08,
+  transmission: 0.95,
+  thickness: 1.6,
   ior: 1.5,
   clearcoat: 1,
 });
@@ -68,16 +86,44 @@ function addShape(geo, mat, pos, scale, speed) {
   mesh.position.set(...pos);
   mesh.scale.setScalar(scale);
   scene.add(mesh);
-  shapes.push({ mesh, speed, offset: Math.random() * Math.PI * 2 });
+  shapes.push({ mesh, speed, offset: Math.random() * Math.PI * 2, tumble: true });
 }
 
-addShape(new THREE.IcosahedronGeometry(1, 0), glassMat, [-2.6, 1.1, -1], 1.1, 0.25);
-addShape(new THREE.TorusGeometry(0.9, 0.28, 32, 100), goldMat, [2.4, -0.6, -2], 1, 0.35);
-addShape(new THREE.OctahedronGeometry(0.8, 0), glassMat, [1.8, 1.6, -3], 0.9, 0.3);
-addShape(new THREE.TorusKnotGeometry(0.55, 0.16, 120, 16), goldMat, [-2.2, -1.4, -2.5], 0.85, 0.4);
-addShape(new THREE.SphereGeometry(0.5, 32, 32), glassMat, [0, -2, -1.5], 0.8, 0.2);
+// Силуэт бутылки через LatheGeometry (профиль вращается вокруг оси Y)
+function makeBottleGeometry() {
+  const profile = [
+    new THREE.Vector2(0, 0),
+    new THREE.Vector2(0.34, 0),
+    new THREE.Vector2(0.36, 0.08),
+    new THREE.Vector2(0.36, 0.82),
+    new THREE.Vector2(0.3, 0.96),
+    new THREE.Vector2(0.15, 1.1),
+    new THREE.Vector2(0.13, 1.5),
+    new THREE.Vector2(0.13, 1.58),
+  ];
+  return new THREE.LatheGeometry(profile, 28);
+}
+function addBottle(mat, capMat, pos, scale, speed) {
+  const group = new THREE.Group();
+  const body = new THREE.Mesh(makeBottleGeometry(), mat);
+  group.add(body);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.145, 0.145, 0.14, 20), capMat);
+  cap.position.y = 1.63;
+  group.add(cap);
+  group.position.set(...pos);
+  group.scale.setScalar(scale);
+  group.rotation.z = (Math.random() - 0.5) * 0.5;
+  scene.add(group);
+  shapes.push({ mesh: group, speed, offset: Math.random() * Math.PI * 2, tumble: false, baseTilt: group.rotation.z });
+}
 
-// Золотые частицы — "шампанское"
+addShape(new THREE.IcosahedronGeometry(1, 0), amberGlassMat, [-2.8, 1.6, -2], 0.7, 0.25);
+addShape(new THREE.TorusGeometry(0.9, 0.28, 32, 100), goldMat, [2.6, -1.6, -2.5], 0.85, 0.35);
+addShape(new THREE.OctahedronGeometry(0.8, 0), forestMat, [2.2, 1.8, -3], 0.6, 0.3);
+addBottle(amberGlassMat, goldMat, [-2.3, -0.8, -1.5], 1, 0.18);
+addBottle(wineGlassMat, goldMat, [1.6, 0.4, -1.2], 0.85, 0.22);
+
+// Янтарные частицы — искры/капли выдержанного напитка
 const PARTICLES = 260;
 const positions = new Float32Array(PARTICLES * 3);
 const speeds = new Float32Array(PARTICLES);
@@ -112,9 +158,14 @@ function animate3D() {
   requestAnimationFrame(animate3D);
   const t = clock.getElapsedTime();
 
-  shapes.forEach(({ mesh, speed, offset }) => {
-    mesh.rotation.x = t * speed + offset;
-    mesh.rotation.y = t * speed * 0.7 + offset;
+  shapes.forEach(({ mesh, speed, offset, tumble, baseTilt }) => {
+    if (tumble) {
+      mesh.rotation.x = t * speed + offset;
+      mesh.rotation.y = t * speed * 0.7 + offset;
+    } else {
+      mesh.rotation.y = t * speed * 0.4 + offset;
+      mesh.rotation.z = (baseTilt || 0) + Math.sin(t * 0.5 + offset) * 0.05;
+    }
     mesh.position.y += Math.sin(t * 0.6 + offset) * 0.0015;
   });
 
@@ -135,157 +186,145 @@ animate3D();
 }
 
 /* =========================================================
-   3. ИГРА «ЛОВИ ПОДАРКИ»
+   3. КВЕСТ-РАССЛЕДОВАНИЕ «ПРОПАВШИЙ КУПАЖ»
+   Улика 1 (визуальная): найти бутылку нужного цвета среди пяти.
+   Улика 2 (логическая): арифметика по данным, уже показанным на сайте.
+   Обе части складываются в кодовое слово, открывающее координаты.
    ========================================================= */
-const gameCanvas = document.getElementById('game-canvas');
-const gctx = gameCanvas.getContext('2d');
-const scoreEl = document.getElementById('score');
-const timerEl = document.getElementById('timer');
-const finalScoreEl = document.getElementById('final-score');
-const resultTextEl = document.getElementById('result-text');
+const BOTTLE_COLORS = [
+  { key: 'amber', color: '#e2892e' },
+  { key: 'forest', color: '#163f2c' }, // верный ответ — «цвета лесной ночи»
+  { key: 'wine', color: '#7a1f22' },
+  { key: 'gold', color: '#b8a06a' },
+  { key: 'charcoal', color: '#2a2a28' },
+];
+const FRAGMENT_VISUAL = 'ЛЕС';
+const FRAGMENT_LOGIC = '2002';
 
-const GAME_DURATION = 20;
-const ITEM_EMOJIS = ['🎁', '🎈', '🥂', '⭐', '🍰'];
-
-const game = {
-  active: false,
-  score: 0,
-  timeLeft: GAME_DURATION,
-  items: [],
-  basketX: 0,
-  spawnTimer: null,
-  countdownTimer: null,
-  raf: null,
-};
-
-function fitGameCanvas() {
-  gameCanvas.width = window.innerWidth;
-  gameCanvas.height = window.innerHeight;
-  game.basketX = window.innerWidth / 2;
+function bottleSVG(color) {
+  return `<svg width="40" height="82" viewBox="0 0 44 90" xmlns="http://www.w3.org/2000/svg">
+    <rect x="16" y="0" width="12" height="16" rx="2" fill="#b8a06a"/>
+    <path d="M10 16 h24 v9 c0 5 6 8 6 17 v38 a6 6 0 0 1 -6 6 h-24 a6 6 0 0 1 -6 -6 v-38 c0 -9 6 -12 6 -17 z"
+      fill="${color}" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>
+    <rect x="9" y="46" width="26" height="10" fill="#fffdf7" opacity="0.12"/>
+  </svg>`;
 }
-window.addEventListener('resize', fitGameCanvas);
-fitGameCanvas();
 
-function pointerMove(clientX) {
-  const rect = gameCanvas.getBoundingClientRect();
-  game.basketX = Math.min(Math.max(clientX - rect.left, 36), gameCanvas.width - 36);
-}
-gameCanvas.addEventListener('pointermove', (e) => pointerMove(e.clientX));
-gameCanvas.addEventListener(
-  'touchmove',
-  (e) => {
-    if (e.touches[0]) pointerMove(e.touches[0].clientX);
-    e.preventDefault();
-  },
-  { passive: false }
-);
-window.addEventListener('keydown', (e) => {
-  if (!game.active) return;
-  if (e.key === 'ArrowLeft') game.basketX = Math.max(game.basketX - 40, 36);
-  if (e.key === 'ArrowRight') game.basketX = Math.min(game.basketX + 40, gameCanvas.width - 36);
-});
+const quest = { visualDone: false, logicDone: false };
 
-function spawnItem() {
-  game.items.push({
-    x: 40 + Math.random() * (gameCanvas.width - 80),
-    y: -30,
-    r: 22,
-    speed: 2.4 + Math.random() * 2.2 + game.score * 0.03,
-    emoji: ITEM_EMOJIS[Math.floor(Math.random() * ITEM_EMOJIS.length)],
-    rot: Math.random() * Math.PI,
+function renderBottleRow() {
+  const row = document.getElementById('bottle-row');
+  const shuffled = [...BOTTLE_COLORS].sort(() => Math.random() - 0.5);
+  row.innerHTML = '';
+  shuffled.forEach(({ key, color }) => {
+    const btn = document.createElement('button');
+    btn.className = 'bottle-btn';
+    btn.type = 'button';
+    btn.dataset.key = key;
+    btn.innerHTML = bottleSVG(color);
+    btn.addEventListener('click', () => onBottleClick(key, btn));
+    row.appendChild(btn);
   });
 }
 
-function drawBasket() {
-  const y = gameCanvas.height - 70;
-  gctx.save();
-  gctx.translate(game.basketX, y);
-  gctx.font = '52px serif';
-  gctx.textAlign = 'center';
-  gctx.textBaseline = 'middle';
-  gctx.shadowColor = 'rgba(212,175,106,0.6)';
-  gctx.shadowBlur = 18;
-  gctx.fillText('🧺', 0, 0);
-  gctx.restore();
-}
-
-function gameTick() {
-  gctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-  const basketY = gameCanvas.height - 70;
-  for (let i = game.items.length - 1; i >= 0; i--) {
-    const it = game.items[i];
-    it.y += it.speed;
-    it.rot += 0.02;
-
-    gctx.save();
-    gctx.translate(it.x, it.y);
-    gctx.rotate(Math.sin(it.rot) * 0.2);
-    gctx.font = '38px serif';
-    gctx.textAlign = 'center';
-    gctx.textBaseline = 'middle';
-    gctx.fillText(it.emoji, 0, 0);
-    gctx.restore();
-
-    const dx = it.x - game.basketX;
-    const dy = it.y - basketY;
-    if (Math.sqrt(dx * dx + dy * dy) < 46) {
-      game.items.splice(i, 1);
-      game.score++;
-      scoreEl.textContent = game.score;
-      continue;
-    }
-    if (it.y > gameCanvas.height + 40) game.items.splice(i, 1);
-  }
-
-  drawBasket();
-
-  if (game.active) game.raf = requestAnimationFrame(gameTick);
-}
-
-function startGame() {
-  game.active = true;
-  game.score = 0;
-  game.timeLeft = GAME_DURATION;
-  game.items = [];
-  scoreEl.textContent = '0';
-  timerEl.textContent = GAME_DURATION;
-  showScreen('game');
-
-  let spawnDelay = 850;
-  function scheduleSpawn() {
-    spawnItem();
-    spawnDelay = Math.max(380, spawnDelay - 12);
-    game.spawnTimer = setTimeout(scheduleSpawn, spawnDelay);
-  }
-  scheduleSpawn();
-
-  game.countdownTimer = setInterval(() => {
-    game.timeLeft--;
-    timerEl.textContent = game.timeLeft;
-    if (game.timeLeft <= 0) endGame();
-  }, 1000);
-
-  game.raf = requestAnimationFrame(gameTick);
-}
-
-function endGame() {
-  game.active = false;
-  clearTimeout(game.spawnTimer);
-  clearInterval(game.countdownTimer);
-  cancelAnimationFrame(game.raf);
-
-  finalScoreEl.textContent = game.score;
-  if (game.score >= 15) {
-    resultTextEl.textContent = 'Невероятно! Ты поймал(а) почти всё веселье этого праздника.';
-  } else if (game.score >= 8) {
-    resultTextEl.textContent = 'Отличный улов! Праздник явно не обойдётся без тебя.';
+function onBottleClick(key, btn) {
+  const feedback = document.getElementById('visual-feedback');
+  if (key === 'forest') {
+    quest.visualDone = true;
+    feedback.textContent = '';
+    setChip('chip-1', FRAGMENT_VISUAL);
+    document.getElementById('clue-visual').style.opacity = '0.55';
+    document.getElementById('clue-visual').style.pointerEvents = 'none';
+    document.getElementById('clue-logic').hidden = false;
+    checkQuestComplete();
   } else {
-    resultTextEl.textContent = 'Неважно, сколько поймано — главное, что ты будешь там.';
+    btn.classList.remove('shake');
+    void btn.offsetWidth;
+    btn.classList.add('shake');
+    feedback.textContent = 'Не то — ищи цвет глубокой хвойной чащи.';
   }
+}
 
+function setChip(id, text) {
+  const chip = document.getElementById(id);
+  chip.textContent = text;
+  chip.classList.add('filled');
+}
+
+function checkQuestComplete() {
+  if (quest.visualDone && quest.logicDone) {
+    document.getElementById('clue-final').hidden = false;
+  }
+}
+
+document.getElementById('logic-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('logic-input');
+  const feedback = document.getElementById('logic-feedback');
+  const val = input.value.trim();
+  if (val === FRAGMENT_LOGIC) {
+    quest.logicDone = true;
+    feedback.textContent = '';
+    feedback.classList.add('ok');
+    setChip('chip-2', FRAGMENT_LOGIC);
+    document.getElementById('clue-logic').style.opacity = '0.55';
+    document.getElementById('clue-logic').style.pointerEvents = 'none';
+    checkQuestComplete();
+  } else {
+    feedback.classList.remove('ok');
+    feedback.textContent = 'Не сходится. Подсказка есть на первом экране приглашения.';
+  }
+});
+
+document.getElementById('final-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('final-input');
+  const feedback = document.getElementById('final-feedback');
+  const normalized = input.value.trim().toUpperCase().replace(/\s+/g, '');
+  const code1 = (FRAGMENT_VISUAL + FRAGMENT_LOGIC).toUpperCase();
+  const code2 = (FRAGMENT_LOGIC + FRAGMENT_VISUAL).toUpperCase();
+  if (normalized === code1 || normalized === code2) {
+    feedback.classList.add('ok');
+    feedback.textContent = 'Верно! Расшифровываю координаты…';
+    setTimeout(finishQuest, 900);
+  } else {
+    feedback.classList.remove('ok');
+    feedback.textContent = 'Код неверный — сложи улики без пробела.';
+  }
+});
+
+function resetQuest() {
+  quest.visualDone = false;
+  quest.logicDone = false;
+  ['chip-1', 'chip-2'].forEach((id) => {
+    const chip = document.getElementById(id);
+    chip.textContent = '—';
+    chip.classList.remove('filled');
+  });
+  document.getElementById('clue-visual').style.opacity = '';
+  document.getElementById('clue-visual').style.pointerEvents = '';
+  document.getElementById('clue-logic').style.opacity = '';
+  document.getElementById('clue-logic').style.pointerEvents = '';
+  document.getElementById('clue-logic').hidden = true;
+  document.getElementById('clue-final').hidden = true;
+  document.getElementById('visual-feedback').textContent = '';
+  document.getElementById('logic-feedback').textContent = '';
+  document.getElementById('logic-feedback').classList.remove('ok');
+  document.getElementById('final-feedback').textContent = '';
+  document.getElementById('final-feedback').classList.remove('ok');
+  document.getElementById('logic-input').value = '';
+  document.getElementById('final-input').value = '';
+  renderBottleRow();
+}
+
+function startQuest() {
+  resetQuest();
+  showScreen('quest');
+}
+
+function finishQuest() {
   showScreen('result');
-  setTimeout(openInvite, 2600);
+  setTimeout(openInvite, 2400);
 }
 
 function openInvite() {
@@ -299,22 +338,38 @@ function openInvite() {
         angle: 60,
         spread: 60,
         origin: { x: 0, y: 0.6 },
-        colors: ['#d4af6a', '#f3dfb0', '#ffffff'],
+        colors: ['#b8a06a', '#e2892e', '#f3ecd8'],
       });
       confetti({
         particleCount: 4,
         angle: 120,
         spread: 60,
         origin: { x: 1, y: 0.6 },
-        colors: ['#d4af6a', '#f3dfb0', '#ffffff'],
+        colors: ['#b8a06a', '#e2892e', '#f3ecd8'],
       });
       if (Date.now() < end) requestAnimationFrame(frame);
     })();
   }
+  renderQR(`https://yandex.ru/maps/?text=${addressQuery}`);
 }
 
-document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('replay-btn').addEventListener('click', startGame);
+function renderQR(text) {
+  const container = document.getElementById('qr-code');
+  container.innerHTML = '';
+  const canvas = document.createElement('canvas');
+  container.appendChild(canvas);
+  if (window.QRCode) {
+    QRCode.toCanvas(
+      canvas,
+      text,
+      { width: 176, margin: 1, color: { dark: '#241f13', light: '#fffdf7' } },
+      (err) => { if (err) console.warn('Не удалось построить QR-код:', err); }
+    );
+  }
+}
+
+document.getElementById('start-btn').addEventListener('click', startQuest);
+document.getElementById('replay-btn').addEventListener('click', startQuest);
 
 /* =========================================================
    4. ПРИГЛАШЕНИЕ — календарь и карты
