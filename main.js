@@ -20,109 +20,202 @@ function showScreen(name) {
   screens[name].classList.add('active');
 }
 
-/* ---------- 2. РИСОВАННЫЕ УЛИКИ ---------- */
-const FIG = '#918978';
-const FIG_2 = '#6f6858';
-const FIG_3 = '#b3ab99';
-const FIG_LIGHT = '#cdc5b1';
+/* ---------- 2. ГРАВЮРНАЯ ГРАФИКА (всё нарисовано вручную) ----------
+   Стиль: чёрная тушь по светлой бумаге, как в старых детективных
+   гравюрах. Лица — бумага с тонким контуром, волосы, шляпы и одежда —
+   сплошная заливка тушью, характер задают предметы: шляпа, очки,
+   трубка, борода, фотоаппарат.                                        */
+const INK = '#211d18';
+const PAPER = '#f1e8d2';
+const LIGHT = '#ddd2b6';
+
+const FACE = `
+  <ellipse cx="33.5" cy="46" rx="3.2" ry="4.4" fill="${PAPER}" stroke="${INK}" stroke-width="2"/>
+  <ellipse cx="66.5" cy="46" rx="3.2" ry="4.4" fill="${PAPER}" stroke="${INK}" stroke-width="2"/>
+  <ellipse cx="50" cy="43" rx="16.5" ry="19.5" fill="${PAPER}" stroke="${INK}" stroke-width="2.2"/>
+  <path d="M40.5 39.5q3.5-2 7 0M52.5 39.5q3.5-2 7 0" stroke="${INK}" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="43.7" cy="45" r="1.7" fill="${INK}"/>
+  <circle cx="56.3" cy="45" r="1.7" fill="${INK}"/>
+  <path d="M50 47v5l-2.5 2" stroke="${INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="M45.5 56q4.5 3.2 9 0" stroke="${INK}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+
+const NECK = `<path d="M43 55h14v21H43z" fill="${PAPER}" stroke="${INK}" stroke-width="2"/>`;
+const BODY = `<path d="M9 112c0-24 19-38 41-38s41 14 41 38z" fill="${INK}"/>`;
+const COLLAR = `<path d="M50 74l-11 6 11 12 11-12z" fill="${PAPER}"/>`;
 
 function silhouette(kind) {
-  const open = '<svg viewBox="0 0 100 102" xmlns="http://www.w3.org/2000/svg">';
+  const open = '<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg">';
   const close = '</svg>';
+
   const shapes = {
-    man: `
-      <path d="M22 102c0-18 12-30 28-30s28 12 28 30z" fill="${FIG}"/>
-      <circle cx="50" cy="37" r="17" fill="${FIG}"/>
-      <path d="M32 32c1-12 9-18 18-18s17 6 18 18c-5-7-11-9-18-9s-13 2-18 9z" fill="${FIG_2}"/>`,
-    woman: `
-      <path d="M26 66c0-16 10-27 24-27s24 11 24 27c0 14-4 24-6 30H32c-2-6-6-16-6-30z" fill="${FIG_2}"/>
-      <path d="M24 102c0-17 11-28 26-28s26 11 26 28z" fill="${FIG}"/>
-      <circle cx="50" cy="38" r="16" fill="${FIG}"/>
-      <path d="M31 34c1-13 9-19 19-19s18 6 19 19c-4-8-11-11-19-11s-15 3-19 11z" fill="${FIG_2}"/>`,
-    strong: `
-      <path d="M8 102c0-23 19-38 42-38s42 15 42 38z" fill="${FIG}"/>
-      <rect x="42" y="44" width="16" height="24" fill="${FIG}"/>
-      <circle cx="50" cy="32" r="16" fill="${FIG}"/>
-      <path d="M33 28c1-11 8-17 17-17s16 6 17 17c-5-6-10-8-17-8s-12 2-17 8z" fill="${FIG_2}"/>`,
-    suit: `
-      <path d="M22 102c0-18 12-29 28-29s28 11 28 29z" fill="${FIG}"/>
-      <path d="M50 73l-11 5 11 12 11-12z" fill="${FIG_3}"/>
-      <path d="M50 90l-4 12h8z" fill="${FIG_2}"/>
-      <circle cx="50" cy="37" r="16" fill="${FIG}"/>
-      <path d="M33 33c1-12 8-18 17-18s16 6 17 18c-5-7-10-9-17-9s-12 2-17 9z" fill="${FIG_2}"/>`,
-    updo: `
-      <path d="M25 102c0-17 11-28 25-28s25 11 25 28z" fill="${FIG}"/>
-      <circle cx="50" cy="39" r="16" fill="${FIG}"/>
-      <circle cx="50" cy="15" r="9" fill="${FIG_2}"/>
-      <path d="M32 36c1-13 9-19 18-19s17 6 18 19c-5-8-11-11-18-11s-13 3-18 11z" fill="${FIG_2}"/>`,
-    cap: `
-      <path d="M22 102c0-18 12-30 28-30s28 12 28 30z" fill="${FIG}"/>
-      <circle cx="50" cy="40" r="16" fill="${FIG}"/>
-      <path d="M31 34c0-11 8-19 19-19s19 8 19 19z" fill="${FIG_2}"/>
-      <rect x="24" y="33" width="52" height="5" rx="2.5" fill="${FIG_2}"/>`,
-    curly: `
-      <path d="M24 102c0-17 11-28 26-28s26 11 26 28z" fill="${FIG}"/>
-      <circle cx="50" cy="40" r="16" fill="${FIG}"/>
-      <circle cx="35" cy="28" r="8" fill="${FIG_2}"/>
-      <circle cx="50" cy="22" r="9" fill="${FIG_2}"/>
-      <circle cx="65" cy="28" r="8" fill="${FIG_2}"/>`,
-    dressLady: `
-      <path d="M50 60l-20 42h40z" fill="${FIG_LIGHT}"/>
-      <path d="M38 58c0-9 5-15 12-15s12 6 12 15z" fill="${FIG_LIGHT}"/>
-      <circle cx="50" cy="30" r="14" fill="${FIG}"/>
-      <path d="M34 44c0-14 6-22 16-22s16 8 16 22c-4-8-9-11-16-11s-12 3-16 11z" fill="${FIG_2}"/>`,
-    beard: `
-      <path d="M22 102c0-18 12-30 28-30s28 12 28 30z" fill="${FIG}"/>
-      <circle cx="50" cy="37" r="17" fill="${FIG}"/>
-      <path d="M35 44c0 9 7 14 15 14s15-5 15-14c0 0-4 5-15 5s-15-5-15-5z" fill="${FIG_2}"/>
-      <path d="M32 32c1-12 9-18 18-18s17 6 18 18c-5-7-11-9-18-9s-13 2-18 9z" fill="${FIG_2}"/>`,
-    /* предметные снимки */
-    bottleShot: `
-      <rect x="42" y="16" width="16" height="18" rx="2" fill="${FIG_2}"/>
-      <path d="M36 34h28v10c0 6 7 9 7 20v32a7 7 0 0 1-7 7H36a7 7 0 0 1-7-7V64c0-11 7-14 7-20z" fill="${FIG}"/>
-      <rect x="30" y="66" width="40" height="15" fill="${FIG_3}" opacity="0.5"/>`,
-    receiptShot: `
-      <path d="M28 14h44v70l-6-5-6 5-6-5-6 5-6-5-6 5-8-6z" fill="${FIG_3}"/>
-      <rect x="35" y="24" width="30" height="3" fill="${FIG_2}"/>
-      <rect x="35" y="33" width="30" height="2.5" fill="${FIG_2}" opacity="0.7"/>
-      <rect x="35" y="41" width="22" height="2.5" fill="${FIG_2}" opacity="0.7"/>
-      <rect x="35" y="49" width="26" height="2.5" fill="${FIG_2}" opacity="0.7"/>
-      <rect x="35" y="60" width="18" height="4" fill="${FIG_2}"/>`,
-    clockShot: `
-      <circle cx="50" cy="51" r="34" fill="none" stroke="${FIG}" stroke-width="5"/>
-      <circle cx="50" cy="51" r="3" fill="${FIG}"/>
-      <path d="M50 51V26" stroke="${FIG}" stroke-width="4.5" stroke-linecap="round"/>
-      <path d="M50 51l15 9" stroke="${FIG_3}" stroke-width="3.5" stroke-linecap="round"/>
-      <circle cx="50" cy="20" r="2.5" fill="${FIG_2}"/>
-      <circle cx="81" cy="51" r="2.5" fill="${FIG_2}"/>
-      <circle cx="50" cy="82" r="2.5" fill="${FIG_2}"/>
-      <circle cx="19" cy="51" r="2.5" fill="${FIG_2}"/>`,
-    stairsShot: `
-      <path d="M0 102h30V80h22V58h22V36h26" stroke="${FIG_2}" stroke-width="6" fill="none"/>
-      <path d="M62 52l-9 22h18z" fill="${FIG_LIGHT}" opacity="0.9"/>
-      <path d="M56 51c0-6 3-10 7-10s7 4 7 10z" fill="${FIG_LIGHT}" opacity="0.9"/>
-      <circle cx="63" cy="33" r="8" fill="${FIG}" opacity="0.85"/>`,
-    /* варианты одежды для опознания */
-    figSuit: `
-      <path d="M50 40l-14 6v56h28V46z" fill="${FIG_2}"/>
-      <path d="M50 46l-7 4 7 9 7-9z" fill="${FIG_3}"/>
-      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
-    figDress: `
-      <path d="M50 48L32 102h36z" fill="${FIG_LIGHT}"/>
-      <path d="M40 47c0-8 4-13 10-13s10 5 10 13z" fill="${FIG_LIGHT}"/>
-      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
-    figSport: `
-      <path d="M30 52c0-9 9-15 20-15s20 6 20 15v22H30z" fill="${FIG_3}"/>
-      <rect x="34" y="76" width="32" height="26" fill="${FIG_2}"/>
-      <rect x="20" y="52" width="8" height="30" rx="4" fill="${FIG}"/>
-      <rect x="72" y="52" width="8" height="30" rx="4" fill="${FIG}"/>
-      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
-    figCoat: `
-      <path d="M50 38l-17 8v56h34V46z" fill="${FIG}"/>
-      <path d="M50 46v56" stroke="${FIG_2}" stroke-width="2.5"/>
-      <path d="M33 46l8-6 9 6-9 8z" fill="${FIG_2}"/>
-      <path d="M67 46l-8-6-9 6 9 8z" fill="${FIG_2}"/>
-      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
+    /* ---------- портреты гостей ---------- */
+    // Никита — знаток напитков: гладкая причёска, бабочка
+    man: `${NECK}${BODY}${COLLAR}
+      <path d="M50 84l-10-6v12zM50 84l10-6v12z" fill="${INK}"/>
+      <rect x="47" y="80.5" width="6" height="7" rx="1.6" fill="${INK}"/>
+      ${FACE}
+      <path d="M32 41c0-14 8-23 18-23s18 9 18 23c-2-7-4-11-8-13 2 3 2 6 1 8-3-6-9-9-16-8-6 1-10 5-13 13z" fill="${INK}"/>`,
+
+    // Алёна — каре и жемчуг
+    woman: `${NECK}${BODY}
+      <path d="M27 47c0-17 10-29 23-29s23 12 23 29c0 11-2 19-4 25h-7c4-10 4-20 4-20-7 5-25 5-32 0 0 0 0 10 4 20h-7c-2-6-4-14-4-25z" fill="${INK}"/>
+      ${FACE}
+      <path d="M28 42c0-15 9-25 22-25s22 10 22 25c-4-11-11-16-22-16s-18 5-22 16z" fill="${INK}"/>
+      <g fill="${PAPER}"><circle cx="40" cy="87" r="2.5"/><circle cx="46.5" cy="90" r="2.5"/>
+      <circle cx="53.5" cy="90" r="2.5"/><circle cx="60" cy="87" r="2.5"/></g>`,
+
+    // Мигаль — широкие плечи, короткий ёжик
+    strong: `<path d="M38 52h24v24H38z" fill="${PAPER}" stroke="${INK}" stroke-width="2"/>
+      <path d="M0 112c0-28 22-44 50-44s50 16 50 44z" fill="${INK}"/>
+      ${FACE}
+      <path d="M31 37h38v-6c0-10-8-17-19-17s-19 7-19 17z" fill="${INK}"/>`,
+
+    // Матвей — костюм, круглые очки, галстук
+    suit: `${NECK}${BODY}
+      <path d="M50 74l-13 6 13 14 13-14z" fill="${PAPER}"/>
+      <path d="M50 90l-4.5 6 4.5 16 4.5-16z" fill="${INK}"/>
+      ${FACE}
+      <path d="M32 41c0-14 8-23 18-23 8 0 14 5 17 12-6-5-13-7-20-5-6 2-12 6-15 16z" fill="${INK}"/>
+      <g fill="none" stroke="${INK}" stroke-width="2">
+        <circle cx="43.5" cy="45" r="6.6"/><circle cx="56.5" cy="45" r="6.6"/>
+        <path d="M50.1 45h-0.2"/><path d="M36.9 44l-3.4-1.6M63.1 44l3.4-1.6"/></g>`,
+
+    // Лера — пучок, серьги, фотоаппарат на шее
+    updo: `${NECK}${BODY}
+      <circle cx="50" cy="16" r="9.5" fill="${INK}"/>
+      ${FACE}
+      <path d="M31 43c0-16 9-26 19-26s19 10 19 26c-3-11-9-16-19-16s-16 5-19 16z" fill="${INK}"/>
+      <circle cx="32.5" cy="52" r="2.7" fill="${INK}"/><circle cx="67.5" cy="52" r="2.7" fill="${INK}"/>
+      <path d="M40 78l-4 12M60 78l4 12" stroke="${PAPER}" stroke-width="2"/>
+      <rect x="36" y="89" width="28" height="17" rx="3.5" fill="${PAPER}" stroke="${INK}" stroke-width="2"/>
+      <circle cx="50" cy="97.5" r="5.4" fill="${INK}"/><circle cx="50" cy="97.5" r="2" fill="${PAPER}"/>`,
+
+    // Софья — широкополая шляпа и светлое платье
+    dressLady: `<path d="M43 58h14v20H43z" fill="${PAPER}" stroke="${INK}" stroke-width="2"/>
+      <path d="M9 112c0-24 19-38 41-38s41 14 41 38z" fill="${LIGHT}" stroke="${INK}" stroke-width="2"/>
+      <path d="M50 76l-9 5 9 10 9-10z" fill="${PAPER}"/>
+      <ellipse cx="50" cy="46" rx="16.5" ry="19" fill="${PAPER}" stroke="${INK}" stroke-width="2.2"/>
+      <path d="M40.5 43q3.5-2 7 0M52.5 43q3.5-2 7 0" stroke="${INK}" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+      <circle cx="43.7" cy="48" r="1.7" fill="${INK}"/><circle cx="56.3" cy="48" r="1.7" fill="${INK}"/>
+      <path d="M45.5 58q4.5 3 9 0" stroke="${INK}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="50" cy="31" rx="31" ry="7.5" fill="${INK}"/>
+      <path d="M34 31c0-12 6-19 16-19s16 7 16 19z" fill="${INK}"/>
+      <rect x="34" y="25.5" width="32" height="4.5" fill="${LIGHT}"/>`,
+
+    // Денис (гость) — борода и кепка
+    beard: `${NECK}${BODY}${COLLAR}
+      ${FACE}
+      <path d="M32.5 44c0 17 8 26 17.5 26s17.5-9 17.5-26c-3 11-9 15-17.5 15s-14.5-4-17.5-15z" fill="${INK}"/>
+      <path d="M45 62q5 3 10 0" stroke="${PAPER}" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M31 35c0-12 8-19 19-19s19 7 19 19z" fill="${INK}"/>
+      <path d="M27 35h46c0 3.5-2.5 6-6 6H33c-3.5 0-6-2.5-6-6z" fill="${INK}"/>`,
+
+    // Даша — кудри и круглые очки
+    curly: `${NECK}${BODY}
+      <g fill="${INK}"><circle cx="34" cy="33" r="9.5"/><circle cx="45" cy="25" r="10.5"/>
+      <circle cx="57" cy="26" r="10"/><circle cx="67" cy="35" r="9"/>
+      <circle cx="30" cy="45" r="7.5"/><circle cx="70" cy="45" r="7.5"/></g>
+      ${FACE}
+      <g fill="${INK}"><circle cx="35" cy="30" r="8"/><circle cx="47" cy="23" r="9"/>
+      <circle cx="59" cy="24" r="8.5"/><circle cx="67" cy="32" r="7.5"/></g>
+      <g fill="none" stroke="${INK}" stroke-width="2">
+        <circle cx="43.5" cy="45" r="6.2"/><circle cx="56.5" cy="45" r="6.2"/><path d="M49.7 45h0.6"/></g>`,
+
+    // Артём — плоская кепка
+    cap: `${NECK}${BODY}${COLLAR}
+      ${FACE}
+      <path d="M30 36c0-13 9-20 20-20s20 7 20 20z" fill="${INK}"/>
+      <circle cx="50" cy="15.5" r="3.2" fill="${INK}"/>
+      <path d="M26 36h32c0 4.5-3.5 7-9 7H33c-4 0-7-2.5-7-7z" fill="${INK}"/>`,
+
+    /* ---------- предметные снимки ---------- */
+    bottleShot: `<rect x="42" y="10" width="16" height="16" rx="2" fill="${INK}"/>
+      <path d="M36 26h28v11c0 7 8 10 8 22v42a7 7 0 0 1-7 7H35a7 7 0 0 1-7-7V59c0-12 8-15 8-22z"
+        fill="${INK}"/>
+      <rect x="30" y="62" width="40" height="20" fill="${PAPER}"/>
+      <path d="M35 68h30M35 73h22M35 78h26" stroke="${INK}" stroke-width="2"/>`,
+
+    receiptShot: `<path d="M25 8h50v88l-7-6-7 6-7-6-7 6-7-6-8 6-7-6z" fill="${PAPER}" stroke="${INK}" stroke-width="2.5"/>
+      <path d="M33 22h34M33 32h34M33 42h24M33 52h30M33 62h20" stroke="${INK}" stroke-width="2.4"/>
+      <rect x="33" y="72" width="26" height="8" fill="${INK}"/>`,
+
+    clockShot: `<circle cx="50" cy="55" r="36" fill="${PAPER}" stroke="${INK}" stroke-width="5"/>
+      <circle cx="50" cy="55" r="30" fill="none" stroke="${INK}" stroke-width="1.5"/>
+      <path d="M50 55V29" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M50 55l16 10" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="50" cy="55" r="3.4" fill="${INK}"/>
+      <g fill="${INK}"><rect x="48.5" y="24" width="3" height="6"/><rect x="76" y="53.5" width="6" height="3"/>
+      <rect x="48.5" y="80" width="3" height="6"/><rect x="18" y="53.5" width="6" height="3"/></g>
+      <path d="M40 12h20l-3 8H43z" fill="${INK}"/>`,
+
+    stairsShot: `<path d="M2 112h26V92h22V72h22V52h26" stroke="${INK}" stroke-width="7" fill="none"/>
+      <path d="M64 60l-11 26h22z" fill="${LIGHT}" stroke="${INK}" stroke-width="2"/>
+      <path d="M57 59c0-7 3-11 7.5-11s7.5 4 7.5 11z" fill="${LIGHT}" stroke="${INK}" stroke-width="2"/>
+      <circle cx="64.5" cy="39" r="9" fill="${INK}"/>
+      <path d="M8 20l14 10M12 12l4 16" stroke="${INK}" stroke-width="2.5" opacity="0.5"/>`,
+
+    /* ---------- варианты одежды для опознания ---------- */
+    figSuit: `<path d="M50 40l-15 7v65h30V47z" fill="${INK}"/>
+      <path d="M50 47l-7 5 7 10 7-10z" fill="${PAPER}"/>
+      <path d="M50 60l-3 5 3 14 3-14z" fill="${PAPER}"/>
+      <circle cx="50" cy="24" r="13" fill="${INK}"/>`,
+    figDress: `<path d="M50 50L30 112h40z" fill="${LIGHT}" stroke="${INK}" stroke-width="2.5"/>
+      <path d="M39 49c0-9 5-14 11-14s11 5 11 14z" fill="${LIGHT}" stroke="${INK}" stroke-width="2.5"/>
+      <circle cx="50" cy="24" r="13" fill="${INK}"/>`,
+    figSport: `<path d="M30 56c0-10 9-17 20-17s20 7 20 17v24H30z" fill="${PAPER}" stroke="${INK}" stroke-width="2.5"/>
+      <rect x="33" y="80" width="34" height="32" fill="${INK}"/>
+      <rect x="18" y="55" width="9" height="32" rx="4.5" fill="${INK}"/>
+      <rect x="73" y="55" width="9" height="32" rx="4.5" fill="${INK}"/>
+      <circle cx="50" cy="24" r="13" fill="${INK}"/>`,
+    figCoat: `<path d="M50 40l-18 8v64h36V48z" fill="${INK}"/>
+      <path d="M50 48v64" stroke="${PAPER}" stroke-width="2.5"/>
+      <path d="M32 48l9-7 9 7-9 9z" fill="${PAPER}"/>
+      <path d="M68 48l-9-7-9 7 9 9z" fill="${PAPER}"/>
+      <circle cx="50" cy="24" r="13" fill="${INK}"/>`,
+
+    /* ---------- реквизит на доску ---------- */
+    magnifier: `<circle cx="42" cy="42" r="27" fill="${PAPER}" opacity="0.5"/>
+      <circle cx="42" cy="42" r="27" fill="none" stroke="${INK}" stroke-width="8"/>
+      <circle cx="42" cy="42" r="20" fill="none" stroke="${INK}" stroke-width="1.5" opacity="0.6"/>
+      <path d="M33 32q9-5 18 2" stroke="${PAPER}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M61 61l26 30" stroke="${INK}" stroke-width="11" stroke-linecap="round"/>
+      <path d="M63 66l20 23" stroke="${PAPER}" stroke-width="2" opacity="0.35" stroke-linecap="round"/>`,
+
+    pipe: `<path d="M20 44h34v14a17 17 0 0 1-17 17 17 17 0 0 1-17-17z" fill="${INK}"/>
+      <ellipse cx="37" cy="44" rx="17" ry="6" fill="${INK}"/>
+      <ellipse cx="37" cy="44" rx="11" ry="3.4" fill="${PAPER}"/>
+      <path d="M54 52q22 2 30-14" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M82 40q6-8 12-6" stroke="${INK}" stroke-width="9" fill="none" stroke-linecap="round"/>`,
+
+    deerstalker: `<path d="M7 60q-11-8-3-19 9 6 15 13z" fill="${INK}"/>
+      <path d="M93 60q11-8 3-19-9 6-15 13z" fill="${INK}"/>
+      <ellipse cx="50" cy="76" rx="45" ry="10" fill="${INK}"/>
+      <path d="M12 76c0-27 17-46 38-46s38 19 38 46z" fill="${INK}"/>
+      <path d="M50 30v46" stroke="${PAPER}" stroke-width="2.6"/>
+      <path d="M25 58q25-13 50 0" stroke="${PAPER}" stroke-width="2.6" fill="none"/>
+      <ellipse cx="50" cy="76" rx="45" ry="10" fill="none" stroke="${PAPER}" stroke-width="1.6" opacity="0.5"/>`,
+
+    fingerprint: `<g fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round">
+      <path d="M50 22c-14 0-24 11-24 26 0 9 2 16 4 22"/>
+      <path d="M50 34c-8 0-13 6-13 14 0 10 2 16 5 22"/>
+      <path d="M50 46c-3 0-5 3-5 8 0 9 2 14 4 20"/>
+      <path d="M50 22c14 0 24 11 24 26 0 12-4 20-7 26"/>
+      <path d="M50 34c8 0 13 6 13 14 0 12-3 19-6 24"/>
+      <path d="M50 46c3 0 5 3 5 8 0 10-2 16-4 22"/></g>`,
+
+    pocketwatch: `<circle cx="50" cy="60" r="32" fill="${PAPER}" stroke="${INK}" stroke-width="5"/>
+      <circle cx="50" cy="60" r="26" fill="none" stroke="${INK}" stroke-width="1.5"/>
+      <path d="M50 60V40M50 60l14 9" stroke="${INK}" stroke-width="3.6" stroke-linecap="round"/>
+      <circle cx="50" cy="60" r="3" fill="${INK}"/>
+      <rect x="44" y="16" width="12" height="10" rx="3" fill="${INK}"/>
+      <circle cx="50" cy="12" r="7" fill="none" stroke="${INK}" stroke-width="4"/>`,
+
+    footprints: `<g fill="${INK}">
+      <ellipse cx="32" cy="30" rx="9" ry="14" transform="rotate(-16 32 30)"/>
+      <ellipse cx="30" cy="46" rx="5.5" ry="4" transform="rotate(-16 30 46)"/>
+      <ellipse cx="63" cy="62" rx="9" ry="14" transform="rotate(-16 63 62)"/>
+      <ellipse cx="61" cy="78" rx="5.5" ry="4" transform="rotate(-16 61 78)"/>
+      <ellipse cx="38" cy="94" rx="9" ry="14" transform="rotate(-16 38 94)"/></g>`,
   };
   return open + (shapes[kind] || shapes.man) + close;
 }
@@ -288,6 +381,56 @@ const BOARD_ITEMS = [
     label: 'Улика Б', evidence: 'b',
   },
 
+  /* ---- винтажный реквизит ---- */
+  {
+    id: 'prop-magnifier', type: 'prop', art: 'magnifier', x: 48, y: 92, rot: -12,
+    detail: {
+      eyebrow: 'Реквизит · лупа инспектора',
+      text: 'Ею осмотрели скол на крышке ящика. Скол свежий, оставлен в ночь пропажи: ящик вскрывали второпях и явно не тем инструментом, что лежит в кладовой.',
+      sign: '— Бочкарёв',
+    },
+  },
+  {
+    id: 'prop-pipe', type: 'prop', art: 'pipe', x: 90, y: 29.5, rot: 9,
+    detail: {
+      eyebrow: 'Реквизит · трубка следователя',
+      text: 'Бочкарёв уверяет, что думает лучше, когда трубка погасла. За эту ночь она гасла четыре раза — ровно по числу улик, которые предстоит разобрать.',
+      sign: 'к делу не относится',
+    },
+  },
+  {
+    id: 'prop-hat', type: 'prop', art: 'deerstalker', x: 8, y: 58, rot: -8,
+    detail: {
+      eyebrow: 'Реквизит · шляпа из гардероба',
+      text: 'Провисела в прихожей весь вечер, никто из гостей её не надевал. Проверено: пыль на полях не тронута.',
+      sign: 'исключено из версий',
+    },
+  },
+  {
+    id: 'prop-print', type: 'prop', art: 'fingerprint', x: 42, y: 70.5, rot: 5,
+    detail: {
+      eyebrow: 'Улика без номера · отпечаток',
+      text: 'Снят с горлышка соседней бутылки, которую даже не тронули. Смазан настолько, что эксперт отказался делать выводы. Приобщён к делу формально.',
+      sign: 'непригоден',
+    },
+  },
+  {
+    id: 'prop-watch', type: 'prop', art: 'pocketwatch', x: 90, y: 74.5, rot: -6,
+    detail: {
+      eyebrow: 'Реквизит · часы кладовщика',
+      text: 'Стрелки замерли на 23:50. Механизм сломан больше недели назад и всё это время врал почти на час — ориентироваться по ним нельзя. Точное время придётся считать по показаниям гостей.',
+      sign: 'ложный след',
+    },
+  },
+  {
+    id: 'prop-steps', type: 'prop', art: 'footprints', x: 8, y: 91.5, rot: 4,
+    detail: {
+      eyebrow: 'Реквизит · следы у чёрного входа',
+      text: 'Пол был мокрый, отпечатки расплылись — ни размер, ни обувь определить не вышло. Ясно одно: выходили именно здесь, а не через главный вход.',
+      sign: 'подтверждает версию',
+    },
+  },
+
   /* ---- декор и подсказки ---- */
   { id: 'sticky1', type: 'sticky', x: 47, y: 17.5, rot: 4, text: 'свечей = ?' },
   { id: 'sticky2', type: 'sticky', x: 13, y: 38.5, rot: -6, text: 'светлое — одно!' },
@@ -344,6 +487,11 @@ function buildBoard() {
           <span class="shot">${silhouette(item.fig)}</span>
           <span class="cap">${item.label}</span>
         </span>`;
+    } else if (item.type === 'prop') {
+      node = el('button', 'pin prop');
+      node.type = 'button';
+      node.innerHTML = `<span class="pushpin pushpin-white"></span>
+        <span class="prop-art">${silhouette(item.art)}</span>`;
     } else if (item.type === 'sticky') {
       node = el('div', 'pin sticky', `<span class="pushpin pushpin-white"></span>${item.text}`);
     } else if (item.type === 'note') {
