@@ -52,22 +52,58 @@
       <!-- Глава 0: завязка -->
       <div class="quest-card story-card" id="chapter-cover">
         <p class="quest-eyebrow">Инспектор Бочкарёв · вечерняя смена</p>
-        <p class="quest-riddle" data-text="Ночью из погреба резиденции пропал купаж особой выдержки — тот самый, что должны были откупорить сегодня вечером. Хозяин молчит, поставщик разводит руками. На крышке пустой бочки — свежий скол. Единственное, что успел учуять сторож: смолистый, хвойный запах, будто бутылку пронесли через лес, а не через погреб. У нас есть три улики с места происшествия и немного времени до начала торжества."></p>
-        <button class="btn btn-primary chapter-next" data-next="clue-visual">Открыть улику А</button>
+        <p class="quest-riddle" data-text="Ночью из погреба резиденции пропал купаж особой выдержки — тот самый, что должны были откупорить сегодня вечером на дне рождения Дениса Федука. Хозяин молчит, поставщик разводит руками. На крышке пустой бочки — свежий скол. Единственное, что успел учуять сторож: смолистый, хвойный запах, будто бутылку пронесли через лес, а не через погреб. На месте происшествия — семеро гостей, которые уже готовы дать показания."></p>
+        <button class="btn btn-primary chapter-next" data-next="chapter-witnesses">Опросить свидетелей</button>
+      </div>
+
+      <!-- Глава 0.5: доска расследования — показания гостей -->
+      <div class="quest-card story-card witness-board-card" id="chapter-witnesses" hidden>
+        <p class="quest-eyebrow">Доска расследования · Опрос свидетелей</p>
+        <div class="witness-board">
+          <div class="witness-card">
+            <span class="witness-name">Никита</span>
+            <span class="witness-quote">«Пахло дубом и вереском — но не совсем тем сортом, что я думал».</span>
+          </div>
+          <div class="witness-card">
+            <span class="witness-name">Алёна</span>
+            <span class="witness-quote">«Кто бы это ни взял — в биттерах разбирался не хуже меня».</span>
+          </div>
+          <div class="witness-card">
+            <span class="witness-name">Мигаль</span>
+            <span class="witness-quote">«Я бы вынес бочку одной рукой. Но у меня железное алиби — вся зала видела меня у штанги».</span>
+          </div>
+          <div class="witness-card">
+            <span class="witness-name">Матвей</span>
+            <span class="witness-quote">«Видел дорогую машину у чёрного входа около полуночи. Не моя, если что».</span>
+          </div>
+          <div class="witness-card">
+            <span class="witness-name">Лера</span>
+            <span class="witness-quote">«Матвей весь вечер был рядом со мной. Мы уже это обсудили с адвокатом».</span>
+          </div>
+          <div class="witness-card">
+            <span class="witness-name">Артём</span>
+            <span class="witness-quote">«Сам ничего не видел, но случайно сфотографировал квитанцию со стола кладовщика».</span>
+          </div>
+          <div class="witness-card">
+            <span class="witness-name">Денис и Даша</span>
+            <span class="witness-quote">«Слышали, как кладовщик бормотал что-то про «дубовые кольца» и старый сейф».</span>
+          </div>
+        </div>
+        <button class="btn btn-primary chapter-next" data-next="clue-visual">Перейти к уликам</button>
       </div>
 
       <!-- Улика A: визуальная дедукция по запаху -->
       <div class="quest-card story-card" id="clue-visual" hidden>
-        <p class="quest-eyebrow">Улика А · Обрывок экспертизы</p>
-        <p class="quest-riddle" data-text="Криминалист успел зафиксировать только запах: «можжевельник, смола, что-то тёмное и дощатое — будто бутылку прятали среди елей». С места происшествия изъяли пять бутылок. Только одна пахнет так, как в отчёте."></p>
+        <p class="quest-eyebrow">Улика А · Заключение экспертов</p>
+        <p class="quest-riddle" data-text="Никита и Алёна — те, кто на этом празднике разбирается в напитках лучше всех, — в один голос описали запах: «можжевельник, смола, что-то тёмное и дощатое, будто бутылку прятали среди елей». С места происшествия изъяли пять бутылок. Только одна пахнет так, как они описали."></p>
         <div class="bottle-row" id="bottle-row"></div>
         <p class="quest-feedback" id="visual-feedback"></p>
       </div>
 
       <!-- Улика Б: логическая дедукция, замаскированная под историю -->
       <div class="quest-card story-card" id="clue-logic" hidden>
-        <p class="quest-eyebrow">Улика Б · Квитанция склада</p>
-        <p class="quest-riddle" data-text="Мятая квитанция. Год на штампе размыт дождём — виден только сегодняшний, 2026-й. Внизу приписка рукой кладовщика: «Бочку заложили ровно за столько лет до сегодняшнего дня, сколько сегодня исполняется имениннику — то есть за 24 оборота дубовых колец». Вычисли год закладки."></p>
+        <p class="quest-eyebrow">Улика Б · Кадр с телефона Артёма</p>
+        <p class="quest-riddle" data-text="На случайном фото Артёма — мятая квитанция склада. Год на штампе размыт, виден только сегодняшний, 2026-й. Внизу приписка рукой кладовщика: «Бочку заложили ровно за столько лет до сегодняшнего дня, сколько сегодня исполняется имениннику — то есть за 24 оборота дубовых колец». Вычисли год закладки."></p>
         <form id="logic-form" autocomplete="off">
           <input type="text" inputmode="numeric" id="logic-input" placeholder="год закладки" maxlength="4">
           <button type="submit" class="btn btn-primary">Проверить</button>
@@ -78,7 +114,7 @@
       <!-- Финал: сейф -->
       <div class="quest-card story-card" id="clue-final" hidden>
         <p class="quest-eyebrow">Старый сейф резиденции</p>
-        <p class="quest-riddle" data-text="На дне бутылки нацарапаны буквы. На обороте квитанции проступили цифры. Сторож использовал именно такие коды для сейфа, где прятал координаты нового погреба. Сложите обе находки по порядку, как они были обнаружены, и введите код."></p>
+        <p class="quest-riddle" data-text="Денис и Даша слышали, как кладовщик бормотал код от старого сейфа — именно там он прятал координаты нового погреба. На дне бутылки нацарапаны буквы. На обороте квитанции проступили цифры. Сложите обе находки по порядку, как они были обнаружены, и введите код."></p>
         <form id="final-form" autocomplete="off">
           <div class="code-tiles" id="code-tiles"></div>
           <input type="text" id="final-input" autocomplete="off" spellcheck="false">
@@ -146,15 +182,21 @@
 
       <div class="mission-block">
         <p class="case-stamp mission-stamp">Совершенно секретно</p>
-        <p class="mission-intro">У следствия остались два запечатанных конверта — по одному на гостя. Внутри тайное задание на весь вечер. Не показывайте задания друг другу.</p>
+        <p class="mission-intro">У каждого гостя — своё запечатанное задание на весь вечер. Найди своё имя, прочти и передай телефон дальше, не показывая, что там написано.</p>
 
-        <div class="mission-picker">
-          <button class="btn btn-ghost mission-btn" data-slot="0" id="mission-btn-1">Конверт гостя 1</button>
-          <button class="btn btn-ghost mission-btn" data-slot="1" id="mission-btn-2">Конверт гостя 2</button>
+        <div class="mission-picker" id="mission-picker">
+          <button class="btn btn-ghost mission-btn" data-name="Никита">Никита</button>
+          <button class="btn btn-ghost mission-btn" data-name="Алёна">Алёна</button>
+          <button class="btn btn-ghost mission-btn" data-name="Денис">Денис</button>
+          <button class="btn btn-ghost mission-btn" data-name="Даша">Даша</button>
+          <button class="btn btn-ghost mission-btn" data-name="Мигаль">Мигаль</button>
+          <button class="btn btn-ghost mission-btn" data-name="Матвей">Матвей</button>
+          <button class="btn btn-ghost mission-btn" data-name="Лера">Лера</button>
+          <button class="btn btn-ghost mission-btn" data-name="Артём">Артём</button>
         </div>
 
         <div class="mission-card" id="mission-card" hidden>
-          <p class="mission-eyebrow">Ваше тайное задание</p>
+          <p class="mission-eyebrow" id="mission-eyebrow">Тайное задание</p>
           <p class="mission-text" id="mission-text"></p>
           <button class="btn btn-primary mission-hide-btn" id="mission-hide-btn">Запомнил(а) · Скрыть и передать</button>
         </div>

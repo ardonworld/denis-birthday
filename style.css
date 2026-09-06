@@ -332,6 +332,12 @@ html,body{
 .evidence-tag.filled{
   border: 1px solid var(--gold);
   background: linear-gradient(135deg, rgba(230,214,168,0.16), rgba(184,160,106,0.08));
+  animation: tag-pop .4s ease;
+}
+@keyframes tag-pop{
+  0%{ transform: scale(1) rotate(0deg); }
+  40%{ transform: scale(1.12) rotate(0deg); }
+  100%{ transform: scale(1) rotate(0deg); }
 }
 .evidence-tag.filled .evidence-tag-value{
   color: var(--gold-light);
@@ -371,6 +377,7 @@ html,body{
 }
 
 .quest-card{
+  --tilt: 0deg;
   background:
     repeating-linear-gradient(0deg, rgba(122,90,40,0.04) 0px, rgba(122,90,40,0.04) 1px, transparent 1px, transparent 3px),
     var(--card-bg);
@@ -380,12 +387,73 @@ html,body{
   padding: 24px 22px;
   text-align: left;
   box-shadow: 0 16px 46px rgba(0,0,0,0.4);
-  transition: opacity .4s ease;
+  animation: card-enter .55s ease both;
 }
 .quest-card[hidden]{ display: none; }
-#clue-visual{ transform: rotate(-0.6deg); }
-#clue-logic{ transform: rotate(0.5deg); }
-#clue-final{ transform: rotate(-0.4deg); }
+#clue-visual{ --tilt: -0.6deg; }
+#clue-logic{ --tilt: 0.5deg; }
+#clue-final{ --tilt: -0.4deg; }
+
+@keyframes card-enter{
+  from{ opacity: 0; transform: translateY(16px) rotate(0deg); }
+  to{ opacity: 1; transform: translateY(0) rotate(var(--tilt)); }
+}
+
+/* Доска расследования — показания гостей, приколотые как улики */
+.witness-board{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin: 6px 0 20px;
+}
+.witness-card{
+  --r: 0deg;
+  position: relative;
+  background: #fffaf0;
+  border: 1px solid rgba(122,31,34,0.25);
+  border-radius: 4px;
+  padding: 14px 12px 12px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+  opacity: 0;
+  animation: witness-pin .5s ease forwards;
+}
+.witness-card::before{
+  content: '';
+  position: absolute;
+  top: -6px; left: 50%;
+  transform: translateX(-50%);
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ff8a7a, #7a1f22);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.45);
+}
+.witness-card:nth-child(1){ --r: -2deg; animation-delay: .05s; }
+.witness-card:nth-child(2){ --r: 1.6deg; animation-delay: .15s; }
+.witness-card:nth-child(3){ --r: -1.2deg; animation-delay: .25s; }
+.witness-card:nth-child(4){ --r: 2deg; animation-delay: .35s; }
+.witness-card:nth-child(5){ --r: -1.6deg; animation-delay: .45s; }
+.witness-card:nth-child(6){ --r: 1.2deg; animation-delay: .55s; }
+.witness-card:nth-child(7){ --r: -2deg; animation-delay: .65s; }
+@keyframes witness-pin{
+  from{ opacity: 0; transform: translateY(-12px) scale(0.9) rotate(0deg); }
+  to{ opacity: 1; transform: translateY(0) scale(1) rotate(var(--r)); }
+}
+.witness-name{
+  display: block;
+  font-family: var(--label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12.5px;
+  color: var(--wine);
+  margin-bottom: 6px;
+}
+.witness-quote{
+  display: block;
+  font-family: var(--typewriter);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--label-ink);
+}
 
 .quest-eyebrow{
   font-family: var(--label);
@@ -684,14 +752,17 @@ html,body{
   margin: 0 0 16px;
 }
 .mission-picker{
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
   margin-bottom: 12px;
 }
-.mission-btn{ flex: 1 1 auto; }
+.mission-btn{ padding: 12px 10px; font-size: 13px; }
 .mission-btn.used{ opacity: 0.4; }
 .mission-btn.active{ background: rgba(122,31,34,0.1); }
+@media (min-width: 400px){
+  .mission-picker{ grid-template-columns: repeat(4, 1fr); }
+}
 
 .mission-card{
   background: #fffaf0;

@@ -384,6 +384,7 @@ function resetQuest() {
     if (valueEl) valueEl.textContent = 'не найдена';
   });
   document.getElementById('chapter-cover').hidden = false;
+  document.getElementById('chapter-witnesses').hidden = true;
   document.getElementById('clue-visual').hidden = true;
   document.getElementById('clue-visual').style.opacity = '';
   document.getElementById('clue-visual').style.pointerEvents = '';
@@ -440,32 +441,24 @@ function openInvite() {
     })();
   }
   renderQR(`https://yandex.ru/maps/?text=${addressQuery}`);
-  shuffleMissions();
 }
 
 /* =========================================================
    3.1 СЕКРЕТНОЕ ЗАДАНИЕ НА ВЕЧЕР
-   Каждый гость открывает свой конверт и не видит чужой —
-   задание нужно выполнять незаметно весь вечер.
+   У каждого гостя — своё персональное задание. Гость находит
+   своё имя, читает и скрывает карточку перед тем, как передать
+   телефон дальше — остальные не должны видеть текст.
    ========================================================= */
-const MISSION_POOL = [
-  'Весь вечер называй Дениса только «шеф» — как будто это совершенно нормально.',
-  'Трижды за вечер незаметно чокнись сам с собой, будто произносишь тост в уме.',
-  'Заведи с кем-нибудь разговор про космос и НЛО с максимально серьёзным лицом.',
-  'Каждый раз, когда кто-то скажет «привет», отвечай «замечено» — и не объясняй почему.',
-  'Собери у трёх разных гостей автограф на салфетке, представившись коллекционером.',
-  'Один раз за вечер начни аплодировать без причины — и посмотри, кто подхватит.',
-  'Похвали чей-то наряд так искренне, будто это последний писк парижской моды.',
-  'Придумай Денису новое прозвище и называй его так весь вечер, как будто оно всегда было.',
-  'Найди повод трижды за вечер использовать слово «единорог» в обычном разговоре.',
-  'Убеди хотя бы одного человека потанцевать — просто начни танцевать рядом с ним.',
-];
-let missionAssignment = [];
-
-function shuffleMissions() {
-  const pool = [...MISSION_POOL].sort(() => Math.random() - 0.5);
-  missionAssignment = [pool[0], pool[1]];
-}
+const GUEST_MISSIONS = {
+  'Никита': 'Весь вечер оценивай ЛЮБОЙ напиток вслух с лицом сомелье — даже воду. Используй слова «танины», «долгое послевкусие», «нотки дуба».',
+  'Алёна': 'Каждый раз, когда кто-то наливает себе выпить, молча и со знанием дела покачай головой — будто не одобряешь выбор бокала.',
+  'Денис': 'Весь вечер как бы невзначай напоминай, что у тебя тоже сегодня почти день рождения — скажи это минимум дважды с серьёзным лицом.',
+  'Даша': 'Найди повод трижды сказать «а вот у нас на свадьбе было по-другому» — даже если ты никогда не была на свадьбе.',
+  'Мигаль': 'Весь вечер предлагай всем помочь что-нибудь донести или подвинуть, даже если помощь не нужна — покажи силу минимум 5 раз.',
+  'Матвей': 'Про любую вещь, которую увидишь за вечером, между делом скажи: «у меня похожее, но получше» — минимум трижды.',
+  'Лера': 'Сфотографируй свою тарелку или бокал как для журнала минимум 4 раза, вслух комментируя свет и композицию.',
+  'Артём': 'Расскажи всем одну и ту же историю про Дениса несколько раз за вечер — но каждый раз немного меняй детали.',
+};
 
 function resetMissions() {
   const card = document.getElementById('mission-card');
@@ -476,12 +469,13 @@ function resetMissions() {
 
 document.querySelectorAll('.mission-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
-    const slot = Number(btn.dataset.slot);
+    const name = btn.dataset.name;
     const card = document.getElementById('mission-card');
     const textEl = document.getElementById('mission-text');
+    document.getElementById('mission-eyebrow').textContent = `Тайное задание · ${name}`;
     card.hidden = false;
-    card.dataset.slot = String(slot);
-    typewrite(textEl, missionAssignment[slot], 16);
+    card.dataset.name = name;
+    typewrite(textEl, GUEST_MISSIONS[name] || 'Задание не найдено.', 16);
     document.querySelectorAll('.mission-btn').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
   });
@@ -489,10 +483,10 @@ document.querySelectorAll('.mission-btn').forEach((btn) => {
 
 document.getElementById('mission-hide-btn').addEventListener('click', () => {
   const card = document.getElementById('mission-card');
-  const slot = card.dataset.slot;
+  const name = card.dataset.name;
   card.hidden = true;
   document.getElementById('mission-text').textContent = '';
-  const btn = document.querySelector(`.mission-btn[data-slot="${slot}"]`);
+  const btn = document.querySelector(`.mission-btn[data-name="${name}"]`);
   if (btn) btn.classList.add('used');
 });
 
