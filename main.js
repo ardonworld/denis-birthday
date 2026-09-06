@@ -726,6 +726,11 @@ let openDetailNode = null;
 
 function typewrite(node, text, speed) {
   clearInterval(node._typeTimer);
+  // Заранее резервируем высоту под полный текст, иначе во время печати
+  // карточка растёт и кнопки уезжают из-под пальца.
+  node.style.minHeight = '';
+  node.textContent = text;
+  node.style.minHeight = node.offsetHeight + 'px';
   node.textContent = '';
   node.classList.add('typing');
   let i = 0;
@@ -752,17 +757,26 @@ function openLens(detailId) {
   if (typed) typewrite(typed, typed.dataset.text, 11);
 }
 
+let lensCloseTimer = null;
+
 function closeLens(instant) {
+  // Отложенное закрытие обязательно снимаем: иначе оно сработает уже
+  // после того, как пользователь открыл следующую улику, и унесёт её.
+  clearTimeout(lensCloseTimer);
+  lensCloseTimer = null;
   if (!openDetailNode) return;
+  const node = openDetailNode;
   const finish = () => {
-    if (openDetailNode) detailStore.appendChild(openDetailNode);
-    openDetailNode = null;
-    lens.hidden = true;
+    detailStore.appendChild(node);
+    if (openDetailNode === node) {
+      openDetailNode = null;
+      lens.hidden = true;
+    }
     lens.classList.remove('closing');
   };
   if (instant) return finish();
   lens.classList.add('closing');
-  setTimeout(finish, 260);
+  lensCloseTimer = setTimeout(finish, 260);
 }
 
 document.getElementById('lens-close').addEventListener('click', () => closeLens());
@@ -848,7 +862,6 @@ function openInvite() {
       if (Date.now() < end) requestAnimationFrame(frame);
     })();
   }
-  renderQR(`https://yandex.ru/maps/?text=${addressQuery}`);
 }
 
 document.getElementById('start-btn').addEventListener('click', startQuest);
@@ -857,46 +870,107 @@ document.getElementById('board-viewport').addEventListener('scroll', () => {
   document.getElementById('board-hint').classList.add('gone');
 }, { once: true });
 
-/* ---------- 16. ТАЙНЫЕ ЗАДАНИЯ НА ВЕЧЕР ---------- */
-const GUEST_MISSIONS = {
-  'Никита': 'Весь вечер оценивай ЛЮБОЙ напиток вслух с лицом сомелье — даже воду. Обязательно вставляй «танины», «долгое послевкусие», «нотки дуба».',
-  'Алёна': 'Каждый раз, когда кто-то наливает себе выпить, молча и со знанием дела покачай головой — будто не одобряешь выбор бокала.',
-  'Денис': 'Весь вечер как бы невзначай напоминай, что у тебя тоже почти день рождения — скажи это минимум дважды с абсолютно серьёзным лицом.',
-  'Даша': 'Найди повод трижды сказать «а вот у нас было по-другому» — про любую мелочь, от салата до музыки.',
-  'Мигаль': 'Весь вечер предлагай всем помочь что-нибудь донести или подвинуть, даже если помощь не нужна. Минимум пять раз.',
-  'Матвей': 'Про любую вещь, которую увидишь за вечер, между делом скажи: «у меня похожее, но получше». Минимум трижды.',
-  'Лера': 'Сфотографируй свою тарелку или бокал как для журнала минимум четыре раза, вслух комментируя свет и композицию.',
-  'Артём': 'Расскажи всем одну и ту же историю про Дениса несколько раз за вечер — но каждый раз меняй в ней одну деталь.',
-  'Софья': 'Ты знала о сюрпризе с самого начала — держи лицо. Минимум трижды за вечер скажи «я тут ни при чём» без всякого повода.',
-};
+/* ---------- 16. ТАЙНЫЕ ЗАДАНИЯ НА ВЕЧЕР ----------
+   Конверты анонимные: никаких имён. Задание выдаётся случайно
+   в момент вскрытия, и часть конвертов пустая — так никто не
+   знает ни чужого задания, ни того, досталось ли соседу вообще
+   хоть что-нибудь.                                            */
+/* Шаблоны: {а|б|в} — случайный вариант при вскрытии конверта.
+   Так даже одинаковая основа выглядит по-разному, и вычислить,
+   у кого какое задание, почти невозможно. */
+const MISSIONS = [
+  'Каждый раз, когда кто-то говорит «спасибо», отвечай «{занесено в протокол|учтено|принято к сведению}». Ни разу не объясняй почему.',
+  '{Три|Четыре|Пять} раза за вечер скажи «а вот у нас было по-другому» — про любую мелочь, от салата до музыки.',
+  'Про {три|четыре} разные вещи скажи между делом: «у меня похожее, но получше». Спокойно, без нажима.',
+  'Весь вечер называй именинника «{шеф|командир|маэстро}» — как будто так всегда и было.',
+  'Оценивай любой напиток вслух с видом сомелье, даже воду. Минимум {три|четыре} раза и обязательно со словом «{танины|послевкусие|минеральность}».',
+  'Найди повод {два|три} раза употребить в обычном разговоре слово «{единорог|кальмар|акведук|вторник}».',
+  'Похвали {трёх|четырёх} разных людей за наряд так искренне, будто это последний писк парижской моды.',
+  'Предложи {четверым|пятерым} помочь что-нибудь донести или подвинуть, даже если помощь совсем не нужна.',
+  'Сфотографируй еду или бокал как для журнала {три|четыре} раза, вслух комментируя свет и композицию.',
+  'Расскажи одну и ту же историю {двум|трём} разным людям, каждый раз меняя в ней ровно одну деталь.',
+  '{Два|Три} раза незаметно поменяй местами два предмета на столе и проверь, заметит ли кто-нибудь.',
+  'Весь вечер держись версии, что где-то в доме спрятана ещё одна бутылка. Повтори это минимум {два|три} раза разным людям.',
+  'Заведи с кем-нибудь долгий серьёзный разговор про {космос и НЛО|глубоководных рыб|древний Рим} с абсолютно честным лицом.',
+  '{Два|Три} раза за вечер начни фразу со слов «как говорил мой дед…» и придумай цитату прямо на ходу.',
+  'Собери у {трёх|четырёх} гостей автограф на салфетке, представившись коллекционером.',
+  'Каждый раз, когда звучит тост, поднимай {левую|правую} руку чуть выше остальных. Не комментируй.',
+  '{Два|Три} раза спроси у разных людей, который час, — даже если только что смотрел на часы.',
+  'Убеди {одного человека|двух человек} потанцевать, не приглашая словами: просто начни танцевать рядом.',
+  'Весь вечер утверждай, что вы с кем-то из гостей уже {дважды|трижды} где-то виделись, но не помнишь где.',
+  '{Три|Четыре} раза за вечер скажи «я как раз об этом думал» с абсолютно серьёзным видом.',
+  'Незаметно собери со стола {три|четыре} салфетки и сложи их себе в карман. Никому не показывай.',
+  'Каждый раз, когда кто-то смеётся, задержи на нём взгляд на секунду дольше обычного. Минимум {четыре|пять} раз.',
+  '{Два|Три} раза скажи кому-нибудь «только между нами» и сообщи абсолютно безобидную мелочь.',
+  'Весь вечер держи при себе один и тот же предмет ({вилку|салфетку|пробку}) и не выпускай его из рук дольше минуты.',
+];
+
+const missionState = { taken: [] };
+
+function fillTemplate(tpl) {
+  return tpl.replace(/\{([^}]+)\}/g, (_, group) => {
+    const opts = group.split('|');
+    return opts[Math.floor(Math.random() * opts.length)];
+  });
+}
+
+/* Если хозяин раздал парам разные ссылки (?g=1, ?g=2, …), конверты
+   берутся из непересекающихся мест списка — совпадения исключены. */
+function envelopeTemplates() {
+  const g = parseInt(new URLSearchParams(location.search).get('g'), 10);
+  if (Number.isInteger(g) && g > 0) {
+    const i = ((g - 1) * 2) % MISSIONS.length;
+    return [MISSIONS[i], MISSIONS[(i + 1) % MISSIONS.length]];
+  }
+  return null;
+}
+const fixedPair = envelopeTemplates();
+let fixedIndex = 0;
+
+function drawEnvelope() {
+  let tpl;
+  if (fixedPair) {
+    tpl = fixedPair[fixedIndex % fixedPair.length];
+    fixedIndex++;
+  } else {
+    const pool = MISSIONS.filter((m) => !missionState.taken.includes(m));
+    const list = pool.length ? pool : MISSIONS;
+    tpl = list[Math.floor(Math.random() * list.length)];
+  }
+  missionState.taken.push(tpl);
+  return fillTemplate(tpl);
+}
 
 function resetMissions() {
+  missionState.taken = [];
+  fixedIndex = 0;
   const card = document.getElementById('mission-card');
   card.hidden = true;
   document.getElementById('mission-text').textContent = '';
-  document.querySelectorAll('.mission-btn').forEach((b) => b.classList.remove('used', 'active'));
+  document.querySelectorAll('.envelope').forEach((env) => {
+    env.classList.remove('opened');
+    env.disabled = false;
+    env.querySelector('.env-state').textContent = 'не вскрыт';
+  });
 }
 
-document.querySelectorAll('.mission-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    const name = btn.dataset.name;
+document.querySelectorAll('.envelope').forEach((env) => {
+  env.addEventListener('click', () => {
+    if (env.classList.contains('opened')) return;
     const card = document.getElementById('mission-card');
-    document.getElementById('mission-eyebrow').textContent = `Тайное задание · ${name}`;
+    env.classList.add('opened');
+    env.disabled = true;
+    env.querySelector('.env-state').textContent = 'вскрыт';
+    document.getElementById('mission-eyebrow').textContent = 'Задание на весь вечер · только для тебя';
     card.hidden = false;
-    card.dataset.name = name;
-    typewrite(document.getElementById('mission-text'), GUEST_MISSIONS[name] || '', 16);
-    document.querySelectorAll('.mission-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
+    typewrite(document.getElementById('mission-text'), drawEnvelope(), 16);
   });
 });
 
 document.getElementById('mission-hide-btn').addEventListener('click', () => {
   const card = document.getElementById('mission-card');
-  const name = card.dataset.name;
   card.hidden = true;
   document.getElementById('mission-text').textContent = '';
-  const btn = document.querySelector(`.mission-btn[data-name="${name}"]`);
-  if (btn) btn.classList.add('used');
 });
 
 /* ---------- 17. ПРИГЛАШЕНИЕ: КАЛЕНДАРЬ, КАРТЫ, QR ---------- */
@@ -936,25 +1010,6 @@ document.getElementById('add-calendar').addEventListener('click', () => {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
-
-function renderQR(text) {
-  const box = document.getElementById('qr-code');
-  const block = document.querySelector('.qr-block');
-  box.innerHTML = '';
-  if (!window.QRCode) {
-    if (block) block.hidden = true;
-    return;
-  }
-  if (block) block.hidden = false;
-  new QRCode(box, {
-    text,
-    width: 168,
-    height: 168,
-    colorDark: '#241f13',
-    colorLight: '#fffaf0',
-    correctLevel: QRCode.CorrectLevel.M,
-  });
-}
 
 const addressQuery = encodeURIComponent('Строитель, улица Северная, 52');
 document.getElementById('map-yandex').href = `https://yandex.ru/maps/?text=${addressQuery}`;

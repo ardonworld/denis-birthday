@@ -99,31 +99,27 @@
         <a class="btn btn-ghost" id="map-google" href="#" target="_blank" rel="noopener">Google Maps</a>
       </div>
 
-      <div class="qr-block">
-        <p class="invite-label">Приз расследования — координаты в одно касание</p>
-        <div id="qr-code"></div>
-      </div>
-
       <div class="mission-block">
         <p class="case-stamp mission-stamp">Совершенно секретно</p>
-        <p class="mission-intro">У каждого гостя — своё запечатанное задание на весь вечер. Найди своё имя, прочти и передай телефон дальше, не показывая, что там написано.</p>
+        <p class="mission-intro">Два запечатанных конверта — по одному на человека. Строго по очереди: открыл — прочитал — закрыл — передал. Задание получает <b>каждый</b>, но своё видишь только ты: имён нет, конверты раздаются вслепую. Ни о задании, ни о самих конвертах за столом лучше не заикаться — весь смысл в том, чтобы весь вечер вычислять, кто что делает.</p>
 
-        <div class="mission-picker" id="mission-picker">
-          <button class="btn btn-ghost mission-btn" data-name="Никита">Никита</button>
-          <button class="btn btn-ghost mission-btn" data-name="Алёна">Алёна</button>
-          <button class="btn btn-ghost mission-btn" data-name="Денис">Денис</button>
-          <button class="btn btn-ghost mission-btn" data-name="Даша">Даша</button>
-          <button class="btn btn-ghost mission-btn" data-name="Мигаль">Мигаль</button>
-          <button class="btn btn-ghost mission-btn" data-name="Матвей">Матвей</button>
-          <button class="btn btn-ghost mission-btn" data-name="Лера">Лера</button>
-          <button class="btn btn-ghost mission-btn" data-name="Артём">Артём</button>
-          <button class="btn btn-ghost mission-btn" data-name="Софья">Софья</button>
+        <div class="envelope-row" id="envelope-row">
+          <button class="envelope" type="button" data-slot="1">
+            <span class="env-seal">✦</span>
+            <span class="env-label">конверт</span>
+            <span class="env-state">не вскрыт</span>
+          </button>
+          <button class="envelope" type="button" data-slot="2">
+            <span class="env-seal">✦</span>
+            <span class="env-label">конверт</span>
+            <span class="env-state">не вскрыт</span>
+          </button>
         </div>
 
         <div class="mission-card" id="mission-card" hidden>
-          <p class="mission-eyebrow" id="mission-eyebrow">Тайное задание</p>
+          <p class="mission-eyebrow" id="mission-eyebrow">Вскрыто</p>
           <p class="mission-text" id="mission-text"></p>
-          <button class="btn btn-primary mission-hide-btn" id="mission-hide-btn">Запомнил(а) · Скрыть и передать</button>
+          <button class="btn btn-primary mission-hide-btn" id="mission-hide-btn">Запомнил(а) · Закрыть и передать</button>
         </div>
       </div>
 
@@ -145,7 +141,6 @@
 <div class="detail-store" id="detail-store" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="main.js"></script>
 </body>
 </html>
