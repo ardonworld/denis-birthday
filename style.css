@@ -93,6 +93,11 @@ html,body{
   pointer-events: auto;
 }
 
+/* Экраны квеста и приглашения — карточки почти на весь экран, фон без изменений */
+#screen-quest, #screen-invite{
+  padding: 2.5vh 3vw;
+}
+
 .glow{
   position: absolute;
   top: 12%; left: 50%;
@@ -263,8 +268,8 @@ html,body{
 
 /* ---------- ЭКРАН: КВЕСТ-РАССЛЕДОВАНИЕ ---------- */
 .quest-wrap{
-  width: min(480px, 92vw);
-  max-height: 88dvh;
+  width: min(760px, 96vw);
+  max-height: 95dvh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -278,6 +283,7 @@ html,body{
   justify-content: space-between;
   margin-bottom: 6px;
   padding: 0 4px;
+  flex-shrink: 0;
 }
 .case-stamp{
   font-family: var(--label);
@@ -351,6 +357,7 @@ html,body{
   justify-content: center;
   gap: 10px;
   margin-bottom: 4px;
+  flex-shrink: 0;
 }
 .quest-tray-label{
   font-family: var(--label);
@@ -384,10 +391,15 @@ html,body{
   color: var(--label-ink);
   border: 2px solid var(--card-border);
   border-radius: 6px;
-  padding: 24px 22px;
+  padding: clamp(22px, 4vw, 34px);
   text-align: left;
   box-shadow: 0 16px 46px rgba(0,0,0,0.4);
   animation: card-enter .55s ease both;
+  min-height: min(64vh, 560px);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .quest-card[hidden]{ display: none; }
 #clue-visual{ --tilt: -0.6deg; }
@@ -637,8 +649,8 @@ html,body{
 /* ---------- ЭКРАН: ПРИГЛАШЕНИЕ (этикетка) ---------- */
 .invite-card{
   position: relative;
-  width: min(460px, 92vw);
-  max-height: 88dvh;
+  width: min(680px, 96vw);
+  max-height: 95dvh;
   overflow-y: auto;
   background: var(--card-bg);
   color: var(--label-ink);
