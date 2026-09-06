@@ -22,6 +22,7 @@
   --serif: 'Playfair Display', Georgia, serif;
   --label: 'Bebas Neue', 'Oswald', Impact, sans-serif;
   --sans: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  --typewriter: 'Special Elite', var(--sans), monospace;
 }
 
 *{ box-sizing: border-box; }
@@ -43,6 +44,30 @@ html,body{
   background:
     radial-gradient(90% 70% at 50% 8%, rgba(226,137,46,0.16) 0%, rgba(226,137,46,0) 55%),
     radial-gradient(120% 100% at 50% 100%, #102a1e 0%, #081108 55%, #050604 100%);
+}
+
+/* Плёночное зерно и виньетка — атмосфера детективного досье (detectit.ru) */
+#vignette{
+  position: fixed; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(120% 100% at 50% 45%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%);
+}
+#grain{
+  position: fixed; inset: -20px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 1s steps(4) infinite;
+}
+@keyframes grain-shift{
+  0%{ transform: translate(0,0); }
+  25%{ transform: translate(-2%,1%); }
+  50%{ transform: translate(1%,-2%); }
+  75%{ transform: translate(-1%,2%); }
+  100%{ transform: translate(0,0); }
 }
 
 #app{
@@ -247,6 +272,39 @@ html,body{
   padding-bottom: 10px;
 }
 
+.case-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding: 0 4px;
+}
+.case-stamp{
+  font-family: var(--label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--wine);
+  border: 1px solid rgba(122,31,34,0.45);
+  padding: 5px 11px;
+  border-radius: 3px;
+  background: rgba(122,31,34,0.06);
+  transform: rotate(-3deg);
+  display: inline-block;
+}
+.case-timer{
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(18px, 4vw, 22px);
+  color: var(--amber-light);
+  letter-spacing: 0.04em;
+  padding: 4px 12px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 4px;
+  background: rgba(0,0,0,0.3);
+}
+.case-timer.warn{ color: #ff7a68; border-color: #ff7a68; }
+
 .quest-tray{
   display: flex;
   align-items: center;
@@ -279,15 +337,21 @@ html,body{
 }
 
 .quest-card{
-  background: var(--card-bg);
+  background:
+    repeating-linear-gradient(0deg, rgba(122,90,40,0.04) 0px, rgba(122,90,40,0.04) 1px, transparent 1px, transparent 3px),
+    var(--card-bg);
   color: var(--label-ink);
   border: 2px solid var(--card-border);
   border-radius: 6px;
   padding: 24px 22px;
   text-align: left;
   box-shadow: 0 16px 46px rgba(0,0,0,0.4);
+  transition: opacity .4s ease;
 }
 .quest-card[hidden]{ display: none; }
+#clue-visual{ transform: rotate(-0.6deg); }
+#clue-logic{ transform: rotate(0.5deg); }
+#clue-final{ transform: rotate(-0.4deg); }
 
 .quest-eyebrow{
   font-family: var(--label);
@@ -298,11 +362,18 @@ html,body{
   margin: 0 0 10px;
 }
 .quest-riddle{
-  font-size: 14.5px;
-  line-height: 1.6;
+  font-family: var(--typewriter);
+  font-size: 13.5px;
+  line-height: 1.75;
   color: var(--label-ink);
   margin: 0 0 18px;
+  min-height: 3.5em;
 }
+.quest-riddle.typing::after{
+  content: '▌';
+  animation: blink-cursor 0.9s steps(2) infinite;
+}
+@keyframes blink-cursor{ 50%{ opacity: 0; } }
 
 .bottle-row{
   display: flex;
@@ -515,6 +586,61 @@ html,body{
   color: var(--wine);
 }
 .invite-actions .btn-ghost:hover{ background: rgba(122,31,34,0.08); }
+
+.mission-block{
+  margin: 24px 0 20px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(122,31,34,0.3);
+}
+.mission-stamp{ margin: 0 auto 12px; }
+.mission-intro{
+  font-size: 12.5px;
+  color: var(--label-ink-dim);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+.mission-picker{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.mission-btn{ flex: 1 1 auto; }
+.mission-btn.used{ opacity: 0.4; }
+.mission-btn.active{ background: rgba(122,31,34,0.1); }
+
+.mission-card{
+  background: #fffaf0;
+  border: 2px dashed var(--wine);
+  border-radius: 6px;
+  padding: 20px;
+  text-align: left;
+}
+.mission-eyebrow{
+  font-family: var(--label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--wine);
+  margin: 0 0 10px;
+}
+.mission-text{
+  font-family: var(--typewriter);
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--label-ink);
+  margin: 0 0 16px;
+  min-height: 3em;
+}
+.mission-text.typing::after{
+  content: '▌';
+  animation: blink-cursor 0.9s steps(2) infinite;
+}
+.mission-hide-btn{
+  width: 100%;
+  font-size: 13px;
+  padding: 12px 18px;
+}
 
 .replay-link{
   background: none;

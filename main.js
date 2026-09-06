@@ -210,7 +210,57 @@ function bottleSVG(color) {
   </svg>`;
 }
 
-const quest = { visualDone: false, logicDone: false };
+const quest = { visualDone: false, logicDone: false, timerId: null };
+const QUEST_SECONDS = 240;
+
+/* Эффект печатной машинки для текста улик — атмосфера детективного досье */
+function typewrite(el, text, speed) {
+  clearInterval(el._typeTimer);
+  el.textContent = '';
+  el.classList.add('typing');
+  let i = 0;
+  el._typeTimer = setInterval(() => {
+    i++;
+    el.textContent = text.slice(0, i);
+    if (i >= text.length) {
+      clearInterval(el._typeTimer);
+      el.classList.remove('typing');
+    }
+  }, speed || 18);
+}
+
+function revealRiddle(cardId) {
+  const p = document.querySelector(`#${cardId} .quest-riddle`);
+  if (p && p.dataset.text) typewrite(p, p.dataset.text, 16);
+}
+
+function formatClock(totalSeconds) {
+  const m = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const s = String(totalSeconds % 60).padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function startQuestTimer() {
+  const el = document.getElementById('quest-timer');
+  let remaining = QUEST_SECONDS;
+  el.textContent = formatClock(remaining);
+  el.classList.remove('warn');
+  clearInterval(quest.timerId);
+  quest.timerId = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(quest.timerId);
+      el.textContent = 'Не спеши';
+      return;
+    }
+    el.textContent = formatClock(remaining);
+    el.classList.toggle('warn', remaining <= 30);
+  }, 1000);
+}
+
+function stopQuestTimer() {
+  clearInterval(quest.timerId);
+}
 
 function renderBottleRow() {
   const row = document.getElementById('bottle-row');
@@ -236,6 +286,7 @@ function onBottleClick(key, btn) {
     document.getElementById('clue-visual').style.opacity = '0.55';
     document.getElementById('clue-visual').style.pointerEvents = 'none';
     document.getElementById('clue-logic').hidden = false;
+    revealRiddle('clue-logic');
     checkQuestComplete();
   } else {
     btn.classList.remove('shake');
@@ -254,6 +305,7 @@ function setChip(id, text) {
 function checkQuestComplete() {
   if (quest.visualDone && quest.logicDone) {
     document.getElementById('clue-final').hidden = false;
+    revealRiddle('clue-final');
   }
 }
 
@@ -315,14 +367,18 @@ function resetQuest() {
   document.getElementById('logic-input').value = '';
   document.getElementById('final-input').value = '';
   renderBottleRow();
+  resetMissions();
 }
 
 function startQuest() {
   resetQuest();
   showScreen('quest');
+  revealRiddle('clue-visual');
+  startQuestTimer();
 }
 
 function finishQuest() {
+  stopQuestTimer();
   showScreen('result');
   setTimeout(openInvite, 2400);
 }
@@ -351,7 +407,61 @@ function openInvite() {
     })();
   }
   renderQR(`https://yandex.ru/maps/?text=${addressQuery}`);
+  shuffleMissions();
 }
+
+/* =========================================================
+   3.1 СЕКРЕТНОЕ ЗАДАНИЕ НА ВЕЧЕР
+   Каждый гость открывает свой конверт и не видит чужой —
+   задание нужно выполнять незаметно весь вечер.
+   ========================================================= */
+const MISSION_POOL = [
+  'Весь вечер называй Дениса только «шеф» — как будто это совершенно нормально.',
+  'Трижды за вечер незаметно чокнись сам с собой, будто произносишь тост в уме.',
+  'Заведи с кем-нибудь разговор про космос и НЛО с максимально серьёзным лицом.',
+  'Каждый раз, когда кто-то скажет «привет», отвечай «замечено» — и не объясняй почему.',
+  'Собери у трёх разных гостей автограф на салфетке, представившись коллекционером.',
+  'Один раз за вечер начни аплодировать без причины — и посмотри, кто подхватит.',
+  'Похвали чей-то наряд так искренне, будто это последний писк парижской моды.',
+  'Придумай Денису новое прозвище и называй его так весь вечер, как будто оно всегда было.',
+  'Найди повод трижды за вечер использовать слово «единорог» в обычном разговоре.',
+  'Убеди хотя бы одного человека потанцевать — просто начни танцевать рядом с ним.',
+];
+let missionAssignment = [];
+
+function shuffleMissions() {
+  const pool = [...MISSION_POOL].sort(() => Math.random() - 0.5);
+  missionAssignment = [pool[0], pool[1]];
+}
+
+function resetMissions() {
+  const card = document.getElementById('mission-card');
+  card.hidden = true;
+  document.getElementById('mission-text').textContent = '';
+  document.querySelectorAll('.mission-btn').forEach((b) => b.classList.remove('used', 'active'));
+}
+
+document.querySelectorAll('.mission-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const slot = Number(btn.dataset.slot);
+    const card = document.getElementById('mission-card');
+    const textEl = document.getElementById('mission-text');
+    card.hidden = false;
+    card.dataset.slot = String(slot);
+    typewrite(textEl, missionAssignment[slot], 16);
+    document.querySelectorAll('.mission-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('mission-hide-btn').addEventListener('click', () => {
+  const card = document.getElementById('mission-card');
+  const slot = card.dataset.slot;
+  card.hidden = true;
+  document.getElementById('mission-text').textContent = '';
+  const btn = document.querySelector(`.mission-btn[data-slot="${slot}"]`);
+  if (btn) btn.classList.add('used');
+});
 
 function renderQR(text) {
   const container = document.getElementById('qr-code');
