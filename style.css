@@ -299,10 +299,10 @@ html, body{
 .board-canvas{
   position: relative;
   width: 100%;
-  height: 1640px;
+  height: 2300px;
 }
 @media (min-width: 700px){
-  .board-canvas{ height: 1320px; }
+  .board-canvas{ height: 2100px; }
 }
 .board-strings{
   position: absolute;
@@ -359,7 +359,10 @@ html, body{
 
 /* ---- полароид ---- */
 .polaroid{
-  width: clamp(86px, 23vw, 142px);
+  width: clamp(84px, 22vw, 120px);
+}
+.polaroid.is-evidence .frame{
+  box-shadow: 0 8px 16px rgba(0,0,0,0.5), 0 0 0 2px rgba(226,137,46,0.55);
 }
 .polaroid .frame{
   display: block;
@@ -718,6 +721,90 @@ html, body{
   75%{ transform: translateX(6px); }
 }
 .bottle-btn svg{ display: block; }
+
+.bottle-btn{ display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.bottle-name{
+  font-family: var(--type);
+  font-size: 9.5px;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+
+/* ---- выбор одежды на снимке ---- */
+.outfit-row{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.outfit-btn{
+  background: rgba(255,250,240,0.5);
+  border: 1px solid rgba(140,36,32,0.2);
+  border-radius: 4px;
+  padding: 6px 3px 5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: transform .2s ease, background .2s ease;
+}
+.outfit-btn:hover{ background: rgba(140,36,32,0.09); transform: translateY(-3px); }
+.outfit-btn.shake{ animation: shake .35s ease; }
+.outfit-shot{
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1.05;
+  background: linear-gradient(170deg, #4a453c, #191612);
+  overflow: hidden;
+}
+.outfit-shot svg{ width: 100%; height: 100%; display: block; }
+.outfit-name{
+  font-family: var(--type);
+  font-size: 9px;
+  line-height: 1.2;
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+/* ---- сейф с четырьмя замками ---- */
+.safe-form{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.safe-lock{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(140,36,32,0.2);
+  background: rgba(255,250,240,0.45);
+}
+.safe-lock label{
+  font-family: var(--label);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.safe-lock input{
+  font-family: var(--type);
+  font-size: 15px;
+  padding: 9px 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(140,36,32,0.3);
+  background: var(--paper-warm);
+  color: var(--ink);
+  width: 100%;
+}
+.safe-lock input:focus{ outline: none; border-color: var(--wine); }
+.safe-lock-name{ border-color: rgba(140,36,32,0.5); background: rgba(140,36,32,0.06); }
+.safe-lock-name label{ color: var(--wine); }
+.safe-lock.lock-ok{ border-color: #3f7d4a; background: rgba(63,125,74,0.1); }
+.safe-lock.lock-ok label::after{ content: ' ✓'; color: #3f7d4a; }
+.safe-lock.lock-bad{ border-color: var(--wine-bright); background: rgba(192,57,43,0.08); }
+.safe-submit{ width: 100%; margin-top: 4px; }
 
 /* ---- формы ---- */
 .d-form{

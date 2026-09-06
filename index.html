@@ -29,8 +29,8 @@
         <p class="folder-eyebrow">Отдел особо выдержанных дел</p>
         <h1 class="folder-title">Пропавший<br>купаж</h1>
         <div class="folder-photo-strip" id="folder-photo-strip"></div>
-        <p class="folder-note">Похищена бутылка особой выдержки — та самая, что должны были откупорить на дне рождения <b>Дениса Федука</b>. Семь свидетелей, три улики, один старый сейф.</p>
-        <p class="folder-handwriting">найди координаты до начала торжества</p>
+        <p class="folder-note">Похищена бутылка особой выдержки — та самая, что должны были откупорить на дне рождения <b>Дениса Федука</b>. Девять свидетелей, четыре улики, один старый сейф на четыре замка.</p>
+        <p class="folder-handwriting">ни одна улика не решается в одиночку —<br>читай показания все до одного</p>
         <button class="btn btn-primary" id="start-btn">Открыть доску расследования</button>
       </div>
     </div>
@@ -40,15 +40,15 @@
   <section class="screen" id="screen-quest">
     <div class="board-header">
       <span class="case-stamp">Дело № 24 · Секретно</span>
-      <span class="case-progress" id="case-progress">Улик: 0 / 2</span>
-      <span class="case-timer" id="quest-timer">06:00</span>
+      <span class="case-progress" id="case-progress">Улик: 0 / 4</span>
+      <span class="case-timer" id="quest-timer">30:00</span>
     </div>
     <div class="board-viewport" id="board-viewport">
       <div class="board-canvas" id="board-canvas">
         <svg class="board-strings" id="board-strings" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
         <!-- предметы доски генерируются в main.js -->
       </div>
-      <p class="board-hint" id="board-hint">Листай доску и нажимай на улики</p>
+      <p class="board-hint" id="board-hint">Листай доску · читай всех свидетелей · улики в жёлтой рамке</p>
     </div>
   </section>
 
@@ -117,6 +117,7 @@
           <button class="btn btn-ghost mission-btn" data-name="Матвей">Матвей</button>
           <button class="btn btn-ghost mission-btn" data-name="Лера">Лера</button>
           <button class="btn btn-ghost mission-btn" data-name="Артём">Артём</button>
+          <button class="btn btn-ghost mission-btn" data-name="Софья">Софья</button>
         </div>
 
         <div class="mission-card" id="mission-card" hidden>

@@ -2,6 +2,9 @@
    ДЕЛО № 24 — «ПРОПАВШИЙ КУПАЖ»
    Весь сайт — доска расследования: улики приколоты к столу,
    по клику улика приближается к зрителю и открывает содержимое.
+
+   Четыре улики нельзя решить по отдельности — ответы разбросаны
+   по показаниям девяти свидетелей, читать нужно всё.
    ========================================================= */
 
 /* ---------- 1. ЭКРАНЫ ---------- */
@@ -21,6 +24,7 @@ function showScreen(name) {
 const FIG = '#918978';
 const FIG_2 = '#6f6858';
 const FIG_3 = '#b3ab99';
+const FIG_LIGHT = '#cdc5b1';
 
 function silhouette(kind) {
   const open = '<svg viewBox="0 0 100 102" xmlns="http://www.w3.org/2000/svg">';
@@ -56,12 +60,23 @@ function silhouette(kind) {
       <circle cx="50" cy="40" r="16" fill="${FIG}"/>
       <path d="M31 34c0-11 8-19 19-19s19 8 19 19z" fill="${FIG_2}"/>
       <rect x="24" y="33" width="52" height="5" rx="2.5" fill="${FIG_2}"/>`,
-    duo: `
-      <path d="M14 102c0-14 9-23 21-23s21 9 21 23z" fill="${FIG_2}"/>
-      <circle cx="35" cy="55" r="13" fill="${FIG_2}"/>
-      <path d="M46 102c0-13 9-22 20-22s20 9 20 22z" fill="${FIG}"/>
-      <path d="M52 76c0-11 6-18 14-18s14 7 14 18c0 8-2 13-3 16H55c-1-3-3-8-3-16z" fill="${FIG}"/>
-      <circle cx="66" cy="58" r="12" fill="${FIG}"/>`,
+    curly: `
+      <path d="M24 102c0-17 11-28 26-28s26 11 26 28z" fill="${FIG}"/>
+      <circle cx="50" cy="40" r="16" fill="${FIG}"/>
+      <circle cx="35" cy="28" r="8" fill="${FIG_2}"/>
+      <circle cx="50" cy="22" r="9" fill="${FIG_2}"/>
+      <circle cx="65" cy="28" r="8" fill="${FIG_2}"/>`,
+    dressLady: `
+      <path d="M50 60l-20 42h40z" fill="${FIG_LIGHT}"/>
+      <path d="M38 58c0-9 5-15 12-15s12 6 12 15z" fill="${FIG_LIGHT}"/>
+      <circle cx="50" cy="30" r="14" fill="${FIG}"/>
+      <path d="M34 44c0-14 6-22 16-22s16 8 16 22c-4-8-9-11-16-11s-12 3-16 11z" fill="${FIG_2}"/>`,
+    beard: `
+      <path d="M22 102c0-18 12-30 28-30s28 12 28 30z" fill="${FIG}"/>
+      <circle cx="50" cy="37" r="17" fill="${FIG}"/>
+      <path d="M35 44c0 9 7 14 15 14s15-5 15-14c0 0-4 5-15 5s-15-5-15-5z" fill="${FIG_2}"/>
+      <path d="M32 32c1-12 9-18 18-18s17 6 18 18c-5-7-11-9-18-9s-13 2-18 9z" fill="${FIG_2}"/>`,
+    /* предметные снимки */
     bottleShot: `
       <rect x="42" y="16" width="16" height="18" rx="2" fill="${FIG_2}"/>
       <path d="M36 34h28v10c0 6 7 9 7 20v32a7 7 0 0 1-7 7H36a7 7 0 0 1-7-7V64c0-11 7-14 7-20z" fill="${FIG}"/>
@@ -73,12 +88,47 @@ function silhouette(kind) {
       <rect x="35" y="41" width="22" height="2.5" fill="${FIG_2}" opacity="0.7"/>
       <rect x="35" y="49" width="26" height="2.5" fill="${FIG_2}" opacity="0.7"/>
       <rect x="35" y="60" width="18" height="4" fill="${FIG_2}"/>`,
+    clockShot: `
+      <circle cx="50" cy="51" r="34" fill="none" stroke="${FIG}" stroke-width="5"/>
+      <circle cx="50" cy="51" r="3" fill="${FIG}"/>
+      <path d="M50 51V26" stroke="${FIG}" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M50 51l15 9" stroke="${FIG_3}" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="50" cy="20" r="2.5" fill="${FIG_2}"/>
+      <circle cx="81" cy="51" r="2.5" fill="${FIG_2}"/>
+      <circle cx="50" cy="82" r="2.5" fill="${FIG_2}"/>
+      <circle cx="19" cy="51" r="2.5" fill="${FIG_2}"/>`,
+    stairsShot: `
+      <path d="M0 102h30V80h22V58h22V36h26" stroke="${FIG_2}" stroke-width="6" fill="none"/>
+      <path d="M62 52l-9 22h18z" fill="${FIG_LIGHT}" opacity="0.9"/>
+      <path d="M56 51c0-6 3-10 7-10s7 4 7 10z" fill="${FIG_LIGHT}" opacity="0.9"/>
+      <circle cx="63" cy="33" r="8" fill="${FIG}" opacity="0.85"/>`,
+    /* варианты одежды для опознания */
+    figSuit: `
+      <path d="M50 40l-14 6v56h28V46z" fill="${FIG_2}"/>
+      <path d="M50 46l-7 4 7 9 7-9z" fill="${FIG_3}"/>
+      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
+    figDress: `
+      <path d="M50 48L32 102h36z" fill="${FIG_LIGHT}"/>
+      <path d="M40 47c0-8 4-13 10-13s10 5 10 13z" fill="${FIG_LIGHT}"/>
+      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
+    figSport: `
+      <path d="M30 52c0-9 9-15 20-15s20 6 20 15v22H30z" fill="${FIG_3}"/>
+      <rect x="34" y="76" width="32" height="26" fill="${FIG_2}"/>
+      <rect x="20" y="52" width="8" height="30" rx="4" fill="${FIG}"/>
+      <rect x="72" y="52" width="8" height="30" rx="4" fill="${FIG}"/>
+      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
+    figCoat: `
+      <path d="M50 38l-17 8v56h34V46z" fill="${FIG}"/>
+      <path d="M50 46v56" stroke="${FIG_2}" stroke-width="2.5"/>
+      <path d="M33 46l8-6 9 6-9 8z" fill="${FIG_2}"/>
+      <path d="M67 46l-8-6-9 6 9 8z" fill="${FIG_2}"/>
+      <circle cx="50" cy="24" r="12" fill="${FIG}"/>`,
   };
   return open + (shapes[kind] || shapes.man) + close;
 }
 
 function bottleSVG(color, w) {
-  const width = w || 40;
+  const width = w || 38;
   return `<svg width="${width}" height="${Math.round(width * 2.05)}" viewBox="0 0 44 90" xmlns="http://www.w3.org/2000/svg">
     <rect x="16" y="0" width="12" height="16" rx="2" fill="#b8a06a"/>
     <path d="M10 16h24v9c0 5 6 8 6 17v38a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V42c0-9 6-12 6-17z"
@@ -115,88 +165,136 @@ function mapSVG() {
 /* Мини-снимки на обложке папки */
 const strip = document.getElementById('folder-photo-strip');
 if (strip) {
-  strip.innerHTML = ['man', 'bottleShot', 'woman']
+  strip.innerHTML = ['man', 'bottleShot', 'dressLady']
     .map((k) => `<div class="mini-shot">${silhouette(k)}</div>`).join('');
 }
 
-/* ---------- 3. КОНФИГ ДОСКИ ---------- */
-const FRAGMENT_A = 'ЛЕС';
-const FRAGMENT_B = '2002';
+/* ---------- 3. ОТВЕТЫ ---------- */
+const FRAG = { a: 'ЛЕС', b: '2002', c: '00:22', d: 'СВЕТЛОЕ ПЛАТЬЕ' };
+const CULPRIT = ['софья', 'софия', 'соня'];
 
+/* ---------- 4. КОНФИГ ДОСКИ ---------- */
 const BOARD_ITEMS = [
   {
-    id: 'brief', type: 'note', x: 50, y: 4.5, rot: -1.2,
+    id: 'brief', type: 'note', x: 50, y: 3.5, rot: -1.2,
     head: 'Дело № 24 · рапорт',
-    body: 'Ночью из погреба «3 Резиденции» пропал купаж особой выдержки.',
+    body: 'Ночью из погреба «3 Резиденции» пропала бутылка особой выдержки.',
     more: 'нажми — прочесть целиком',
     detail: {
       eyebrow: 'Инспектор Бочкарёв · вечерняя смена',
-      text: 'Ночью из погреба пропала бутылка особой выдержки — та самая, что должны были откупорить сегодня на дне рождения Дениса Федука. Замок цел, окно закрыто, на крышке пустой бочки — свежий скол. Сторож клянётся, что почувствовал смолистый хвойный запах, будто бутылку пронесли через лес, а не через погреб. Семеро гостей уже дали показания — они на доске. Собери две улики, и старый сейф отдаст координаты.',
+      text: 'Замок цел, окно закрыто, свет в погребе кто-то выключил. На полу — еловые иголки, на крышке ящика свежий скол. Девять человек были в доме и все дали показания. Четыре улики ждут разбора, но по отдельности ни одна не сходится: ответ на каждую спрятан в чужих словах. Читайте всех, сверяйте время, вычёркивайте лишнее. Сейф в кабинете откроется, только когда сойдутся все четыре замка — и когда вы назовёте того, кто спускался в погреб.',
       sign: '— Бочкарёв',
     },
   },
+
+  /* ---- свидетели ---- */
   {
-    id: 'nikita', type: 'polaroid', fig: 'man', x: 20, y: 14, rot: -4.5, label: 'Никита',
+    id: 'nikita', type: 'polaroid', fig: 'man', x: 20, y: 11, rot: -4.5, label: 'Никита',
     detail: {
-      eyebrow: 'Свидетель · знаток напитков',
-      fig: 'man',
-      shotCap: 'Никита',
-      quote: '«Я пробовал этот купаж полгода назад. Пахло дубом и вереском — но не тем сортом, что я думал. Кто-то подменил пробку, точно говорю».',
-      sign: 'опрошен в 01:14',
+      eyebrow: 'Свидетель · разбирается в напитках',
+      fig: 'man', shotCap: 'Никита',
+      quote: '«Янтарную можете сразу вычеркнуть — мы открыли её за ужином, я сам её и допил, пустая стоит на кухне. Пропавшая пахла иначе: хвоя, смола, будто её держали в еловом ящике. Я выходил покурить в 00:10, вернулся в 00:35 — никого не встретил, к сожалению».',
+      sign: 'алиби нет',
     },
   },
   {
-    id: 'alena', type: 'polaroid', fig: 'woman', x: 75, y: 14.5, rot: 3.5, label: 'Алёна',
+    id: 'alena', type: 'polaroid', fig: 'woman', x: 74, y: 11.5, rot: 3.5, label: 'Алёна',
     detail: {
-      eyebrow: 'Свидетель · знаток напитков',
-      fig: 'woman',
-      shotCap: 'Алёна',
-      quote: '«Кто бы это ни взял — в биттерах разбирался не хуже меня. Из шести бутылок унесли самую редкую, остальные даже не тронули».',
-      sign: 'опрошена в 01:20',
+      eyebrow: 'Свидетель · разбирается в напитках',
+      fig: 'woman', shotCap: 'Алёна',
+      quote: '«Красную я узнала бы из тысячи, но её увезли ещё днём — спросите Матвея. А около полуночи в погреб спускалась фигура в светлом. Светлое в тот вечер было ровно на одном человеке, остальные все в тёмном. Я весь вечер была в зале, меня видели все».',
+      sign: 'алиби подтверждено',
     },
   },
-  { id: 'sticky1', type: 'sticky', x: 47, y: 21, rot: 4, text: '24 кольца?' },
   {
-    id: 'evidence-a', type: 'polaroid', fig: 'bottleShot', x: 25, y: 27, rot: -2.5,
+    id: 'migal', type: 'polaroid', fig: 'strong', x: 72, y: 21.5, rot: -3, label: 'Мигаль',
+    detail: {
+      eyebrow: 'Свидетель · алиби железное',
+      fig: 'strong', shotCap: 'Мигаль',
+      quote: '«Чёрная бутылка — моя минералка, не трогайте её вообще. Я с 23:30 до 00:40 был у штанги, весь зал подтвердит. И вот что важно: через главный вход за это время никто не выходил, я бы заметил. Значит, выносили через чёрный».',
+      sign: 'исключён из подозреваемых',
+    },
+  },
+  {
+    id: 'matvey', type: 'polaroid', fig: 'suit', x: 24, y: 30, rot: 2.5, label: 'Матвей',
+    detail: {
+      eyebrow: 'Свидетель',
+      fig: 'suit', shotCap: 'Матвей',
+      quote: '«Красную бутылку я забрал днём к себе домой, Алёна не даст соврать. Видел машину у чёрного входа около полуночи — не моя, моя стояла спереди. И да, Софья была в светлом платье, она специально подбирала под скатерти. Весь вечер я провёл с Лерой».',
+      sign: 'алиби подтверждено',
+    },
+  },
+  {
+    id: 'lera', type: 'polaroid', fig: 'updo', x: 70, y: 30.5, rot: -2, label: 'Лера',
+    detail: {
+      eyebrow: 'Свидетель · снимала весь вечер',
+      fig: 'updo', shotCap: 'Лера',
+      quote: '«На моём кадре 23:47 бутылка ещё стоит на стойке. Золотую я снимала до самого утра — она никуда не девалась, стояла на виду. А на одном снимке за спиной случайно попал человек, спускающийся в погреб. Отдаю снимок следствию».',
+      sign: 'снимок — улика Г',
+    },
+  },
+  {
+    id: 'sofya', type: 'polaroid', fig: 'dressLady', x: 76, y: 39, rot: 3, label: 'Софья',
+    detail: {
+      eyebrow: 'Свидетель · жена именинника',
+      fig: 'dressLady', shotCap: 'Софья',
+      quote: '«Я весь вечер встречала гостей у входа, никуда не отлучалась. Торт заказывала сама: свечей ровно столько, сколько ему исполняется — двадцать четыре. И утром я привезла еловые ветки, украшать зал, — если где-то нашли иголки, это наверняка мои».',
+      sign: 'алиби со слов свидетеля',
+    },
+  },
+  {
+    id: 'denis', type: 'polaroid', fig: 'beard', x: 22, y: 47, rot: -3.5, label: 'Денис (гость)',
+    detail: {
+      eyebrow: 'Свидетель',
+      fig: 'beard', shotCap: 'Денис',
+      quote: '«Ровно в 00:15 в погребе погас свет — я ещё пошутил про пробки. Пошёл к щитку один, провозился минут десять. Когда возвращался, у чёрного входа хлопнула дверь, но я никого не разглядел».',
+      sign: 'время отмечено точно',
+    },
+  },
+  {
+    id: 'dasha', type: 'polaroid', fig: 'curly', x: 58, y: 47.5, rot: 2, label: 'Даша',
+    detail: {
+      eyebrow: 'Свидетель',
+      fig: 'curly', shotCap: 'Даша',
+      quote: '«Сигнализация на чёрном входе пикнула ровно через семь минут после того, как погас свет, — я как раз смотрела на часы. И ещё: у главного входа в тот момент вообще никого не было, мы с Денисом сами открывали дверь опоздавшим гостям».',
+      sign: 'важно для времени',
+    },
+  },
+  {
+    id: 'artem', type: 'polaroid', fig: 'cap', x: 20, y: 64, rot: -4, label: 'Артём',
+    detail: {
+      eyebrow: 'Свидетель · нашёл квитанцию',
+      fig: 'cap', shotCap: 'Артём',
+      quote: '«Стыдно признаться: я уснул в машине с полуночи до часа ночи. Проснулся, зашёл в дом — на столе кладовщика лежала квитанция. Сфотографировал на всякий случай, вдруг пригодится следствию».',
+      sign: 'алиби нет',
+    },
+  },
+
+  /* ---- улики ---- */
+  {
+    id: 'evidence-a', type: 'polaroid', fig: 'bottleShot', x: 22, y: 21, rot: -2.5,
     label: 'Улика А', evidence: 'a',
   },
   {
-    id: 'migal', type: 'polaroid', fig: 'strong', x: 74, y: 27.5, rot: -3, label: 'Мигаль',
-    detail: {
-      eyebrow: 'Свидетель · алиби проверено',
-      fig: 'strong',
-      shotCap: 'Мигаль',
-      quote: '«Я бы вынес эту бочку одной рукой, не спорю. Но у меня железное алиби — весь зал видел меня у штанги до самой полуночи».',
-      sign: 'из подозреваемых исключён',
-    },
-  },
-  { id: 'sticky2', type: 'sticky', x: 13, y: 35, rot: -6, text: '18.09 срок!' },
-  {
-    id: 'matvey', type: 'polaroid', fig: 'suit', x: 46, y: 36.5, rot: 2.5, label: 'Матвей',
-    detail: {
-      eyebrow: 'Свидетель',
-      fig: 'suit',
-      shotCap: 'Матвей',
-      quote: '«Видел дорогую машину у чёрного входа около полуночи. Не моя, если что — моя стояла спереди, у фонаря».',
-      sign: 'опрошен в 01:32',
-    },
+    id: 'evidence-g', type: 'polaroid', fig: 'stairsShot', x: 45, y: 37.5, rot: 3.5,
+    label: 'Улика Г', evidence: 'd',
   },
   {
-    id: 'lera', type: 'polaroid', fig: 'updo', x: 79, y: 38, rot: -2, label: 'Лера',
-    detail: {
-      eyebrow: 'Свидетель',
-      fig: 'updo',
-      shotCap: 'Лера',
-      quote: '«Матвей весь вечер был рядом со мной. И да — я сфотографировала ужин, на снимке видно время: 23:47».',
-      sign: 'фото приобщено к делу',
-    },
+    id: 'evidence-v', type: 'polaroid', fig: 'clockShot', x: 30, y: 55.5, rot: -2,
+    label: 'Улика В', evidence: 'c',
   },
   {
-    id: 'evidence-b', type: 'polaroid', fig: 'receiptShot', x: 24, y: 46.5, rot: 3,
+    id: 'evidence-b', type: 'polaroid', fig: 'receiptShot', x: 64, y: 65, rot: 3,
     label: 'Улика Б', evidence: 'b',
   },
+
+  /* ---- декор и подсказки ---- */
+  { id: 'sticky1', type: 'sticky', x: 47, y: 17.5, rot: 4, text: 'свечей = ?' },
+  { id: 'sticky2', type: 'sticky', x: 13, y: 38.5, rot: -6, text: 'светлое — одно!' },
+  { id: 'sticky3', type: 'sticky', x: 88, y: 46.5, rot: 5, text: '00:15 + 7 =' },
+  { id: 'sticky4', type: 'sticky', x: 12, y: 73, rot: -4, text: 'вычеркни лишние' },
   {
-    id: 'news', type: 'news', x: 66, y: 48, rot: -3,
+    id: 'news', type: 'news', x: 68, y: 57, rot: -3,
     brand: 'ВЕЧЕРНИЙ СТРОИТЕЛЬ',
     head: 'Резиденция закрыта на спецобслуживание',
     detail: {
@@ -205,42 +303,23 @@ const BOARD_ITEMS = [
       sign: 'приобщено к делу',
     },
   },
-  {
-    id: 'artem', type: 'polaroid', fig: 'cap', x: 22, y: 57.5, rot: -4, label: 'Артём',
-    detail: {
-      eyebrow: 'Свидетель · нашёл улику Б',
-      fig: 'cap',
-      shotCap: 'Артём',
-      quote: '«Сам ничего не видел. Зато случайно снял стол кладовщика — там лежала какая-то квитанция. Держи фото, вдруг пригодится».',
-      sign: 'фото — улика Б',
-    },
-  },
-  {
-    id: 'denisdasha', type: 'polaroid', fig: 'duo', x: 62, y: 59, rot: 3, label: 'Денис и Даша',
-    detail: {
-      eyebrow: 'Свидетели',
-      fig: 'duo',
-      shotCap: 'Денис и Даша',
-      quote: '«Слышали, как кладовщик бормотал что-то про "дубовые кольца" и старый сейф. Он туда прячет всё важное — и, кажется, координаты тоже».',
-      sign: 'опрошены в 02:05',
-    },
-  },
-  { id: 'sticky3', type: 'sticky', x: 30, y: 67, rot: 5, text: 'сейф = 2 части' },
-  { id: 'final', type: 'map', x: 53, y: 80, rot: -1 },
+  { id: 'final', type: 'map', x: 50, y: 82, rot: -1 },
 ];
 
 const STRINGS = [
   ['brief', 'nikita'], ['brief', 'alena'],
-  ['nikita', 'evidence-a'], ['alena', 'evidence-a'],
-  ['migal', 'matvey'], ['artem', 'evidence-b'],
+  ['nikita', 'evidence-a'], ['alena', 'evidence-a'], ['migal', 'evidence-a'],
+  ['lera', 'evidence-g'], ['alena', 'evidence-g'], ['matvey', 'sofya'],
+  ['denis', 'evidence-v'], ['dasha', 'evidence-v'],
+  ['artem', 'evidence-b'], ['sofya', 'evidence-b'],
   ['evidence-a', 'final'], ['evidence-b', 'final'],
-  ['denisdasha', 'final'], ['lera', 'news'],
+  ['evidence-v', 'final'], ['evidence-g', 'final'],
 ];
 
-/* ---------- 4. СБОРКА ДОСКИ ---------- */
+/* ---------- 5. СБОРКА ДОСКИ ---------- */
 const boardCanvas = document.getElementById('board-canvas');
 const detailStore = document.getElementById('detail-store');
-const quest = { solvedA: false, solvedB: false, timerId: null };
+const quest = { solved: { a: false, b: false, c: false, d: false }, timerId: null };
 
 function el(tag, cls, html) {
   const node = document.createElement(tag);
@@ -255,10 +334,9 @@ function buildBoard() {
 
   BOARD_ITEMS.forEach((item, i) => {
     let node;
-    const delay = `${0.06 * i}s`;
 
     if (item.type === 'polaroid') {
-      node = el('button', 'pin polaroid');
+      node = el('button', 'pin polaroid' + (item.evidence ? ' is-evidence' : ''));
       node.type = 'button';
       node.innerHTML = `
         <span class="pushpin ${i % 3 === 0 ? 'pushpin-yellow' : i % 3 === 1 ? '' : 'pushpin-white'}"></span>
@@ -291,7 +369,7 @@ function buildBoard() {
         <span class="pushpin"></span>
         <span class="frame">
           ${mapSVG()}
-          <span class="lock-badge"><span class="lock-ico">🔒</span>нужны обе улики</span>
+          <span class="lock-badge"><span class="lock-ico">🔒</span>нужны все четыре улики</span>
         </span>
         <span class="cap">старый сейф резиденции</span>`;
     }
@@ -299,13 +377,11 @@ function buildBoard() {
     node.style.setProperty('--x', item.x + '%');
     node.style.setProperty('--y', item.y + '%');
     node.style.setProperty('--rot', (item.rot || 0) + 'deg');
-    node.style.setProperty('--delay', delay);
+    node.style.setProperty('--delay', `${0.045 * i}s`);
     node.dataset.id = item.id;
     if (item.evidence) node.dataset.evidence = item.evidence;
 
-    if (item.type !== 'sticky') {
-      node.addEventListener('click', () => onPinClick(item, node));
-    }
+    if (item.type !== 'sticky') node.addEventListener('click', () => onPinClick(item, node));
     boardCanvas.appendChild(node);
 
     const detail = buildDetail(item);
@@ -321,13 +397,14 @@ function buildBoard() {
 function buildDetail(item) {
   if (item.evidence === 'a') return buildEvidenceA();
   if (item.evidence === 'b') return buildEvidenceB();
+  if (item.evidence === 'c') return buildEvidenceC();
+  if (item.evidence === 'd') return buildEvidenceD();
   if (item.type === 'map') return buildFinal();
   if (!item.detail) return null;
 
   const d = item.detail;
   const box = el('div', 'detail');
   box.appendChild(el('p', 'd-eyebrow', d.eyebrow));
-
   if (d.fig) {
     box.appendChild(el('div', 'd-shot',
       `<div class="shot-inner">${silhouette(d.fig)}</div><div class="shot-cap">${d.shotCap}</div>`));
@@ -342,32 +419,67 @@ function buildDetail(item) {
   return box;
 }
 
+/* ---------- 6. УЛИКА А: КАКАЯ БУТЫЛКА ПРОПАЛА ---------- */
+const BOTTLES = [
+  { key: 'amber', color: '#c9772a', name: 'янтарная' },
+  { key: 'forest', color: '#1b3f2c', name: 'тёмно-зелёная' },
+  { key: 'wine', color: '#6d1c20', name: 'красная' },
+  { key: 'gold', color: '#b8a06a', name: 'золотая' },
+  { key: 'charcoal', color: '#2a2a28', name: 'чёрная' },
+  { key: 'clear', color: '#d8dcd2', name: 'прозрачная' },
+];
+
 function buildEvidenceA() {
   const box = el('div', 'detail');
-  box.appendChild(el('p', 'd-eyebrow', 'Улика А · заключение экспертов'));
+  box.appendChild(el('p', 'd-eyebrow', 'Улика А · шесть бутылок с места'));
   const p = el('p', 'd-text');
-  p.dataset.text = 'Никита и Алёна описали запах в один голос: «можжевельник, смола, что-то тёмное и дощатое, будто бутылку прятали среди елей». С места происшествия изъяли пять бутылок разного купажа. Только одна пахнет так, как они описали — найди её.';
+  p.dataset.text = 'Эксперт уверен только в одном: пропавшая пахла хвоей и смолой, и стекло было тёмным. Остальное — в показаниях. Четверо гостей случайно вычеркнули по одной бутылке: кто-то допил, кто-то увёз, кто-то снимал её весь вечер, а одна вообще чужая. Вычеркни лишние и укажи ту, что унесли.';
   box.appendChild(p);
-
   const row = el('div', 'bottle-row');
   row.id = 'bottle-row';
   box.appendChild(row);
-
   const fb = el('p', 'd-feedback');
   fb.id = 'visual-feedback';
   box.appendChild(fb);
   return box;
 }
 
+function renderBottleRow() {
+  const row = document.getElementById('bottle-row');
+  if (!row) return;
+  row.innerHTML = '';
+  [...BOTTLES].sort(() => Math.random() - 0.5).forEach(({ key, color, name }) => {
+    const btn = el('button', 'bottle-btn', bottleSVG(color, 38) + `<span class="bottle-name">${name}</span>`);
+    btn.type = 'button';
+    btn.addEventListener('click', () => onBottleClick(key, btn));
+    row.appendChild(btn);
+  });
+}
+
+function onBottleClick(key, btn) {
+  const fb = document.getElementById('visual-feedback');
+  if (key !== 'forest') {
+    btn.classList.remove('shake');
+    void btn.offsetWidth;
+    btn.classList.add('shake');
+    fb.classList.remove('ok');
+    fb.textContent = 'Не она. Сверься с показаниями: кто какую бутылку вычеркнул?';
+    return;
+  }
+  fb.classList.add('ok');
+  fb.textContent = 'Она. На донышке нацарапаны три буквы: ' + FRAG.a;
+  solveEvidence('a', 'evidence-a', FRAG.a);
+}
+
+/* ---------- 7. УЛИКА Б: ГОД ЗАКЛАДКИ ---------- */
 function buildEvidenceB() {
   const box = el('div', 'detail');
   box.appendChild(el('p', 'd-eyebrow', 'Улика Б · кадр с телефона Артёма'));
   box.appendChild(el('div', 'd-shot',
     `<div class="shot-inner">${silhouette('receiptShot')}</div><div class="shot-cap">квитанция склада</div>`));
   const p = el('p', 'd-text');
-  p.dataset.text = 'Год на штампе размыт, читается только сегодняшний — 2026-й. Ниже приписка рукой кладовщика: «Бочку заложили ровно за столько лет до сегодняшнего дня, сколько сегодня исполняется имениннику — за двадцать четыре оборота дубовых колец». Вычисли год закладки.';
+  p.dataset.text = 'Год на штампе размыт, читается только текущий — 2026-й. Ниже приписка кладовщика: «Бочку заложили ровно за столько лет до сегодняшнего дня, сколько свечей будет на праздничном торте». Сколько свечей — кладовщик не знал. Зато знает та, кто торт заказывала. Введи год закладки.';
   box.appendChild(p);
-
   const form = el('form', 'd-form');
   form.id = 'logic-form';
   form.autocomplete = 'off';
@@ -376,32 +488,183 @@ function buildEvidenceB() {
     <button type="submit" class="btn btn-primary">Проверить</button>`;
   form.addEventListener('submit', onLogicSubmit);
   box.appendChild(form);
-
   const fb = el('p', 'd-feedback');
   fb.id = 'logic-feedback';
   box.appendChild(fb);
   return box;
 }
 
+function onLogicSubmit(e) {
+  e.preventDefault();
+  const fb = document.getElementById('logic-feedback');
+  if (document.getElementById('logic-input').value.trim() !== FRAG.b) {
+    fb.classList.remove('ok');
+    fb.textContent = 'Не сходится. Найди, кто заказывал торт, и узнай число свечей.';
+    return;
+  }
+  fb.classList.add('ok');
+  fb.textContent = 'Верно. На обороте проступает год: ' + FRAG.b;
+  solveEvidence('b', 'evidence-b', FRAG.b);
+}
+
+/* ---------- 8. УЛИКА В: ТОЧНОЕ ВРЕМЯ ---------- */
+function buildEvidenceC() {
+  const box = el('div', 'detail');
+  box.appendChild(el('p', 'd-eyebrow', 'Улика В · часы в коридоре'));
+  box.appendChild(el('div', 'd-shot',
+    `<div class="shot-inner">${silhouette('clockShot')}</div><div class="shot-cap">часы остановились</div>`));
+  const p = el('p', 'd-text');
+  p.dataset.text = 'Бутылку вынесли через чёрный вход — в этом сходятся все. На чёрном входе стоит сигнализация: один короткий сигнал в момент открытия двери. Никто не смотрел на часы в ту секунду, но двое гостей независимо друг от друга назвали то, из чего время складывается. Введи время срабатывания сигнализации в формате 00:00.';
+  box.appendChild(p);
+  const form = el('form', 'd-form');
+  form.id = 'time-form';
+  form.autocomplete = 'off';
+  form.innerHTML = `
+    <input type="text" inputmode="numeric" id="time-input" placeholder="00:00" maxlength="5">
+    <button type="submit" class="btn btn-primary">Проверить</button>`;
+  form.addEventListener('submit', onTimeSubmit);
+  box.appendChild(form);
+  const fb = el('p', 'd-feedback');
+  fb.id = 'time-feedback';
+  box.appendChild(fb);
+  return box;
+}
+
+function normTime(v) {
+  const digits = v.replace(/\D/g, '');
+  if (digits.length === 4) return digits;
+  if (digits.length === 3) return '0' + digits;
+  if (digits.length === 2) return '00' + digits;
+  return digits;
+}
+
+function onTimeSubmit(e) {
+  e.preventDefault();
+  const fb = document.getElementById('time-feedback');
+  if (normTime(document.getElementById('time-input').value) !== '0022') {
+    fb.classList.remove('ok');
+    fb.textContent = 'Мимо. Кто-то назвал точное время, а кто-то — сколько минут прошло после.';
+    return;
+  }
+  fb.classList.add('ok');
+  fb.textContent = 'Сходится: ' + FRAG.c + '. Именно тогда хлопнула дверь чёрного входа.';
+  solveEvidence('c', 'evidence-v', FRAG.c);
+}
+
+/* ---------- 9. УЛИКА Г: КТО НА СНИМКЕ ---------- */
+const OUTFITS = [
+  { key: 'figSuit', name: 'тёмный костюм' },
+  { key: 'figDress', name: 'светлое платье' },
+  { key: 'figSport', name: 'спортивная форма' },
+  { key: 'figCoat', name: 'длинный плащ' },
+];
+
+function buildEvidenceD() {
+  const box = el('div', 'detail');
+  box.appendChild(el('p', 'd-eyebrow', 'Улика Г · случайный кадр Леры'));
+  box.appendChild(el('div', 'd-shot',
+    `<div class="shot-inner">${silhouette('stairsShot')}</div><div class="shot-cap">лестница в погреб, 23:47</div>`));
+  const p = el('p', 'd-text');
+  p.dataset.text = 'Снимок засвечен, лица не видно — различима только одежда фигуры, спускающейся по лестнице. Выбери, во что она одета: это и будет ниточкой к имени. Один из гостей уже сказал, что в тот вечер такое было ровно на одном человеке.';
+  box.appendChild(p);
+  const row = el('div', 'outfit-row');
+  row.id = 'outfit-row';
+  box.appendChild(row);
+  const fb = el('p', 'd-feedback');
+  fb.id = 'outfit-feedback';
+  box.appendChild(fb);
+  return box;
+}
+
+function renderOutfitRow() {
+  const row = document.getElementById('outfit-row');
+  if (!row) return;
+  row.innerHTML = '';
+  [...OUTFITS].sort(() => Math.random() - 0.5).forEach(({ key, name }) => {
+    const btn = el('button', 'outfit-btn',
+      `<span class="outfit-shot">${silhouette(key)}</span><span class="outfit-name">${name}</span>`);
+    btn.type = 'button';
+    btn.addEventListener('click', () => onOutfitClick(key, btn));
+    row.appendChild(btn);
+  });
+}
+
+function onOutfitClick(key, btn) {
+  const fb = document.getElementById('outfit-feedback');
+  if (key !== 'figDress') {
+    btn.classList.remove('shake');
+    void btn.offsetWidth;
+    btn.classList.add('shake');
+    fb.classList.remove('ok');
+    fb.textContent = 'На снимке светлое пятно, а не тёмный силуэт. Присмотрись ещё раз.';
+    return;
+  }
+  fb.classList.add('ok');
+  fb.textContent = 'Да: светлое платье. Теперь вспомни, на ком оно было в тот вечер.';
+  solveEvidence('d', 'evidence-g', 'СВЕТЛОЕ ПЛАТЬЕ');
+}
+
+/* ---------- 10. ПРОГРЕСС ---------- */
+function solveEvidence(key, itemId, fragment) {
+  quest.solved[key] = true;
+  markSolved(itemId, fragment);
+  setTimeout(() => closeLens(), 1800);
+}
+
+function markSolved(itemId, fragment) {
+  const pin = boardCanvas.querySelector(`.pin[data-id="${itemId}"]`);
+  if (pin && !pin.classList.contains('solved')) {
+    pin.classList.add('solved');
+    const shot = pin.querySelector('.shot');
+    if (shot) shot.insertAdjacentHTML('beforeend', '<span class="found-stamp">найдено</span>');
+    const cap = pin.querySelector('.cap');
+    if (cap) cap.insertAdjacentHTML('beforeend', `<span class="fragment">${fragment}</span>`);
+  }
+  updateProgress();
+}
+
+function solvedCount() {
+  return Object.values(quest.solved).filter(Boolean).length;
+}
+
+function updateProgress() {
+  const n = solvedCount();
+  document.getElementById('case-progress').textContent = `Улик: ${n} / 4`;
+  const map = boardCanvas.querySelector('.map-pin');
+  if (map && n === 4) {
+    map.classList.remove('locked');
+    map.classList.add('unlocked');
+    const badge = map.querySelector('.lock-badge');
+    if (badge) badge.remove();
+    const cap = map.querySelector('.cap');
+    if (cap) cap.textContent = 'сейф готов — четыре замка';
+  }
+}
+
+/* ---------- 11. СЕЙФ: ЧЕТЫРЕ ЗАМКА И ИМЯ ---------- */
 function buildFinal() {
   const box = el('div', 'detail');
   box.appendChild(el('p', 'd-eyebrow', 'Старый сейф резиденции'));
   const p = el('p', 'd-text');
-  p.dataset.text = 'Денис и Даша слышали, как кладовщик бормотал код от сейфа — именно там он прятал координаты нового погреба. На дне бутылки нацарапаны буквы, на обороте квитанции проступили цифры. Сложи обе находки по порядку и набери код.';
+  p.dataset.text = 'На дверце четыре наборных замка и латунная табличка: «Кто знает дело — знает и код». Под ними — прорезь для последнего ответа: имя того, кто спускался в погреб в светлом платье. Проверь показания ещё раз: у этого человека алиби рассыпается от слов другого гостя.';
   box.appendChild(p);
 
-  const tiles = el('div', 'code-tiles');
-  tiles.id = 'code-tiles';
-  box.appendChild(tiles);
-
-  const form = el('form', 'd-form');
+  const form = el('form', 'safe-form');
   form.id = 'final-form';
   form.autocomplete = 'off';
   form.innerHTML = `
-    <input type="text" id="final-input" autocomplete="off" spellcheck="false" placeholder="код сейфа">
-    <button type="submit" class="btn btn-primary">Открыть сейф</button>`;
+    <div class="safe-lock"><label for="lock-a">Слово с донышка бутылки</label>
+      <input type="text" id="lock-a" placeholder="—"></div>
+    <div class="safe-lock"><label for="lock-b">Год закладки</label>
+      <input type="text" inputmode="numeric" id="lock-b" maxlength="4" placeholder="—"></div>
+    <div class="safe-lock"><label for="lock-c">Время у чёрного входа</label>
+      <input type="text" inputmode="numeric" id="lock-c" maxlength="5" placeholder="—"></div>
+    <div class="safe-lock"><label for="lock-d">Одежда на снимке</label>
+      <input type="text" id="lock-d" placeholder="—"></div>
+    <div class="safe-lock safe-lock-name"><label for="lock-name">Кто спускался в погреб</label>
+      <input type="text" id="lock-name" placeholder="имя"></div>
+    <button type="submit" class="btn btn-primary safe-submit">Открыть сейф</button>`;
   form.addEventListener('submit', onFinalSubmit);
-  form.querySelector('#final-input').addEventListener('input', (e) => renderCodeTiles(e.target.value));
   box.appendChild(form);
 
   const fb = el('p', 'd-feedback');
@@ -410,7 +673,38 @@ function buildFinal() {
   return box;
 }
 
-/* ---------- 5. КРАСНАЯ НИТЬ ---------- */
+const norm = (v) => v.trim().toLowerCase().replace(/\s+/g, ' ');
+
+function onFinalSubmit(e) {
+  e.preventDefault();
+  const fb = document.getElementById('final-feedback');
+  const checks = [
+    ['lock-a', norm(document.getElementById('lock-a').value) === norm(FRAG.a)],
+    ['lock-b', document.getElementById('lock-b').value.replace(/\D/g, '') === FRAG.b],
+    ['lock-c', normTime(document.getElementById('lock-c').value) === '0022'],
+    ['lock-d', norm(document.getElementById('lock-d').value).replace(/ё/g, 'е') === 'светлое платье'],
+    ['lock-name', CULPRIT.includes(norm(document.getElementById('lock-name').value).replace(/ё/g, 'е'))],
+  ];
+  let wrong = 0;
+  checks.forEach(([id, ok]) => {
+    const field = document.getElementById(id).closest('.safe-lock');
+    field.classList.toggle('lock-ok', ok);
+    field.classList.toggle('lock-bad', !ok);
+    if (!ok) wrong++;
+  });
+  if (wrong) {
+    fb.classList.remove('ok');
+    fb.textContent = wrong === 1
+      ? 'Один замок не поддался — он отмечен красным.'
+      : `Не поддались ${wrong} замка — они отмечены красным.`;
+    return;
+  }
+  fb.classList.add('ok');
+  fb.textContent = 'Щелчок, ещё щелчок… сейф открыт.';
+  setTimeout(() => { closeLens(); finishQuest(); }, 1000);
+}
+
+/* ---------- 12. КРАСНАЯ НИТЬ ---------- */
 function drawStrings() {
   const svg = document.getElementById('board-strings');
   const byId = Object.fromEntries(BOARD_ITEMS.map((it) => [it.id, it]));
@@ -420,12 +714,12 @@ function drawStrings() {
     const mx = (A.x + B.x) / 2 + (Math.random() - 0.5) * 4;
     const my = (A.y + B.y) / 2 + (Math.random() - 0.5) * 1.2;
     return `<path d="M${A.x} ${A.y} Q${mx} ${my} ${B.x} ${B.y}"
-      fill="none" stroke="#b5342c" stroke-width="1.6"
-      vector-effect="non-scaling-stroke" opacity="0.72"/>`;
+      fill="none" stroke="#b5342c" stroke-width="1.5"
+      vector-effect="non-scaling-stroke" opacity="0.68"/>`;
   }).join('');
 }
 
-/* ---------- 6. ЛИНЗА: УЛИКА ПРИБЛИЖАЕТСЯ ---------- */
+/* ---------- 13. ЛИНЗА: УЛИКА ПРИБЛИЖАЕТСЯ ---------- */
 const lens = document.getElementById('lens');
 const lensSlot = document.getElementById('lens-slot');
 let openDetailNode = null;
@@ -442,7 +736,7 @@ function typewrite(node, text, speed) {
       clearInterval(node._typeTimer);
       node.classList.remove('typing');
     }
-  }, speed || 14);
+  }, speed || 12);
 }
 
 function openLens(detailId) {
@@ -453,10 +747,9 @@ function openLens(detailId) {
   lensSlot.appendChild(detail);
   lens.hidden = false;
   lens.classList.remove('closing');
+  lens.scrollTop = 0;
   const typed = detail.querySelector('.d-text[data-text]');
-  if (typed) typewrite(typed, typed.dataset.text, 13);
-  const input = detail.querySelector('input');
-  if (input) setTimeout(() => input.focus({ preventScroll: true }), 450);
+  if (typed) typewrite(typed, typed.dataset.text, 11);
 }
 
 function closeLens(instant) {
@@ -481,137 +774,25 @@ document.addEventListener('keydown', (e) => {
 function onPinClick(item, node) {
   document.getElementById('board-hint').classList.add('gone');
 
-  if (item.type === 'map' && !(quest.solvedA && quest.solvedB)) {
-    node.classList.remove('shake-pin');
-    void node.offsetWidth;
+  if (item.type === 'map' && solvedCount() < 4) {
     node.animate(
       [{ transform: 'translate(-50%,-50%) rotate(-1deg) translateX(-7px)' },
        { transform: 'translate(-50%,-50%) rotate(-1deg) translateX(7px)' },
        { transform: 'translate(-50%,-50%) rotate(-1deg) translateX(0)' }],
-      { duration: 320, easing: 'ease' }
-    );
+      { duration: 320, easing: 'ease' });
     const badge = node.querySelector('.lock-badge');
-    if (badge) badge.lastChild.textContent = 'сначала найди обе улики';
+    if (badge) badge.lastChild.textContent = `собрано ${solvedCount()} из 4 улик`;
     return;
   }
-  if (item.evidence === 'a' && quest.solvedA) return;
-  if (item.evidence === 'b' && quest.solvedB) return;
+  if (item.evidence && quest.solved[item.evidence]) return;
 
   openLens('detail-' + item.id);
   if (item.evidence === 'a') renderBottleRow();
+  if (item.evidence === 'd') renderOutfitRow();
 }
 
-/* ---------- 7. УЛИКА А: БУТЫЛКА ПО ЗАПАХУ ---------- */
-const BOTTLES = [
-  { key: 'amber', color: '#c9772a' },
-  { key: 'forest', color: '#1b3f2c' },
-  { key: 'wine', color: '#6d1c20' },
-  { key: 'gold', color: '#b8a06a' },
-  { key: 'charcoal', color: '#2a2a28' },
-];
-
-function renderBottleRow() {
-  const row = document.getElementById('bottle-row');
-  if (!row) return;
-  row.innerHTML = '';
-  [...BOTTLES].sort(() => Math.random() - 0.5).forEach(({ key, color }) => {
-    const btn = el('button', 'bottle-btn', bottleSVG(color, 42));
-    btn.type = 'button';
-    btn.addEventListener('click', () => onBottleClick(key, btn));
-    row.appendChild(btn);
-  });
-}
-
-function onBottleClick(key, btn) {
-  const fb = document.getElementById('visual-feedback');
-  if (key !== 'forest') {
-    btn.classList.remove('shake');
-    void btn.offsetWidth;
-    btn.classList.add('shake');
-    if (fb) fb.textContent = 'Не тот запах. Перечитай, среди чего прятали бутылку.';
-    return;
-  }
-  quest.solvedA = true;
-  if (fb) {
-    fb.classList.add('ok');
-    fb.textContent = 'Совпадение! На дне бутылки нацарапаны буквы: ' + FRAGMENT_A;
-  }
-  markSolved('evidence-a', FRAGMENT_A);
-  setTimeout(() => closeLens(), 1600);
-}
-
-/* ---------- 8. УЛИКА Б: ГОД ЗАКЛАДКИ ---------- */
-function onLogicSubmit(e) {
-  e.preventDefault();
-  const input = document.getElementById('logic-input');
-  const fb = document.getElementById('logic-feedback');
-  if (input.value.trim() !== FRAGMENT_B) {
-    fb.classList.remove('ok');
-    fb.textContent = 'Не сходится. «Двадцать четыре кольца» — это годы выдержки.';
-    return;
-  }
-  quest.solvedB = true;
-  fb.classList.add('ok');
-  fb.textContent = 'Верно. На обороте проступают цифры: ' + FRAGMENT_B;
-  markSolved('evidence-b', FRAGMENT_B);
-  setTimeout(() => closeLens(), 1600);
-}
-
-/* ---------- 9. ПРОГРЕСС И СЕЙФ ---------- */
-function markSolved(itemId, fragment) {
-  const pin = boardCanvas.querySelector(`.pin[data-id="${itemId}"]`);
-  if (pin && !pin.classList.contains('solved')) {
-    pin.classList.add('solved');
-    const shot = pin.querySelector('.shot');
-    if (shot) shot.insertAdjacentHTML('beforeend', '<span class="found-stamp">найдено</span>');
-    const cap = pin.querySelector('.cap');
-    if (cap) cap.insertAdjacentHTML('beforeend', `<span class="fragment">${fragment}</span>`);
-  }
-  updateProgress();
-}
-
-function updateProgress() {
-  const n = (quest.solvedA ? 1 : 0) + (quest.solvedB ? 1 : 0);
-  document.getElementById('case-progress').textContent = `Улик: ${n} / 2`;
-  const map = boardCanvas.querySelector('.map-pin');
-  if (map && n === 2) {
-    map.classList.remove('locked');
-    map.classList.add('unlocked');
-    const badge = map.querySelector('.lock-badge');
-    if (badge) badge.remove();
-    const cap = map.querySelector('.cap');
-    if (cap) cap.textContent = 'сейф готов — набери код';
-  }
-}
-
-function renderCodeTiles(value) {
-  const wrap = document.getElementById('code-tiles');
-  if (!wrap) return;
-  const chars = value.toUpperCase().replace(/\s+/g, '').split('');
-  wrap.innerHTML = (chars.length ? chars : ['']).map(
-    (ch) => `<span class="code-tile${ch ? ' filled' : ''}">${ch || ''}</span>`
-  ).join('');
-}
-
-function onFinalSubmit(e) {
-  e.preventDefault();
-  const input = document.getElementById('final-input');
-  const fb = document.getElementById('final-feedback');
-  const got = input.value.trim().toUpperCase().replace(/\s+/g, '');
-  const c1 = (FRAGMENT_A + FRAGMENT_B).toUpperCase();
-  const c2 = (FRAGMENT_B + FRAGMENT_A).toUpperCase();
-  if (got !== c1 && got !== c2) {
-    fb.classList.remove('ok');
-    fb.textContent = 'Замок не поддался. Сложи обе находки без пробела.';
-    return;
-  }
-  fb.classList.add('ok');
-  fb.textContent = 'Щелчок. Сейф открыт — внутри карта…';
-  setTimeout(() => { closeLens(); finishQuest(); }, 900);
-}
-
-/* ---------- 10. ТАЙМЕР ---------- */
-const QUEST_SECONDS = 360;
+/* ---------- 14. ТАЙМЕР ---------- */
+const QUEST_SECONDS = 30 * 60;
 
 function clock(sec) {
   return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
@@ -632,14 +813,13 @@ function startTimer() {
       return;
     }
     node.textContent = clock(left);
-    node.classList.toggle('warn', left <= 45);
+    node.classList.toggle('warn', left <= 120);
   }, 1000);
 }
 
-/* ---------- 11. ПОТОК ЭКРАНОВ ---------- */
+/* ---------- 15. ПОТОК ЭКРАНОВ ---------- */
 function startQuest() {
-  quest.solvedA = false;
-  quest.solvedB = false;
+  quest.solved = { a: false, b: false, c: false, d: false };
   closeLens(true);
   buildBoard();
   updateProgress();
@@ -653,7 +833,7 @@ function startQuest() {
 function finishQuest() {
   clearInterval(quest.timerId);
   showScreen('result');
-  setTimeout(openInvite, 2500);
+  setTimeout(openInvite, 3200);
 }
 
 function openInvite() {
@@ -677,7 +857,7 @@ document.getElementById('board-viewport').addEventListener('scroll', () => {
   document.getElementById('board-hint').classList.add('gone');
 }, { once: true });
 
-/* ---------- 12. ТАЙНЫЕ ЗАДАНИЯ НА ВЕЧЕР ---------- */
+/* ---------- 16. ТАЙНЫЕ ЗАДАНИЯ НА ВЕЧЕР ---------- */
 const GUEST_MISSIONS = {
   'Никита': 'Весь вечер оценивай ЛЮБОЙ напиток вслух с лицом сомелье — даже воду. Обязательно вставляй «танины», «долгое послевкусие», «нотки дуба».',
   'Алёна': 'Каждый раз, когда кто-то наливает себе выпить, молча и со знанием дела покачай головой — будто не одобряешь выбор бокала.',
@@ -687,6 +867,7 @@ const GUEST_MISSIONS = {
   'Матвей': 'Про любую вещь, которую увидишь за вечер, между делом скажи: «у меня похожее, но получше». Минимум трижды.',
   'Лера': 'Сфотографируй свою тарелку или бокал как для журнала минимум четыре раза, вслух комментируя свет и композицию.',
   'Артём': 'Расскажи всем одну и ту же историю про Дениса несколько раз за вечер — но каждый раз меняй в ней одну деталь.',
+  'Софья': 'Ты знала о сюрпризе с самого начала — держи лицо. Минимум трижды за вечер скажи «я тут ни при чём» без всякого повода.',
 };
 
 function resetMissions() {
@@ -718,7 +899,7 @@ document.getElementById('mission-hide-btn').addEventListener('click', () => {
   if (btn) btn.classList.add('used');
 });
 
-/* ---------- 13. ПРИГЛАШЕНИЕ: КАЛЕНДАРЬ, КАРТЫ, QR ---------- */
+/* ---------- 17. ПРИГЛАШЕНИЕ: КАЛЕНДАРЬ, КАРТЫ, QR ---------- */
 const EVENT = {
   title: 'День рождения Дениса (24 года)',
   start: '20260918T153000',
@@ -761,7 +942,6 @@ function renderQR(text) {
   const block = document.querySelector('.qr-block');
   box.innerHTML = '';
   if (!window.QRCode) {
-    // библиотека не догрузилась — прячем блок, чтобы не осталось пустой рамки
     if (block) block.hidden = true;
     return;
   }
