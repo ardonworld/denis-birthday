@@ -40,42 +40,49 @@
     <div class="quest-wrap">
 
       <div class="case-header">
-        <span class="case-stamp">Дело №24 · Секретно</span>
-        <span class="case-timer" id="quest-timer">04:00</span>
+        <span class="case-stamp">Дело о пропавшем купаже · Секретно</span>
+        <span class="case-timer" id="quest-timer">06:00</span>
       </div>
 
       <div class="quest-tray" id="quest-tray">
-        <span class="quest-tray-label">Найдено:</span>
-        <span class="quest-chip" id="chip-1" data-empty="?">—</span>
-        <span class="quest-chip" id="chip-2" data-empty="?">—</span>
+        <span class="evidence-tag" id="chip-1"><span class="evidence-tag-label">Улика А</span><span class="evidence-tag-value">не найдена</span></span>
+        <span class="evidence-tag" id="chip-2"><span class="evidence-tag-label">Улика Б</span><span class="evidence-tag-value">не найдена</span></span>
       </div>
 
-      <!-- Улика 1: визуальная — найди нужную бутылку -->
-      <div class="quest-card" id="clue-visual">
-        <p class="quest-eyebrow">Улика №1 · На вид</p>
-        <p class="quest-riddle" data-text="В своде трав и хвойной тьмы хранится первая часть кода. Найди бутылку цвета лесной ночи."></p>
+      <!-- Глава 0: завязка -->
+      <div class="quest-card story-card" id="chapter-cover">
+        <p class="quest-eyebrow">Инспектор Бочкарёв · вечерняя смена</p>
+        <p class="quest-riddle" data-text="Ночью из погреба резиденции пропал купаж особой выдержки — тот самый, что должны были откупорить сегодня вечером. Хозяин молчит, поставщик разводит руками. На крышке пустой бочки — свежий скол. Единственное, что успел учуять сторож: смолистый, хвойный запах, будто бутылку пронесли через лес, а не через погреб. У нас есть три улики с места происшествия и немного времени до начала торжества."></p>
+        <button class="btn btn-primary chapter-next" data-next="clue-visual">Открыть улику А</button>
+      </div>
+
+      <!-- Улика A: визуальная дедукция по запаху -->
+      <div class="quest-card story-card" id="clue-visual" hidden>
+        <p class="quest-eyebrow">Улика А · Обрывок экспертизы</p>
+        <p class="quest-riddle" data-text="Криминалист успел зафиксировать только запах: «можжевельник, смола, что-то тёмное и дощатое — будто бутылку прятали среди елей». С места происшествия изъяли пять бутылок. Только одна пахнет так, как в отчёте."></p>
         <div class="bottle-row" id="bottle-row"></div>
         <p class="quest-feedback" id="visual-feedback"></p>
       </div>
 
-      <!-- Улика 2: логическая — простая математика по данным на странице -->
-      <div class="quest-card" id="clue-logic" hidden>
-        <p class="quest-eyebrow">Улика №2 · На счёт</p>
-        <p class="quest-riddle" data-text="Возьми текущий год розлива (2026) и вычти из него срок выдержки именинника (24 года). Получившийся год розлива — вторая часть кода."></p>
+      <!-- Улика Б: логическая дедукция, замаскированная под историю -->
+      <div class="quest-card story-card" id="clue-logic" hidden>
+        <p class="quest-eyebrow">Улика Б · Квитанция склада</p>
+        <p class="quest-riddle" data-text="Мятая квитанция. Год на штампе размыт дождём — виден только сегодняшний, 2026-й. Внизу приписка рукой кладовщика: «Бочку заложили ровно за столько лет до сегодняшнего дня, сколько сегодня исполняется имениннику — то есть за 24 оборота дубовых колец». Вычисли год закладки."></p>
         <form id="logic-form" autocomplete="off">
-          <input type="text" inputmode="numeric" id="logic-input" placeholder="год розлива" maxlength="4">
+          <input type="text" inputmode="numeric" id="logic-input" placeholder="год закладки" maxlength="4">
           <button type="submit" class="btn btn-primary">Проверить</button>
         </form>
         <p class="quest-feedback" id="logic-feedback"></p>
       </div>
 
-      <!-- Финальный ввод кода -->
-      <div class="quest-card" id="clue-final" hidden>
-        <p class="quest-eyebrow">Расшифровка</p>
-        <p class="quest-riddle" data-text="Сложи обе части улик без пробела — и получишь кодовое слово купажа."></p>
+      <!-- Финал: сейф -->
+      <div class="quest-card story-card" id="clue-final" hidden>
+        <p class="quest-eyebrow">Старый сейф резиденции</p>
+        <p class="quest-riddle" data-text="На дне бутылки нацарапаны буквы. На обороте квитанции проступили цифры. Сторож использовал именно такие коды для сейфа, где прятал координаты нового погреба. Сложите обе находки по порядку, как они были обнаружены, и введите код."></p>
         <form id="final-form" autocomplete="off">
-          <input type="text" id="final-input" placeholder="кодовое слово">
-          <button type="submit" class="btn btn-primary">Открыть координаты</button>
+          <div class="code-tiles" id="code-tiles"></div>
+          <input type="text" id="final-input" autocomplete="off" spellcheck="false">
+          <button type="submit" class="btn btn-primary">Открыть сейф</button>
         </form>
         <p class="quest-feedback" id="final-feedback"></p>
       </div>
@@ -86,8 +93,9 @@
   <!-- ЭКРАН 3: РЕЗУЛЬТАТ -->
   <section class="screen" id="screen-result">
     <div class="glow"></div>
-    <h2 class="result-title">Код принят!</h2>
-    <p class="result-text">Координаты особого купажа расшифрованы.</p>
+    <div class="case-closed-stamp">ДЕЛО ЗАКРЫТО</div>
+    <h2 class="result-title">Сейф открыт</h2>
+    <p class="result-text">Инспектор Бочкарёв закрывает папку: координаты найдены, купаж ждёт своего часа.</p>
     <div class="loader"><div class="loader-bar"></div></div>
     <p class="scroll-hint">открываю приглашение…</p>
   </section>
@@ -97,7 +105,7 @@
     <div class="glow"></div>
     <div class="invite-card">
       <p class="invite-emblem">✦ ✦ ✦</p>
-      <p class="invite-eyebrow">Ты справился(лась) — праздник ждёт</p>
+      <p class="invite-eyebrow">Дело раскрыто — координаты подтверждены</p>
       <h2 class="invite-title">День рождения Дениса</h2>
       <div class="invite-age">Выдержка 24 года · <b>винтаж 2002</b></div>
 

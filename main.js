@@ -211,7 +211,7 @@ function bottleSVG(color) {
 }
 
 const quest = { visualDone: false, logicDone: false, timerId: null };
-const QUEST_SECONDS = 240;
+const QUEST_SECONDS = 360;
 
 /* Эффект печатной машинки для текста улик — атмосфера детективного досье */
 function typewrite(el, text, speed) {
@@ -292,15 +292,44 @@ function onBottleClick(key, btn) {
     btn.classList.remove('shake');
     void btn.offsetWidth;
     btn.classList.add('shake');
-    feedback.textContent = 'Не то — ищи цвет глубокой хвойной чащи.';
+    feedback.textContent = 'Не тот запах — перечитай отчёт эксперта внимательнее.';
   }
 }
 
 function setChip(id, text) {
   const chip = document.getElementById(id);
-  chip.textContent = text;
   chip.classList.add('filled');
+  const valueEl = chip.querySelector('.evidence-tag-value');
+  if (valueEl) valueEl.textContent = text;
 }
+
+/* Переход между главами дела (кнопки с data-next) */
+document.querySelectorAll('.chapter-next').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const currentCard = btn.closest('.quest-card');
+    const nextId = btn.dataset.next;
+    if (currentCard) currentCard.hidden = true;
+    const next = document.getElementById(nextId);
+    if (next) {
+      next.hidden = false;
+      revealRiddle(nextId);
+    }
+  });
+});
+
+/* Плитки кода — визуализация набираемого шифра сейфа */
+function renderCodeTiles(value) {
+  const wrap = document.getElementById('code-tiles');
+  const chars = value.toUpperCase().replace(/\s+/g, '').split('');
+  const shown = chars.length ? chars : [''];
+  wrap.innerHTML = shown
+    .map((ch) => `<span class="code-tile${ch ? ' filled' : ''}">${ch || ''}</span>`)
+    .join('');
+}
+document.getElementById('final-input').addEventListener('input', (e) => {
+  renderCodeTiles(e.target.value);
+});
+renderCodeTiles('');
 
 function checkQuestComplete() {
   if (quest.visualDone && quest.logicDone) {
@@ -324,7 +353,7 @@ document.getElementById('logic-form').addEventListener('submit', (e) => {
     checkQuestComplete();
   } else {
     feedback.classList.remove('ok');
-    feedback.textContent = 'Не сходится. Подсказка есть на первом экране приглашения.';
+    feedback.textContent = 'Не сходится. Перечитай приписку кладовщика — что значат «24 оборота колец»?';
   }
 });
 
@@ -337,11 +366,11 @@ document.getElementById('final-form').addEventListener('submit', (e) => {
   const code2 = (FRAGMENT_LOGIC + FRAGMENT_VISUAL).toUpperCase();
   if (normalized === code1 || normalized === code2) {
     feedback.classList.add('ok');
-    feedback.textContent = 'Верно! Расшифровываю координаты…';
+    feedback.textContent = 'Щелчок. Сейф открыт — внутри карта…';
     setTimeout(finishQuest, 900);
   } else {
     feedback.classList.remove('ok');
-    feedback.textContent = 'Код неверный — сложи улики без пробела.';
+    feedback.textContent = 'Замок не поддался. Сложи обе находки по порядку без пробела.';
   }
 });
 
@@ -350,9 +379,12 @@ function resetQuest() {
   quest.logicDone = false;
   ['chip-1', 'chip-2'].forEach((id) => {
     const chip = document.getElementById(id);
-    chip.textContent = '—';
     chip.classList.remove('filled');
+    const valueEl = chip.querySelector('.evidence-tag-value');
+    if (valueEl) valueEl.textContent = 'не найдена';
   });
+  document.getElementById('chapter-cover').hidden = false;
+  document.getElementById('clue-visual').hidden = true;
   document.getElementById('clue-visual').style.opacity = '';
   document.getElementById('clue-visual').style.pointerEvents = '';
   document.getElementById('clue-logic').style.opacity = '';
@@ -366,6 +398,7 @@ function resetQuest() {
   document.getElementById('final-feedback').classList.remove('ok');
   document.getElementById('logic-input').value = '';
   document.getElementById('final-input').value = '';
+  renderCodeTiles('');
   renderBottleRow();
   resetMissions();
 }
@@ -373,7 +406,7 @@ function resetQuest() {
 function startQuest() {
   resetQuest();
   showScreen('quest');
-  revealRiddle('clue-visual');
+  revealRiddle('chapter-cover');
   startQuestTimer();
 }
 

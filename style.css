@@ -305,6 +305,40 @@ html,body{
 }
 .case-timer.warn{ color: #ff7a68; border-color: #ff7a68; }
 
+.evidence-tag{
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 7px 14px;
+  border: 1px dashed var(--gold-dim);
+  border-radius: 4px;
+  background: rgba(184,160,106,0.05);
+  transform: rotate(-1deg);
+}
+.evidence-tag:nth-child(2){ transform: rotate(1deg); }
+.evidence-tag-label{
+  font-family: var(--label);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.evidence-tag-value{
+  font-family: var(--typewriter);
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+.evidence-tag.filled{
+  border: 1px solid var(--gold);
+  background: linear-gradient(135deg, rgba(230,214,168,0.16), rgba(184,160,106,0.08));
+}
+.evidence-tag.filled .evidence-tag-value{
+  color: var(--gold-light);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
 .quest-tray{
   display: flex;
   align-items: center;
@@ -406,6 +440,32 @@ html,body{
 }
 .quest-feedback.ok{ color: #2f6b3a; }
 
+.code-tiles{
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  min-height: 40px;
+}
+.code-tile{
+  width: 32px;
+  height: 38px;
+  border: 2px solid rgba(122,31,34,0.3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--label);
+  font-size: 18px;
+  color: var(--label-ink-dim);
+  background: rgba(255,253,247,0.6);
+}
+.code-tile.filled{
+  border-color: var(--wine);
+  color: var(--wine);
+  background: #fffdf7;
+}
+
 #logic-form, #final-form{
   display: flex;
   gap: 10px;
@@ -425,6 +485,11 @@ html,body{
 #logic-input:focus, #final-input:focus{
   outline: none;
   border-color: var(--wine);
+}
+#final-input{
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-align: center;
 }
 #logic-form .btn, #final-form .btn{
   padding: 12px 20px;
@@ -449,6 +514,25 @@ html,body{
 }
 
 /* ---------- ЭКРАН: РЕЗУЛЬТАТ ---------- */
+.case-closed-stamp{
+  font-family: var(--label);
+  font-size: clamp(28px, 7vw, 42px);
+  letter-spacing: 0.12em;
+  color: #c0392b;
+  border: 4px solid #c0392b;
+  border-radius: 8px;
+  padding: 8px 22px;
+  transform: rotate(-9deg) scale(1.4);
+  opacity: 0;
+  margin-bottom: 20px;
+  animation: stamp-slam 0.5s ease 0.15s forwards;
+  mix-blend-mode: multiply;
+}
+@keyframes stamp-slam{
+  0%{ opacity: 0; transform: rotate(-9deg) scale(2.2); }
+  60%{ opacity: 0.9; transform: rotate(-9deg) scale(0.9); }
+  100%{ opacity: 0.85; transform: rotate(-9deg) scale(1); }
+}
 .result-title{
   font-family: var(--serif);
   font-size: clamp(30px, 6vw, 44px);
