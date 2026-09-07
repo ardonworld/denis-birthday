@@ -39,23 +39,19 @@ html, body{
   position: fixed; inset: 0;
   z-index: 0;
   background:
-    repeating-linear-gradient(91deg,
-      rgba(0,0,0,0.16) 0 2px,
-      rgba(255,255,255,0.014) 2px 7px,
-      rgba(0,0,0,0.07) 7px 13px),
-    repeating-linear-gradient(180deg,
-      rgba(0,0,0,0.3) 0 3px,
-      rgba(255,255,255,0.018) 3px 5px,
-      transparent 5px 150px),
-    linear-gradient(175deg, #4a3320 0%, #352415 55%, #241810 100%);
+    repeating-linear-gradient(92deg,
+      rgba(0,0,0,0.20) 0 2px,
+      rgba(255,255,255,0.012) 2px 9px,
+      rgba(0,0,0,0.09) 9px 16px),
+    linear-gradient(160deg, #333c47 0%, #232a33 45%, #14181e 100%);
 }
 #lamp{
   position: fixed; inset: 0;
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 85% 55% at 50% 4%, rgba(255,216,150,0.26), rgba(255,216,150,0) 62%),
-    radial-gradient(ellipse 60% 45% at 78% 88%, rgba(255,180,90,0.07), rgba(0,0,0,0) 70%);
+    radial-gradient(ellipse 70% 55% at 14% -4%, rgba(255,236,198,0.5), rgba(255,236,198,0) 58%),
+    radial-gradient(ellipse 120% 90% at 30% 10%, rgba(255,228,180,0.14), rgba(0,0,0,0) 70%);
 }
 #vignette{
   position: fixed; inset: 0;
@@ -288,41 +284,37 @@ html, body{
 }
 .case-timer.warn{ color: #ff7a68; border-color: #ff7a68; }
 
-/* Деревянная рама доски — стоит на месте, пробка внутри прокручивается */
+/* Рама доски — тонкая тёмная, как на референсе. Прокрутки нет:
+   всё полотно целиком помещается в один экран. */
 .board-viewport{
   position: relative;
   flex: 1 1 auto;
   width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  overflow: hidden;
   border-style: solid;
-  border-width: clamp(11px, 3.2vw, 18px);
-  border-image: linear-gradient(150deg,
-      #9a6d3c 0%, #6b4823 18%, #8b5f31 38%,
-      #5a3c1e 62%, #7d5529 82%, #432c15 100%) 1;
+  border-width: clamp(7px, 1.5vmin, 13px);
+  border-image: linear-gradient(145deg,
+      #574d43 0%, #2b251f 40%, #443b32 62%, #17130f 100%) 1;
   box-shadow:
-    inset 0 0 60px rgba(60,28,6,0.5),
-    inset 0 2px 3px rgba(0,0,0,0.55),
-    0 20px 46px rgba(0,0,0,0.6);
+    inset 0 0 0 2px rgba(0,0,0,0.55),
+    inset 0 8px 34px rgba(0,0,0,0.42),
+    0 26px 55px rgba(0,0,0,0.62);
 }
 
-/* Пробковая доска */
+/* Полотно доски — приглушённое серо-бежевое сукно */
 .board-canvas{
-  position: relative;
-  width: 100%;
-  height: 2300px;
-  background-color: #c49a63;
+  position: absolute;
+  inset: 0;
+  background-color: #b1a897;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.30 0 0 0 0 0.18 0 0 0 0 0.06 0 0 0 0.62 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' seed='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.16 0 0 0 0 0.09 0 0 0 0 0.03 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse 120% 45% at 50% 0%, rgba(255,228,182,0.32), rgba(255,228,182,0) 62%),
-    linear-gradient(180deg, #cba36c 0%, #bd9159 45%, #a87c47 100%);
-  background-size: 220px 220px, 90px 90px, auto, auto;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' seed='11'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.22 0 0 0 0 0.20 0 0 0 0 0.16 0 0 0 0.35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 85% 65% at 18% 8%, rgba(255,246,224,0.55), rgba(255,246,224,0) 60%),
+    radial-gradient(ellipse 90% 80% at 88% 100%, rgba(20,16,10,0.42), rgba(20,16,10,0) 65%),
+    linear-gradient(152deg, #c3baa8 0%, #ada494 48%, #8d8577 100%);
+  background-size: 160px 160px, auto, auto, auto;
 }
-@media (min-width: 700px){
-  .board-canvas{ height: 2100px; }
-}
+
 .board-strings{
   position: absolute;
   inset: 0;
@@ -332,19 +324,21 @@ html, body{
   pointer-events: none;
 }
 .board-hint{
-  position: sticky;
-  bottom: 8px;
-  margin: 0 auto;
-  width: fit-content;
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  margin: 0;
   font-family: var(--type);
-  font-size: 11.5px;
-  color: #f3e6cb;
-  background: rgba(20,12,6,0.7);
-  padding: 6px 14px;
+  font-size: clamp(8.5px, 2.2vmin, 12px);
+  color: rgba(255,244,224,0.92);
+  background: rgba(18,14,10,0.55);
+  padding: 4px 12px;
   border-radius: 20px;
   z-index: 5;
   pointer-events: none;
-  transition: opacity .4s ease;
+  white-space: nowrap;
+  transition: opacity .5s ease;
 }
 .board-hint.gone{ opacity: 0; }
 
@@ -378,7 +372,7 @@ html, body{
 
 /* ---- полароид ---- */
 .polaroid{
-  width: clamp(84px, 22vw, 120px);
+  width: clamp(44px, min(18vw, 11dvh), 124px);
 }
 .polaroid.is-evidence .frame{
   box-shadow: 0 8px 16px rgba(0,0,0,0.5), 0 0 0 2px rgba(226,137,46,0.55);
@@ -410,7 +404,7 @@ html, body{
 .polaroid .cap{
   display: block;
   font-family: var(--hand);
-  font-size: 17px;
+  font-size: clamp(9px, 2.9vmin, 17px);
   line-height: 1.15;
   color: #2b2418;
   padding: 5px 2px 2px;
@@ -447,7 +441,7 @@ html, body{
 
 /* ---- винтажный реквизит на пробке ---- */
 .prop{
-  width: clamp(46px, 12.5vw, 74px);
+  width: clamp(26px, min(10vw, 6.6dvh), 72px);
 }
 .prop-art{
   display: block;
@@ -459,8 +453,8 @@ html, body{
 
 /* ---- записка-стикер ---- */
 .sticky{
-  width: clamp(74px, 20vw, 104px);
-  min-height: clamp(66px, 18vw, 92px);
+  width: clamp(36px, min(12vw, 8dvh), 92px);
+  min-height: clamp(32px, min(9.8vw, 6.6dvh), 78px);
   background: linear-gradient(160deg, var(--sticky), var(--sticky-2));
   box-shadow: 0 7px 14px rgba(0,0,0,0.45);
   display: flex;
@@ -469,7 +463,7 @@ html, body{
   padding: 10px 8px;
   font-family: var(--hand);
   font-weight: 700;
-  font-size: clamp(15px, 4vw, 19px);
+  font-size: clamp(8.5px, 2.7vmin, 17px);
   color: #4a3a08;
   text-align: center;
   line-height: 1.15;
@@ -486,7 +480,7 @@ html, body{
 
 /* ---- записка следователя (бумага) ---- */
 .note{
-  width: min(64vw, 300px);
+  width: clamp(115px, min(44vw, 29dvh), 300px);
   background:
     repeating-linear-gradient(0deg, rgba(70,90,140,0.09) 0 1px, transparent 1px 17px),
     var(--paper-warm);
@@ -497,7 +491,7 @@ html, body{
 }
 .note .note-head{
   font-family: var(--label);
-  font-size: 12px;
+  font-size: clamp(8px, 2.2vmin, 12px);
   letter-spacing: 0.18em;
   color: var(--wine);
   display: block;
@@ -505,22 +499,22 @@ html, body{
 }
 .note .note-body{
   font-family: var(--type);
-  font-size: 12px;
+  font-size: clamp(7.5px, 2vmin, 12px);
   line-height: 1.6;
   color: var(--ink);
   display: block;
 }
 .note .note-more{
   display: block;
-  margin-top: 8px;
+  margin-top: 6px;
   font-family: var(--hand);
-  font-size: 17px;
+  font-size: clamp(9px, 2.6vmin, 16px);
   color: var(--wine);
 }
 
 /* ---- газетная вырезка ---- */
 .news{
-  width: clamp(120px, 34vw, 190px);
+  width: clamp(74px, min(28vw, 14dvh), 170px);
   background: #efeadd;
   padding: 10px 11px 12px;
   box-shadow: 0 8px 18px rgba(0,0,0,0.45);
@@ -530,7 +524,7 @@ html, body{
 .news .news-brand{
   display: block;
   font-family: var(--serif);
-  font-size: 9px;
+  font-size: clamp(5.5px, 1.6vmin, 9px);
   letter-spacing: 0.1em;
   text-align: center;
   border-bottom: 1px solid #9a927f;
@@ -542,7 +536,7 @@ html, body{
   display: block;
   font-family: var(--serif);
   font-weight: 700;
-  font-size: clamp(11px, 3vw, 14px);
+  font-size: clamp(7px, 2.2vmin, 13px);
   line-height: 1.15;
   color: #1e1a12;
   margin-bottom: 6px;
@@ -556,7 +550,7 @@ html, body{
 
 /* ---- карта / сейф ---- */
 .map-pin{
-  width: min(66vw, 320px);
+  width: clamp(112px, min(41vw, 20dvh), 240px);
 }
 .map-pin .frame{
   display: block;
@@ -570,12 +564,12 @@ html, body{
 .map-pin .cap{
   display: block;
   font-family: var(--hand);
-  font-size: 19px;
+  font-size: clamp(10px, 3vmin, 18px);
   color: #2b2418;
   text-align: center;
   padding-top: 5px;
 }
-.map-pin.locked .frame{ filter: grayscale(0.75) brightness(0.72); }
+.map-pin.locked .frame{ filter: grayscale(0.45) brightness(0.9); }
 .map-pin .lock-badge{
   position: absolute;
   inset: 8px;
@@ -586,13 +580,15 @@ html, body{
   gap: 4px;
   font-family: var(--label);
   letter-spacing: 0.12em;
-  font-size: 14px;
-  color: #ffe0b0;
-  text-shadow: 0 2px 5px rgba(0,0,0,0.9);
-  background: rgba(12,8,4,0.62);
+  font-size: clamp(9px, 2.4vmin, 13px);
+  color: #ffeacb;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.95);
+  background: rgba(14,10,6,0.42);
+  text-align: center;
+  padding: 0 6px;
   z-index: 3;
 }
-.map-pin .lock-badge span.lock-ico{ font-size: 26px; }
+.map-pin .lock-badge span.lock-ico{ font-size: clamp(16px, 4.5vmin, 26px); }
 .map-pin.unlocked{ animation: map-glow 2.2s ease-in-out infinite; }
 @keyframes map-glow{
   0%,100%{ filter: drop-shadow(0 0 0 rgba(255,180,90,0)); }

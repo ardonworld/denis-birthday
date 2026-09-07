@@ -269,7 +269,7 @@ const CULPRIT = ['софья', 'софия', 'соня'];
 /* ---------- 4. КОНФИГ ДОСКИ ---------- */
 const BOARD_ITEMS = [
   {
-    id: 'brief', type: 'note', x: 50, y: 3.5, rot: -1.2,
+    id: 'brief', type: 'note', x: 27, y: 9.5, rot: -1.2,
     head: 'Дело № 24 · рапорт',
     body: 'Ночью из погреба «3 Резиденции» пропала бутылка особой выдержки.',
     more: 'нажми — прочесть целиком',
@@ -282,7 +282,7 @@ const BOARD_ITEMS = [
 
   /* ---- свидетели ---- */
   {
-    id: 'nikita', type: 'polaroid', fig: 'man', x: 20, y: 11, rot: -4.5, label: 'Никита',
+    id: 'nikita', type: 'polaroid', fig: 'man', x: 12, y: 28, rot: -4.5, label: 'Никита',
     detail: {
       eyebrow: 'Свидетель · разбирается в напитках',
       fig: 'man', shotCap: 'Никита',
@@ -291,7 +291,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'alena', type: 'polaroid', fig: 'woman', x: 74, y: 11.5, rot: 3.5, label: 'Алёна',
+    id: 'alena', type: 'polaroid', fig: 'woman', x: 33, y: 28, rot: 3.5, label: 'Алёна',
     detail: {
       eyebrow: 'Свидетель · разбирается в напитках',
       fig: 'woman', shotCap: 'Алёна',
@@ -300,7 +300,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'migal', type: 'polaroid', fig: 'strong', x: 72, y: 21.5, rot: -3, label: 'Мигаль',
+    id: 'migal', type: 'polaroid', fig: 'strong', x: 54, y: 28, rot: -3, label: 'Мигаль',
     detail: {
       eyebrow: 'Свидетель · алиби железное',
       fig: 'strong', shotCap: 'Мигаль',
@@ -309,7 +309,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'matvey', type: 'polaroid', fig: 'suit', x: 24, y: 30, rot: 2.5, label: 'Матвей',
+    id: 'matvey', type: 'polaroid', fig: 'suit', x: 12, y: 45, rot: 2.5, label: 'Матвей',
     detail: {
       eyebrow: 'Свидетель',
       fig: 'suit', shotCap: 'Матвей',
@@ -318,7 +318,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'lera', type: 'polaroid', fig: 'updo', x: 70, y: 30.5, rot: -2, label: 'Лера',
+    id: 'lera', type: 'polaroid', fig: 'updo', x: 75, y: 28, rot: 2, label: 'Лера',
     detail: {
       eyebrow: 'Свидетель · снимала весь вечер',
       fig: 'updo', shotCap: 'Лера',
@@ -327,7 +327,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'sofya', type: 'polaroid', fig: 'dressLady', x: 76, y: 39, rot: 3, label: 'Софья',
+    id: 'sofya', type: 'polaroid', fig: 'dressLady', x: 33, y: 45, rot: 3, label: 'Софья',
     detail: {
       eyebrow: 'Свидетель · жена именинника',
       fig: 'dressLady', shotCap: 'Софья',
@@ -336,7 +336,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'denis', type: 'polaroid', fig: 'beard', x: 22, y: 47, rot: -3.5, label: 'Денис (гость)',
+    id: 'denis', type: 'polaroid', fig: 'beard', x: 54, y: 45, rot: -3.5, label: 'Денис (гость)',
     detail: {
       eyebrow: 'Свидетель',
       fig: 'beard', shotCap: 'Денис',
@@ -345,7 +345,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'dasha', type: 'polaroid', fig: 'curly', x: 58, y: 47.5, rot: 2, label: 'Даша',
+    id: 'dasha', type: 'polaroid', fig: 'curly', x: 75, y: 45, rot: 2, label: 'Даша',
     detail: {
       eyebrow: 'Свидетель',
       fig: 'curly', shotCap: 'Даша',
@@ -354,7 +354,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'artem', type: 'polaroid', fig: 'cap', x: 20, y: 64, rot: -4, label: 'Артём',
+    id: 'artem', type: 'polaroid', fig: 'cap', x: 12, y: 62, rot: -4, label: 'Артём',
     detail: {
       eyebrow: 'Свидетель · нашёл квитанцию',
       fig: 'cap', shotCap: 'Артём',
@@ -365,25 +365,25 @@ const BOARD_ITEMS = [
 
   /* ---- улики ---- */
   {
-    id: 'evidence-a', type: 'polaroid', fig: 'bottleShot', x: 22, y: 21, rot: -2.5,
+    id: 'evidence-a', type: 'polaroid', fig: 'bottleShot', x: 61, y: 9.5, rot: -2.5,
     label: 'Улика А', evidence: 'a',
   },
   {
-    id: 'evidence-g', type: 'polaroid', fig: 'stairsShot', x: 45, y: 37.5, rot: 3.5,
+    id: 'evidence-g', type: 'polaroid', fig: 'stairsShot', x: 75, y: 62, rot: -3.5,
     label: 'Улика Г', evidence: 'd',
   },
   {
-    id: 'evidence-v', type: 'polaroid', fig: 'clockShot', x: 30, y: 55.5, rot: -2,
+    id: 'evidence-v', type: 'polaroid', fig: 'clockShot', x: 54, y: 62, rot: -2,
     label: 'Улика В', evidence: 'c',
   },
   {
-    id: 'evidence-b', type: 'polaroid', fig: 'receiptShot', x: 64, y: 65, rot: 3,
+    id: 'evidence-b', type: 'polaroid', fig: 'receiptShot', x: 33, y: 62, rot: 3,
     label: 'Улика Б', evidence: 'b',
   },
 
   /* ---- винтажный реквизит ---- */
   {
-    id: 'prop-magnifier', type: 'prop', art: 'magnifier', x: 48, y: 92, rot: -12,
+    id: 'prop-magnifier', type: 'prop', art: 'magnifier', x: 79, y: 10.5, rot: -12,
     detail: {
       eyebrow: 'Реквизит · лупа инспектора',
       text: 'Ею осмотрели скол на крышке ящика. Скол свежий, оставлен в ночь пропажи: ящик вскрывали второпях и явно не тем инструментом, что лежит в кладовой.',
@@ -391,7 +391,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'prop-pipe', type: 'prop', art: 'pipe', x: 90, y: 29.5, rot: 9,
+    id: 'prop-pipe', type: 'prop', art: 'pipe', x: 93, y: 27, rot: 9,
     detail: {
       eyebrow: 'Реквизит · трубка следователя',
       text: 'Бочкарёв уверяет, что думает лучше, когда трубка погасла. За эту ночь она гасла четыре раза — ровно по числу улик, которые предстоит разобрать.',
@@ -399,7 +399,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'prop-hat', type: 'prop', art: 'deerstalker', x: 8, y: 58, rot: -8,
+    id: 'prop-hat', type: 'prop', art: 'deerstalker', x: 12, y: 94.5, rot: -8,
     detail: {
       eyebrow: 'Реквизит · шляпа из гардероба',
       text: 'Провисела в прихожей весь вечер, никто из гостей её не надевал. Проверено: пыль на полях не тронута.',
@@ -407,7 +407,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'prop-print', type: 'prop', art: 'fingerprint', x: 42, y: 70.5, rot: 5,
+    id: 'prop-print', type: 'prop', art: 'fingerprint', x: 94, y: 80, rot: 5,
     detail: {
       eyebrow: 'Улика без номера · отпечаток',
       text: 'Снят с горлышка соседней бутылки, которую даже не тронули. Смазан настолько, что эксперт отказался делать выводы. Приобщён к делу формально.',
@@ -415,7 +415,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'prop-watch', type: 'prop', art: 'pocketwatch', x: 90, y: 74.5, rot: -6,
+    id: 'prop-watch', type: 'prop', art: 'pocketwatch', x: 93, y: 61.5, rot: -6,
     detail: {
       eyebrow: 'Реквизит · часы кладовщика',
       text: 'Стрелки замерли на 23:50. Механизм сломан больше недели назад и всё это время врал почти на час — ориентироваться по ним нельзя. Точное время придётся считать по показаниям гостей.',
@@ -423,7 +423,7 @@ const BOARD_ITEMS = [
     },
   },
   {
-    id: 'prop-steps', type: 'prop', art: 'footprints', x: 8, y: 91.5, rot: 4,
+    id: 'prop-steps', type: 'prop', art: 'footprints', x: 88, y: 94.5, rot: 4,
     detail: {
       eyebrow: 'Реквизит · следы у чёрного входа',
       text: 'Пол был мокрый, отпечатки расплылись — ни размер, ни обувь определить не вышло. Ясно одно: выходили именно здесь, а не через главный вход.',
@@ -432,12 +432,12 @@ const BOARD_ITEMS = [
   },
 
   /* ---- декор и подсказки ---- */
-  { id: 'sticky1', type: 'sticky', x: 47, y: 17.5, rot: 4, text: 'свечей = ?' },
-  { id: 'sticky2', type: 'sticky', x: 13, y: 38.5, rot: -6, text: 'светлое — одно!' },
-  { id: 'sticky3', type: 'sticky', x: 88, y: 46.5, rot: 5, text: '00:15 + 7 =' },
-  { id: 'sticky4', type: 'sticky', x: 12, y: 73, rot: -4, text: 'вычеркни лишние' },
+  { id: 'sticky1', type: 'sticky', x: 92, y: 9.5, rot: 4, text: 'свечей = ?' },
+  { id: 'sticky2', type: 'sticky', x: 92.5, y: 44.5, rot: -4, text: 'светлое — одно!' },
+  { id: 'sticky3', type: 'sticky', x: 8, y: 80, rot: 5, text: '00:15 + 7 =' },
+  { id: 'sticky4', type: 'sticky', x: 50, y: 94, rot: 3, text: 'вычеркни лишние' },
   {
-    id: 'news', type: 'news', x: 68, y: 57, rot: -3,
+    id: 'news', type: 'news', x: 74, y: 80, rot: -3,
     brand: 'ВЕЧЕРНИЙ СТРОИТЕЛЬ',
     head: 'Резиденция закрыта на спецобслуживание',
     detail: {
@@ -446,7 +446,7 @@ const BOARD_ITEMS = [
       sign: 'приобщено к делу',
     },
   },
-  { id: 'final', type: 'map', x: 50, y: 82, rot: -1 },
+  { id: 'final', type: 'map', x: 38, y: 80, rot: -1 },
 ];
 
 const STRINGS = [
@@ -862,8 +862,8 @@ function drawStrings() {
     const mx = (A.x + B.x) / 2 + (Math.random() - 0.5) * 4;
     const my = (A.y + B.y) / 2 + (Math.random() - 0.5) * 1.2;
     return `<path d="M${A.x} ${A.y} Q${mx} ${my} ${B.x} ${B.y}"
-      fill="none" stroke="#b5342c" stroke-width="1.5"
-      vector-effect="non-scaling-stroke" opacity="0.68"/>`;
+      fill="none" stroke="#c0272d" stroke-width="2.4"
+      vector-effect="non-scaling-stroke" opacity="0.85"/>`;
   }).join('');
 }
 
