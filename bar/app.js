@@ -1,3 +1,5 @@
+import { BarScene, canRun3D } from './scene3d.js';
+
 /* =========================================================
    3 РЕЗИДЕНЦИЯ — бар, кухня, табак
    Вся графика нарисована вручную в SVG: стекло, лёд, гарнир.
@@ -226,7 +228,7 @@ function glassHurricane(id, top, bottom) {
 /* ---------- данные бара ---------- */
 const COCKTAILS = [
   {
-    id: 'negroni', name: 'Негрони', accent: '#e0492c',
+    id: 'negroni', name: 'Негрони', accent: '#e0492c', kind: 'rocks', liquid: '#b3231c', garnish: 'citrus',
     art: glassRocks, top: '#f0603a', bottom: '#96150f',
     lead: 'Горький классик на троих равных. Тот случай, когда простая формула держит весь вечер.',
     base: 'Джин', abv: '24%', vol: '90 мл', serve: 'Рокс, крупный лёд',
@@ -236,7 +238,7 @@ const COCKTAILS = [
     pairing: 'Оливки, вяленое мясо, твёрдый сыр.',
   },
   {
-    id: 'mojito', name: 'Мохито', accent: '#63c94f',
+    id: 'mojito', name: 'Мохито', accent: '#63c94f', kind: 'highball', liquid: '#bfe89a', garnish: 'mint',
     art: glassHighball, top: '#c9f5a8', bottom: '#4d9c3a',
     lead: 'Мята, лайм и лёд. Освежает и не даёт вечеру провалиться в тяжесть.',
     base: 'Белый ром', abv: '12%', vol: '320 мл', serve: 'Хайбол, дроблёный лёд',
@@ -246,7 +248,7 @@ const COCKTAILS = [
     pairing: 'Севиче, лёгкие закуски, всё острое.',
   },
   {
-    id: 'aperol', name: 'Шприц', accent: '#ff8a1f',
+    id: 'aperol', name: 'Шприц', accent: '#ff8a1f', kind: 'wine', liquid: '#ff8a1f', garnish: 'citrus',
     art: glassSpritz, top: '#ffb648', bottom: '#e8590c',
     lead: 'Аперитив, с которого начинают. Пузырьки, апельсин и лёгкая горчинка.',
     base: 'Апероль', abv: '9%', vol: '250 мл', serve: 'Бокал для вина, много льда',
@@ -256,7 +258,7 @@ const COCKTAILS = [
     pairing: 'Брускетта, прошутто, сырная тарелка.',
   },
   {
-    id: 'espresso', name: 'Эспрессо', accent: '#c08b4e',
+    id: 'espresso', name: 'Эспрессо', accent: '#c08b4e', kind: 'coupe', liquid: '#2e1a0f', garnish: 'beans',
     art: glassCoupe, top: '#8a5a2b', bottom: '#3a1f10',
     lead: 'Кофе и водка в одном бокале. Тот самый коктейль для второй половины вечера.',
     base: 'Водка', abv: '18%', vol: '110 мл', serve: 'Купе, три зерна',
@@ -266,7 +268,7 @@ const COCKTAILS = [
     pairing: 'Тирамису, шоколад, орехи.',
   },
   {
-    id: 'lagoon', name: 'Лагуна', accent: '#2fb6e8',
+    id: 'lagoon', name: 'Лагуна', accent: '#2fb6e8', kind: 'hurricane', liquid: '#1f9be0', garnish: 'lime',
     art: glassHurricane, top: '#7ee0ff', bottom: '#1273c4',
     lead: 'Голубой цитрус со льдом. Самый заметный бокал в зале — берут глазами.',
     base: 'Водка', abv: '11%', vol: '280 мл', serve: 'Харрикейн, лёд, трубочка',
@@ -388,6 +390,7 @@ function paint(i, animate) {
     glassWrap.classList.add('swap');
   }
   switcher.querySelectorAll('.chip').forEach((b, k) => b.classList.toggle('is-active', k === i));
+  if (scene) { scene.setAccent(c.accent); scene.build(c.kind, c.liquid, c.garnish); }
 }
 
 function buildSwitcher() {
@@ -530,6 +533,23 @@ drinksScene.addEventListener('pointerleave', () => {
   const tilt = glassWrap.querySelector('.glass-tilt');
   if (tilt) tilt.style.transform = '';
 });
+
+/* ---------- настоящее 3D, если железо тянет ---------- */
+let scene = null;
+/* 3D пока черновик: качество ниже рисованной версии, поэтому включается
+   только вручную — ?3d=1 в адресе. Основным гостям отдаём SVG. */
+const want3D = new URLSearchParams(location.search).has('3d');
+if (want3D && canRun3D()) {
+  try {
+    scene = new BarScene(document.getElementById('scene3d'));
+    scene.init();
+    document.body.classList.add('has3d');
+  } catch (err) {
+    console.warn('3D не поднялось, остаёмся на рисованных бокалах:', err);
+    scene = null;
+    document.body.classList.remove('has3d');
+  }
+}
 
 /* ---------- старт ---------- */
 buildSwitcher();
