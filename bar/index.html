@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3 Резиденция — бар, кухня, табак</title>
+<meta name="description" content="Карта бара: коктейли, кухня и табачная карта">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#drinks">
+    <span class="brand-mark"></span>
+    3 Резиденция
+  </a>
+  <nav class="nav">
+    <a href="#drinks" class="nav-link is-active" data-nav="drinks">Коктейли</a>
+    <a href="#kitchen" class="nav-link" data-nav="kitchen">Кухня</a>
+    <a href="#tobacco" class="nav-link" data-nav="tobacco">Табак</a>
+  </nav>
+  <a class="topbar-cta" href="../">К приглашению <span>→</span></a>
+</header>
+
+<main id="scroller">
+
+  <!-- ================= КОКТЕЙЛИ ================= -->
+  <section class="scene" id="drinks">
+    <div class="scene-glow" id="drink-glow"></div>
+
+    <div class="scene-inner">
+      <p class="eyebrow">Карта бара · пять позиций</p>
+
+      <div class="hero">
+        <h1 class="hero-title" id="drink-title">Негрони</h1>
+
+        <div class="hero-stage">
+          <div class="hero-col hero-col-left">
+            <p class="hero-lead" id="drink-lead"></p>
+            <button class="btn btn-accent" id="open-detail">
+              Состав и подача <span>→</span>
+            </button>
+          </div>
+
+          <div class="glass-wrap" id="glass-wrap"></div>
+
+          <div class="hero-col hero-col-right">
+            <div class="fact"><span class="fact-key">База</span><span class="fact-val" id="fact-base"></span></div>
+            <div class="fact"><span class="fact-key">Крепость</span><span class="fact-val" id="fact-abv"></span></div>
+            <div class="fact"><span class="fact-key">Объём</span><span class="fact-val" id="fact-vol"></span></div>
+            <div class="fact"><span class="fact-key">Подача</span><span class="fact-val" id="fact-serve"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="switcher" id="switcher"></div>
+
+    <button class="jump" data-to="kitchen">
+      <span class="jump-label">Кухня — по блюду к каждому коктейлю</span>
+      <span class="jump-arrow">↓</span>
+    </button>
+  </section>
+
+  <!-- ================= КУХНЯ ================= -->
+  <section class="scene scene-alt" id="kitchen">
+    <div class="scene-inner">
+      <p class="eyebrow">Кухня · пара к коктейлю</p>
+      <h2 class="section-title">Что берут<br>под бокал</h2>
+      <div class="cards" id="dish-list"></div>
+    </div>
+
+    <button class="jump" data-to="tobacco">
+      <span class="jump-label">Табачная карта</span>
+      <span class="jump-arrow">↓</span>
+    </button>
+  </section>
+
+  <!-- ================= ТАБАК ================= -->
+  <section class="scene" id="tobacco">
+    <div class="scene-inner">
+      <p class="eyebrow">Табачная карта · миксы вечера</p>
+      <h2 class="section-title">Дым<br>под настроение</h2>
+      <div class="cards" id="tobacco-list"></div>
+    </div>
+
+    <button class="jump jump-up" data-to="drinks">
+      <span class="jump-label">Наверх, к коктейлям</span>
+      <span class="jump-arrow">↑</span>
+    </button>
+  </section>
+
+</main>
+
+<!-- ВЫДВИЖНАЯ КАРТОЧКА -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-backdrop" id="sheet-backdrop"></div>
+  <article class="sheet-card">
+    <button class="sheet-close" id="sheet-close" aria-label="Закрыть">✕</button>
+    <div class="sheet-body" id="sheet-body"></div>
+  </article>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
