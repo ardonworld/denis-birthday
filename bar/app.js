@@ -372,7 +372,7 @@ const TOBACCO = [
 /* ---------- состояние и отрисовка ---------- */
 let current = 0;
 const glassWrap = document.getElementById('glass-wrap');
-const switcher = document.getElementById('switcher');
+const switcher = document.getElementById('switcher');  // может отсутствовать
 
 /* ---------- движок презентации ----------
    Карта показывает себя сама: коктейль за коктейлем, блок за блоком.
@@ -429,7 +429,8 @@ function paint(i, animate) {
   current = i;
   document.documentElement.style.setProperty('--accent', c.accent);
   if (scene) scene.build(c.kind, c.liquid, c.accent);
-  switcher.querySelectorAll('.chip').forEach((b, k) => b.classList.toggle('is-active', k === i));
+  const num = document.getElementById('show-num');
+  if (num) num.textContent = String(i + 1).padStart(2, '0');
 
   if (animate) {
     clearStage();
@@ -461,15 +462,13 @@ document.addEventListener('visibilitychange', () => {
   else if (show.paused) { show.paused = false; startShow(current, false); }
 });
 
-function buildSwitcher() {
-  COCKTAILS.forEach((c, i) => {
-    const b = el('button', 'chip');
-    b.type = 'button';
-    b.innerHTML = `<span class="chip-thumb">${c.art('thumb-' + c.id, c.top, c.bottom)}</span>${c.name}`;
-    b.addEventListener('click', () => startShow(i, true));
-    switcher.appendChild(b);
-  });
-}
+function buildSwitcher() { /* лента убрана: показ идёт сам */ }
+
+/* стрелками можно перескочить вперёд или назад */
+addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') startShow((current + 1) % COCKTAILS.length, true);
+  if (e.key === 'ArrowLeft') startShow((current - 1 + COCKTAILS.length) % COCKTAILS.length, true);
+});
 
 /* ---------- карточка с составом ---------- */
 const sheet = document.getElementById('sheet');
@@ -571,22 +570,20 @@ function buildTobacco() {
 }
 
 /* ---------- переходы между сценами ---------- */
-document.querySelectorAll('.jump').forEach((btn) => {
+document.querySelectorAll('.next-hint').forEach((btn) => {
   btn.addEventListener('click', () => {
     document.getElementById(btn.dataset.to).scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
 
-const sections = ['drinks', 'kitchen', 'tobacco'].map((id) => document.getElementById(id));
-const observer = new IntersectionObserver((entries) => {
+/* показ на первом экране идёт только пока он на виду */
+const drinksSection = document.getElementById('drinks');
+new IntersectionObserver((entries) => {
   entries.forEach((e) => {
-    if (e.isIntersecting) {
-      document.querySelectorAll('.nav-link').forEach((l) =>
-        l.classList.toggle('is-active', l.dataset.nav === e.target.id));
-    }
+    if (e.isIntersecting && show.paused) { show.paused = false; startShow(current, false); }
+    else if (!e.isIntersecting && !show.paused) { clearTimeout(show.timer); show.paused = true; }
   });
-}, { threshold: 0.55 });
-sections.forEach((s) => observer.observe(s));
+}, { threshold: 0.4 }).observe(drinksSection);
 
 /* ---------- лёгкий параллакс стакана ---------- */
 const drinksScene = document.getElementById('drinks');

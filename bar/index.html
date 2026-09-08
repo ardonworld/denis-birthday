@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=202609081359">
+<link rel="stylesheet" href="style.css?v=202609081428">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>">
 </head>
 <body>
@@ -26,16 +26,10 @@
 </div>
 
 <header class="topbar">
-  <a class="brand" href="#drinks">
+  <span class="brand">
     <span class="brand-mark"></span>
     3 Резиденция
-  </a>
-  <nav class="nav">
-    <a href="#drinks" class="nav-link is-active" data-nav="drinks">Коктейли</a>
-    <a href="#kitchen" class="nav-link" data-nav="kitchen">Кухня</a>
-    <a href="#tobacco" class="nav-link" data-nav="tobacco">Табак</a>
-  </nav>
-  <a class="topbar-cta" href="../">К приглашению <span>→</span></a>
+  </span>
 </header>
 
 <main id="scroller">
@@ -45,7 +39,7 @@
     <div class="scene-glow" id="drink-glow"></div>
 
     <div class="scene-inner">
-      <p class="eyebrow">Карта бара · пять позиций</p>
+      <p class="eyebrow"><span class="counter"><span id="show-num">01</span><i>/</i>05</span></p>
 
       <div class="hero" id="hero">
         <h1 class="hero-title reveal" id="drink-title">Негрони</h1>
@@ -85,32 +79,29 @@
     </div>
 
     <div class="show-bar" id="show-bar"></div>
-    <div class="switcher" id="switcher"></div>
 
-    <button class="jump" data-to="kitchen">
-      <span class="jump-label">Кухня — по блюду к каждому коктейлю</span>
-      <span class="jump-arrow">↓</span>
+    <button class="next-hint" data-to="kitchen">
+      Дальше — кухня <span class="next-arrow">↓</span>
     </button>
   </section>
 
   <!-- ================= КУХНЯ ================= -->
   <section class="scene scene-alt" id="kitchen">
     <div class="scene-inner">
-      <p class="eyebrow">Кухня · пара к коктейлю</p>
+      <p class="eyebrow">Кухня</p>
       <h2 class="section-title">Что берут<br>под бокал</h2>
       <div class="cards" id="dish-list"></div>
     </div>
 
-    <button class="jump" data-to="tobacco">
-      <span class="jump-label">Табачная карта</span>
-      <span class="jump-arrow">↓</span>
+    <button class="next-hint" data-to="tobacco">
+      Дальше — табачная карта <span class="next-arrow">↓</span>
     </button>
   </section>
 
   <!-- ================= ТАБАК ================= -->
   <section class="scene" id="tobacco">
     <div class="scene-inner">
-      <p class="eyebrow">Табачная карта · миксы вечера</p>
+      <p class="eyebrow">Табак</p>
       <h2 class="section-title">Дым<br>под настроение</h2>
       <div class="cards" id="tobacco-list"></div>
     </div>
@@ -121,10 +112,10 @@
       Карта освещения — <a href="https://polyhaven.com/a/studio_small_09" target="_blank" rel="noopener">Poly Haven</a>, CC0.
     </p>
 
-    <button class="jump jump-up" data-to="drinks">
-      <span class="jump-label">Наверх, к коктейлям</span>
-      <span class="jump-arrow">↑</span>
-    </button>
+    <div class="ending">
+      <a class="next-hint" href="../">К приглашению <span class="next-arrow next-arrow-right">→</span></a>
+      <button class="next-hint next-hint-up" data-to="drinks"><span class="next-arrow">↑</span> К началу</button>
+    </div>
   </section>
 
 </main>
@@ -146,6 +137,6 @@
   }
 }
 </script>
-<script type="module" src="app.js?v=202609081359"></script>
+<script type="module" src="app.js?v=202609081428"></script>
 </body>
 </html>

@@ -727,3 +727,86 @@ body.has3d .glass-wrap{ filter: none; }
   .recipe .col-label{ text-align: center; }
   .show-bar{ bottom: 112px; }
 }
+
+/* ================= БЕЗ ПАНЕЛЕЙ: тихая навигация ================= */
+.switcher{ display: none !important; }
+
+.counter{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-left: 14px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  transition: color .6s ease;
+}
+.counter i{ font-style: normal; opacity: 0.4; margin: 0 1px; }
+.counter #show-num{ color: var(--ink); }
+
+.show-bar{
+  bottom: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.07);
+}
+
+.next-hint{
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 7;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  color: rgba(243,245,244,0.42);
+  font-family: var(--font);
+  font-size: clamp(11.5px, 1.4vw, 13px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color .35s ease, letter-spacing .35s ease;
+}
+.next-hint:hover{ color: var(--ink); letter-spacing: 0.2em; }
+.next-arrow{
+  font-size: 15px;
+  animation: nudge 2.4s ease-in-out infinite;
+}
+.next-hint-up .next-arrow{ animation-name: nudge-up; }
+
+.credits{ bottom: 62px; text-align: center; }
+
+/* ================= ШАПКА БЕЗ ИНТЕРФЕЙСА ================= */
+.topbar{
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  pointer-events: none;
+  height: 54px;
+}
+.topbar .brand{
+  font-size: clamp(11px, 1.5vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(243,245,244,0.42);
+}
+.topbar .brand-mark{ width: 8px; height: 8px; box-shadow: 0 0 12px var(--accent); }
+.nav, .topbar-cta{ display: none !important; }
+
+.eyebrow{ margin-bottom: clamp(6px, 1.4vw, 14px); }
+.counter{ margin-left: 0; font-size: clamp(11px, 1.5vw, 13px); letter-spacing: 0.18em; }
+
+.ending{
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 22px;
+  display: flex;
+  justify-content: center;
+  gap: clamp(18px, 4vw, 46px);
+  z-index: 7;
+}
+.ending .next-hint{ position: static; transform: none; text-decoration: none; }
+.next-arrow-right{ animation: none; }
