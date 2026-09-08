@@ -222,21 +222,33 @@ export class BarScene {
     if (this.composer) this.composer.setSize(window.innerWidth, window.innerHeight);
   }
 
+  /* прогресс прокрутки в экранах: 0 — бар, 1 — кухня, 2 — табак */
+  setScroll(p) { this.scroll = p; }
+
   loop() {
     requestAnimationFrame(() => this.loop());
     if (!this.enabled) return;
+    const sp = this.scroll || 0;
+    this.scrollEase = (this.scrollEase ?? sp) + (sp - (this.scrollEase ?? sp)) * 0.08;
     this.pointer.x += (this.target.x - this.pointer.x) * 0.045;
     this.pointer.y += (this.target.y - this.pointer.y) * 0.045;
     const t = performance.now() * 0.001;
 
     if (this.group) {
-      this.group.rotation.y = t * 0.12 + this.pointer.x * 0.35;
-      this.group.rotation.x = this.pointer.y * 0.06;
-      this.group.position.y = this.baseY + Math.sin(t * 0.7) * 0.04;
+      const e = this.scrollEase;
+      /* бокал улетает вверх-влево и уменьшается, когда уходим на кухню */
+      const away = Math.min(Math.max(e, 0), 2);
+      this.group.rotation.y = t * 0.12 + this.pointer.x * 0.35 + away * 0.9;
+      this.group.rotation.x = this.pointer.y * 0.06 - away * 0.12;
+      this.group.position.x = -away * 3.4;
+      this.group.position.y = this.baseY + Math.sin(t * 0.7) * 0.04 + away * 2.2;
+      this.group.position.z = -away * 3;
+      this.camera.position.z = 6.4 + away * 1.6;
+      this.canvas.style.opacity = String(Math.max(0, 1 - away * 1.7));
       if (this.enterFrom) {
         const k = Math.min((performance.now() - this.enterFrom) / 800, 1);
         const e = 1 - Math.pow(1 - k, 3);
-        this.group.scale.setScalar(this.fitScale * (0.9 + e * 0.1));
+        this.group.scale.setScalar(this.fitScale * (0.9 + (1 - Math.pow(1 - k, 3)) * 0.1));
         if (k >= 1) this.enterFrom = 0;
       }
     }

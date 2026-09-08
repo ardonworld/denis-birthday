@@ -555,6 +555,31 @@ if (quality !== 'off' && !new URLSearchParams(location.search).has('no3d')) {
     });
 }
 
+/* ---------- киновступление ---------- */
+const titles = document.getElementById('titles');
+function runTitles() {
+  const lines = [...document.querySelectorAll('.title-line')];
+  if (sessionStorage.getItem('seenTitles')) { titles.classList.add('done'); return; }
+  lines.forEach((l, i) => setTimeout(() => l.classList.add('show'), i * 1250));
+  setTimeout(endTitles, lines.length * 1250 + 600);
+}
+function endTitles() {
+  titles.classList.add('done');
+  sessionStorage.setItem('seenTitles', '1');
+}
+document.getElementById('titles-skip').addEventListener('click', endTitles);
+runTitles();
+
+/* ---------- прокрутка управляет сценой ---------- */
+let scrollRaf = 0;
+addEventListener('scroll', () => {
+  if (scrollRaf) return;
+  scrollRaf = requestAnimationFrame(() => {
+    scrollRaf = 0;
+    if (scene) scene.setScroll(window.scrollY / Math.max(window.innerHeight, 1));
+  });
+}, { passive: true });
+
 /* ---------- старт ---------- */
 buildSwitcher();
 buildDishes();

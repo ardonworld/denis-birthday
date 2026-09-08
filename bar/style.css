@@ -548,3 +548,58 @@ body.has3d .glass-wrap{ filter: none; }
   z-index: 6;
 }
 .credits a{ color: rgba(243,245,244,0.55); }
+
+/* ================= КИНОВСТУПЛЕНИЕ ================= */
+.titles{
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: #050708;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1.1s ease, visibility 1.1s;
+}
+.titles.done{ opacity: 0; visibility: hidden; pointer-events: none; }
+.titles-inner{ text-align: center; }
+.title-line{
+  margin: 0 0 6px;
+  font-size: clamp(15px, 2.4vw, 24px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(243,245,244,0.72);
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(6px);
+}
+.title-line-big{
+  font-size: clamp(30px, 7vw, 84px);
+  letter-spacing: -0.03em;
+  text-transform: none;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 10px 0 14px;
+}
+.title-line.show{
+  animation: title-in 1.5s cubic-bezier(.2,.8,.25,1) forwards;
+}
+@keyframes title-in{
+  0%{ opacity: 0; transform: translateY(14px); filter: blur(6px); }
+  25%{ opacity: 1; transform: translateY(0); filter: blur(0); }
+  78%{ opacity: 1; transform: translateY(0); filter: blur(0); }
+  100%{ opacity: 0; transform: translateY(-8px); filter: blur(3px); }
+}
+.titles-skip{
+  position: absolute;
+  bottom: 34px; left: 50%;
+  transform: translateX(-50%);
+  background: none;
+  border: none;
+  color: rgba(243,245,244,0.4);
+  font-family: var(--font);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.titles-skip:hover{ color: var(--ink); }
