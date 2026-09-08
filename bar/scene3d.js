@@ -55,12 +55,17 @@ export class BarScene {
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 100);
-    this.camera.position.set(0, 0.15, 6.4);
+    this.camera.position.set(0, 0.95, 6.4);
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.5);
+    /* свет как на предметной съёмке: рисующий сверху-сбоку, контровой
+       из-за бокала (он подсвечивает кромку) и еле заметная заливка */
+    const key = new THREE.DirectionalLight(0xffffff, 1.4);
     key.position.set(3, 5, 4);
     this.scene.add(key);
-    this.scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+    const rim = new THREE.DirectionalLight(0xcfe3ff, 2.2);
+    rim.position.set(-2.5, 3.5, -5);
+    this.scene.add(rim);
+    this.scene.add(new THREE.AmbientLight(0xffffff, 0.12));
 
     await this.buildEnvironment();
 
@@ -113,7 +118,7 @@ export class BarScene {
     panel(0.9, 18, -6.2, 1, 1.5, 0, Math.PI / 2, '#ffffff', 16);
     panel(0.55, 15, -7.4, 0, -1, 0, Math.PI / 2, '#eaf2ff', 10);
     panel(0.7, 16, 6.6, 0.5, 1, 0, -Math.PI / 2, '#dceaff', 12);
-    panel(9, 2.2, 0, 7.5, -1, Math.PI / 2, 0, '#ffffff', 5);
+    panel(11, 7, 0, 6.4, 0.5, Math.PI / 2, 0, '#ffffff', 7);
     /* тёмные экраны — от них в стекле появляются глубокие тени */
     panel(6, 18, -3.2, 0, 5.5, 0, 0, '#000000', 1);
     panel(6, 18, 3.2, 0, 5.5, 0, 0, '#000000', 1);
@@ -141,22 +146,155 @@ export class BarScene {
     this.meshes = list;
 
     const hi = this.quality === 'high';
+    /* Настоящее стекло выдаёт не блик, а толща: свет, проходя сквозь неё,
+       чуть зеленеет и гаснет. Это даёт attenuationColor/Distance. */
     this.glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0xeef4f8,
+      color: 0xffffff,
       metalness: 0,
-      roughness: 0.015,
-      ior: 1.52,
+      roughness: 0.01,
+      ior: 1.51,
       transmission: hi ? 1 : 0,
-      thickness: 0.3,
+      thickness: 0.28,
+      attenuationColor: new THREE.Color(0xe8f7f0),
+      attenuationDistance: 6.5,
+      specularIntensity: 1,
+      specularColor: new THREE.Color(0xffffff),
       clearcoat: 1,
       clearcoatRoughness: 0.02,
-      envMapIntensity: 3.2,
+      envMapIntensity: 1.45,
       transparent: true,
       opacity: hi ? 1 : 0.32,
       side: THREE.DoubleSide,
       depthWrite: hi,
     });
     this.ready = true;
+  }
+
+  /* ---------- ЖИДКОСТЬ ----------
+     Три вещи отличают напиток от «заливки цветом»:
+     цвет густеет ко дну, поверхность отражает свет отдельно от толщи,
+     и по ней всё время идёт волна. Всё это делаем в шейдере. */
+
+  /* общая для тела и поверхности функция волны — иначе они разойдутся */
+  static WAVE_GLSL = `
+    float waveAt(vec3 p, float t){
+      return (sin(p.x * 5.2 + t * 2.9) + sin(p.z * 4.1 - t * 2.2)
+            + sin((p.x + p.z) * 7.3 + t * 3.7) * 0.45) * 0.42;
+    }`;
+
+  liquidUniforms(color, opts) {
+    const c = new THREE.Color(color);
+    return {
+      uTime:  { value: 0 },
+      uWave:  { value: 0.006 },
+      uY0:    { value: 0 },
+      uY1:    { value: 1 },
+      uDeep:  { value: c.clone().multiplyScalar(0.72) },
+      uTop:   { value: c.clone().lerp(new THREE.Color(0xffffff), 0.1).multiplyScalar(1.06) },
+      uPure:  { value: c.clone() },
+      uFizz:  { value: opts.fizz ? 1 : 0 },
+    };
+  }
+
+  /* толща напитка: густой у дна, светлее к поверхности, с пузырьками у стенки */
+  bodyMaterial(color, opts, u) {
+    const m = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(color),
+      emissive: new THREE.Color(color).multiplyScalar(0.22),
+      roughness: 0.16, metalness: 0,
+      clearcoat: 0.9, clearcoatRoughness: 0.1,
+      envMapIntensity: 0.75,
+      transmission: 0, transparent: false,
+    });
+    m.customProgramCacheKey = () => 'bar-liquid-body';
+    m.onBeforeCompile = (sh) => {
+      Object.assign(sh.uniforms, u);
+      sh.vertexShader = `
+        uniform float uTime; uniform float uWave; uniform float uY0; uniform float uY1;
+        varying float vH; varying vec2 vLUv;
+        ${BarScene.WAVE_GLSL}
+      ` + sh.vertexShader.replace('#include <begin_vertex>', `
+        #include <begin_vertex>
+        vH = clamp((transformed.y - uY0) / max(uY1 - uY0, 0.0001), 0.0, 1.0);
+        vLUv = uv;
+        transformed.y += waveAt(transformed, uTime) * uWave * pow(vH, 3.0);
+      `);
+      sh.fragmentShader = `
+        uniform float uTime; uniform vec3 uDeep; uniform vec3 uTop; uniform vec3 uPure; uniform float uFizz;
+        varying float vH; varying vec2 vLUv;
+        float hash(float n){ return fract(sin(n * 43758.5453) * 43758.5453); }
+      ` + sh.fragmentShader.replace('#include <emissivemap_fragment>', `
+        #include <emissivemap_fragment>
+        /* на просвет напиток горит по касательной — как настоящий в стекле */
+        float fres = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.6);
+        totalEmissiveRadiance += uPure * fres * 0.4 * (0.3 + vH * 0.7);
+      `).replace('#include <color_fragment>', `
+        #include <color_fragment>
+        /* цвет густеет ко дну */
+        diffuseColor.rgb = mix(uDeep, uTop, smoothstep(0.0, 1.0, vH));
+        /* пузырьки идут вверх вдоль стенки */
+        if (uFizz > 0.5) {
+          float b = 0.0;
+          for (int i = 0; i < 14; i++) {
+            float fi = float(i);
+            float cx = hash(fi * 1.37);
+            float sp = 0.22 + hash(fi * 3.11) * 0.5;
+            float py = fract(uTime * sp * 0.5 + hash(fi * 7.53));
+            vec2 d = vLUv - vec2(cx, py);
+            d.x = min(abs(d.x), 1.0 - abs(d.x));
+            float r = 0.013 + hash(fi * 5.29) * 0.011;
+            b += smoothstep(r, r * 0.3, length(vec2(d.x, d.y * 0.5)));
+          }
+          diffuseColor.rgb += clamp(b, 0.0, 1.6) * 0.55;
+        }
+      `);
+    };
+    return m;
+  }
+
+  /* гладь напитка: отдельное зеркало со своей нормалью и мениском у стенки */
+  surfaceMaterial(color, opts, u) {
+    const base = opts.foam ? new THREE.Color(opts.foam) : new THREE.Color(color);
+    const m = new THREE.MeshPhysicalMaterial({
+      color: base,
+      roughness: opts.foam ? 0.6 : 0.14,
+      metalness: 0,
+      emissive: base.clone().multiplyScalar(0.16),
+      clearcoat: opts.foam ? 0.2 : 0.55, clearcoatRoughness: opts.foam ? 0.5 : 0.08,
+      envMapIntensity: opts.foam ? 0.45 : 0.9,
+      transmission: 0, transparent: false,
+      side: THREE.DoubleSide,
+    });
+    m.customProgramCacheKey = () => 'bar-liquid-surface';
+    m.onBeforeCompile = (sh) => {
+      Object.assign(sh.uniforms, u);
+      sh.vertexShader = `
+        uniform float uTime; uniform float uWave;
+        varying float vR;
+        ${BarScene.WAVE_GLSL}
+      ` + sh.vertexShader
+        .replace('#include <beginnormal_vertex>', `
+          #include <beginnormal_vertex>
+          /* нормаль гладит волну аналитически — иначе блик стоит на месте */
+          float dx = (waveAt(position + vec3(0.02,0.0,0.0), uTime) - waveAt(position - vec3(0.02,0.0,0.0), uTime)) / 0.04;
+          float dz = (waveAt(position + vec3(0.0,0.0,0.02), uTime) - waveAt(position - vec3(0.0,0.0,0.02), uTime)) / 0.04;
+          objectNormal = normalize(vec3(-dx * uWave * 9.0, 1.0, -dz * uWave * 9.0));
+        `)
+        .replace('#include <begin_vertex>', `
+          #include <begin_vertex>
+          vR = uv.y;
+          transformed.y += waveAt(transformed, uTime) * uWave;
+        `);
+      sh.fragmentShader = `
+        varying float vR;
+      ` + sh.fragmentShader.replace('#include <color_fragment>', `
+        #include <color_fragment>
+        /* мениск: у стенки напиток чуть светлее и ярче */
+        float rim = smoothstep(0.82, 1.0, vR);
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 1.7 + 0.05, rim);
+      `);
+    };
+    return m;
   }
 
   /* Снимаем профиль бокала: на каждой высоте — максимальный радиус.
@@ -206,6 +344,45 @@ export class BarScene {
     pts.push(new THREE.Vector2(0, yAt(to)));
     const g = new THREE.LatheGeometry(pts, 96);
     g.translate(cx, 0, cz);
+    g.userData.top = yAt(to);
+    g.userData.rTop = Math.max(r[to] * gap, 0.001);
+    g.userData.bottom = yAt(from);
+    return g;
+  }
+
+  /* Лёд плавает у самой поверхности: три кубика по кругу, каждый
+     наполовину утоплен. Уровень им задаёт loop, пока напиток наливается. */
+  buildIce(rTop, cx, cz) {
+    const grp = new THREE.Group();
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: 0xeaf6ff, metalness: 0, roughness: 0.14,
+      emissive: new THREE.Color(0x0d1a24),
+      clearcoat: 1, clearcoatRoughness: 0.06,
+      envMapIntensity: 1.7, transmission: 0, transparent: false,
+    });
+    const s = rTop * 0.38;
+    for (let i = 0; i < 4; i++) {
+      const cube = new THREE.Mesh(new THREE.BoxGeometry(s, s, s), mat);
+      cube.userData.own = true;
+      const a2 = (i / 4) * Math.PI * 2 + 0.7;
+      const rr = rTop * (0.3 + (i % 2) * 0.22);
+      cube.position.set(cx + Math.cos(a2) * rr, 0, cz + Math.sin(a2) * rr);
+      cube.rotation.set(0.4 + i * 0.5, a2 * 1.7, 0.25 + i * 0.3);
+      cube.userData.phase = i * 2.1;
+      grp.add(cube);
+    }
+    grp.userData.own = true;
+    grp.userData.size = s;
+    return grp;
+  }
+
+  /* гладь напитка: диск из концентрических колец, чтобы по нему шла волна.
+     uv.y идёт от центра к стенке — по нему рисуем мениск. */
+  surfaceGeometry(rTop, y, cx, cz, rings = 18) {
+    const pts = [];
+    for (let i = 0; i <= rings; i++) pts.push(new THREE.Vector2((i / rings) * rTop, y));
+    const g = new THREE.LatheGeometry(pts, 96);
+    g.translate(cx, 0, cz);
     return g;
   }
 
@@ -222,11 +399,14 @@ export class BarScene {
     return this.side;
   }
 
-  build(kind, liquidColor, accent) {
-    if (!this.ready) { this.pending = [kind, liquidColor, accent]; return; }
+  build(kind, liquidColor, accent, opts = {}) {
+    if (!this.ready) { this.pending = [kind, liquidColor, accent, opts]; return; }
     if (this.group) {
       this.scene.remove(this.group);
-      this.group.traverse((o) => { if (o.geometry && o.userData.own) o.geometry.dispose(); });
+      this.group.traverse((o) => {
+        if (o.geometry && o.userData.own) o.geometry.dispose();
+        if (o.material && o.userData.own) o.material.dispose();
+      });
     }
     const cfg = GLASSES[kind] || GLASSES.rocks;
     const src = this.meshes[cfg.mesh];
@@ -241,23 +421,38 @@ export class BarScene {
     const geo = this.liquidGeometry(prof, cfg.fill);
     const yBase = prof.y0 + (this.bowlBottom(prof) / prof.bins) * prof.h;
 
-    const liquid = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(liquidColor),
-      roughness: 0.3,
-      metalness: 0,
-      ior: 1.34,
-      clearcoat: 0.45,
-      clearcoatRoughness: 0.12,
-      envMapIntensity: 0.28,
-      transmission: 0,
-      transparent: false,
-    }));
-    liquid.userData.own = true;
-    liquid.renderOrder = 1;
+    /* толща и гладь живут одной группой: наливаем — двигается всё разом */
+    const u = this.liquidUniforms(liquidColor, opts);
+    u.uY0.value = geo.userData.bottom;
+    u.uY1.value = geo.userData.top;
+    this.liquidU = u;
+
+    const body = new THREE.Mesh(geo, this.bodyMaterial(liquidColor, opts, u));
+    body.userData.own = true;
+    body.renderOrder = 1;
+
+    const surf = new THREE.Mesh(
+      this.surfaceGeometry(geo.userData.rTop * 0.995, geo.userData.top + 0.004, prof.cx, prof.cz),
+      this.surfaceMaterial(liquidColor, opts, u));
+    surf.userData.own = true;
+    surf.renderOrder = 2;
+
+    const liquid = new THREE.Group();
+    liquid.add(body);
+    liquid.add(surf);
     g.add(liquid);
     this.liquid = liquid;
+
+    /* лёд живёт вне группы напитка: он не должен сплющиваться при наливе */
+    if (this.ice) { g.remove(this.ice); this.ice = null; }
+    if (opts.ice) {
+      this.ice = this.buildIce(geo.userData.rTop, prof.cx, prof.cz);
+      g.add(this.ice);
+    }
+    this.liquidTop = geo.userData.top;
     this.liquidBase = yBase;
     this.pourFrom = performance.now() + 260;   // наливаем чуть позже появления
+    this.splashFrom = this.pourFrom;           // и плещем при наливе
 
     const box = new THREE.Box3().setFromObject(g);
     const s2 = new THREE.Vector3(); box.getSize(s2);
@@ -345,8 +540,37 @@ export class BarScene {
         /* волна: как только налили, жидкость коротко качается */
         const w = pk > 0.55 ? Math.sin((pk - 0.55) * 26) * (1 - pk) * 0.09 : 0;
         this.liquid.rotation.z = w;
+        this.pourK = kk;
         if (pk >= 1) { this.pourFrom = 0; this.liquid.rotation.z = 0; }
       }
+      /* лёд всплывает вместе с уровнем и качается на волне */
+      if (this.ice) {
+        const kk = this.pourK ?? 1;
+        const level = this.liquidTop * kk + this.liquidBase * (1 - kk);
+        const amp = this.liquidU ? this.liquidU.uWave.value : 0.01;
+        this.ice.visible = kk > 0.4;
+        this.ice.children.forEach((c, i) => {
+          const ph = c.userData.phase + t * 1.6;
+          c.position.y = level - this.ice.userData.size * (0.2 + Math.sin(ph) * 0.06)
+            + Math.sin(ph * 1.3) * amp * 6;
+          c.rotation.z = 0.25 + i * 0.3 + Math.sin(ph * 0.8) * amp * 9;
+          c.rotation.x = 0.4 + i * 0.5 + Math.cos(ph * 0.7) * amp * 7;
+        });
+      }
+    }
+    /* поверхность напитка живёт всё время: после налива волна затухает
+       до едва заметной ряби, но никогда не встаёт колом */
+    if (this.liquidU) {
+      this.liquidU.uTime.value = t;
+      let amp = 0.016;
+      if (this.splashFrom) {
+        const sk = (performance.now() - this.splashFrom) / 2200;
+        if (sk >= 1) this.splashFrom = 0;
+        else if (sk > 0) amp += 0.075 * Math.pow(1 - sk, 2.2);
+      }
+      /* от движения мыши напиток тоже отзывается */
+      amp += Math.abs(this.pointer.x - this.target.x) * 0.06;
+      this.liquidU.uWave.value += (amp - this.liquidU.uWave.value) * 0.14;
     }
     /* камера подъезжает на смене коктейля и плавно отходит */
     if (this.dollyFrom) {
@@ -361,7 +585,7 @@ export class BarScene {
       this.renderer.toneMappingExposure = 1.05 + (1 - fk) * (1 - fk) * 0.75;
       if (fk >= 1) { this.flashFrom = 0; this.renderer.toneMappingExposure = 1.05; }
     }
-    this.camera.lookAt(0, 0, 0);
+    this.camera.lookAt(0, -0.08, 0);
     if (this.composer) this.composer.render();
     else this.renderer.render(this.scene, this.camera);
   }

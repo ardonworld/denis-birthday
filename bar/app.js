@@ -232,7 +232,7 @@ const COCKTAILS = [
   /* ---------- АКТ ПЕРВЫЙ: лёгкие и классика ---------- */
   {
     id: 'bellini', act: 1, name: 'Беллини', accent: '#ff9a6b',
-    kind: 'hurricane', liquid: '#f7a35c',
+    kind: 'hurricane', liquid: '#f7a35c', fizz: true,
     lead: 'Персик и просекко. С него начинают, когда вечер ещё только разгоняется.',
     base: 'Просекко', abv: '8%', vol: '150 мл', serve: 'Флейта, без льда',
     recipe: ['Просекко — 100 мл', 'Пюре белого персика — 50 мл', 'Капля персикового ликёра'],
@@ -250,7 +250,7 @@ const COCKTAILS = [
   },
   {
     id: 'aperol', act: 1, name: 'Апероль Шприц', accent: '#ff8a1f',
-    kind: 'wine', liquid: '#e35f05',
+    kind: 'wine', liquid: '#e35f05', fizz: true, ice: true,
     lead: 'Аперитив, с которого начинают. Пузырьки, апельсин и лёгкая горчинка.',
     base: 'Апероль', abv: '9%', vol: '250 мл', serve: 'Бокал для вина, много льда',
     recipe: ['Апероль — 60 мл', 'Просекко — 90 мл', 'Содовая — 30 мл', 'Долька апельсина'],
@@ -259,7 +259,7 @@ const COCKTAILS = [
   },
   {
     id: 'paloma', act: 1, name: 'Палома', accent: '#f2557d',
-    kind: 'highball', liquid: '#f06a86',
+    kind: 'highball', liquid: '#f06a86', fizz: true, ice: true,
     lead: 'Грейпфрут, текила и соль на кромке. Мексика без лишнего пафоса.',
     base: 'Текила', abv: '12%', vol: '300 мл', serve: 'Хайбол, соляная кромка',
     recipe: ['Текила бланко — 50 мл', 'Грейпфрутовый содовый — 150 мл', 'Сок лайма — 15 мл', 'Щепотка соли'],
@@ -268,7 +268,7 @@ const COCKTAILS = [
   },
   {
     id: 'margarita', act: 1, name: 'Маргарита', accent: '#b6d94c',
-    kind: 'rocks', liquid: '#cfe08a',
+    kind: 'rocks', liquid: '#cfe08a', ice: true,
     lead: 'Классика в чистом виде: текила, лайм и соль. Ничего лишнего.',
     base: 'Текила', abv: '22%', vol: '120 мл', serve: 'Рокс, соляная кромка',
     recipe: ['Текила бланко — 50 мл', 'Куантро — 25 мл', 'Сок лайма — 25 мл', 'Соль на кромку'],
@@ -279,7 +279,7 @@ const COCKTAILS = [
   /* ---------- АКТ ВТОРОЙ: фирменные крепкие ---------- */
   {
     id: 'tvr', act: 2, name: 'TVR', accent: '#c8571f',
-    kind: 'tall', liquid: '#b8621d',
+    kind: 'tall', liquid: '#b8621d', fizz: true, ice: true,
     lead: 'Назван в честь британского спорткара TVR — разгоняет ровно так же. Брутальный микс из английских пабов.',
     base: 'Текила и водка', abv: '11%', vol: '210 мл', serve: 'Хайбол, много льда',
     recipe: ['Серебряная текила — 30 мл', 'Водка — 30 мл', 'Энергетик — 150 мл', 'Лёд'],
@@ -297,7 +297,7 @@ const COCKTAILS = [
   },
   {
     id: 'jager', act: 2, name: 'Атомный Егерь', accent: '#4fae5a',
-    kind: 'highball', liquid: '#2f6b2f',
+    kind: 'highball', liquid: '#2f6b2f', fizz: true, ice: true,
     lead: 'Усиленная егербомба: здесь ликёр не просто сбрасывают в энергетик, здесь правила жёстче.',
     base: 'Егермейстер и водка', abv: '11%', vol: '210 мл', serve: 'Хайбол, шот внутрь',
     recipe: ['Водка — 30 мл', 'Jägermeister — 30 мл', 'Red Bull — 150 мл'],
@@ -306,7 +306,7 @@ const COCKTAILS = [
   },
   {
     id: 'sour', act: 2, name: 'Виски Сауэр', accent: '#d8a24a',
-    kind: 'rocks', liquid: '#c98b34',
+    kind: 'rocks', liquid: '#c98b34', foam: '#f2e0c0',
     lead: 'Бурбон, лимон и та самая легендарная кремовая пенка. Кислое, крепкое и очень взрослое.',
     base: 'Бурбон', abv: '20%', vol: '100 мл', serve: 'Рокс, пенная шапка',
     recipe: ['Бурбон Jim Beam или Bulleit — 50 мл', 'Свежий сок лимона — 25 мл', 'Сахарный сироп 1:1 — 15 мл', 'Яичный белок — для пенки'],
@@ -496,8 +496,9 @@ function paint(i, animate) {
   setTimeout(() => document.documentElement.style.setProperty('--accent', c.accent),
     animate ? 380 : 0);
   if (scene) {
-    if (animate) { scene.leave(); setTimeout(() => scene.build(c.kind, c.liquid, c.accent), 560); }
-    else scene.build(c.kind, c.liquid, c.accent);
+    const look = { fizz: c.fizz, foam: c.foam, ice: c.ice };
+    if (animate) { scene.leave(); setTimeout(() => scene.build(c.kind, c.liquid, c.accent, look), 560); }
+    else scene.build(c.kind, c.liquid, c.accent, look);
   }
   const num = document.getElementById('show-num');
   const inAct = COCKTAILS.filter((x) => x.act === c.act);
@@ -699,7 +700,7 @@ if (quality !== 'off' && !new URLSearchParams(location.search).has('no3d')) {
       document.body.classList.add('has3d');
       window.__scene = scene;
       const c = COCKTAILS[current];
-      scene.build(c.kind, c.liquid, c.accent);
+      scene.build(c.kind, c.liquid, c.accent, { fizz: c.fizz, foam: c.foam, ice: c.ice });
     })
     .catch((err) => {
       console.warn('3D не поднялось, остаёмся на рисованных бокалах:', err);
