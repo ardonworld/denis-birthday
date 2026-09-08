@@ -87,9 +87,11 @@ export class BarScene {
     const hdr = await new RGBELoader().loadAsync('assets/studio.hdr');
 
     const envScene = new THREE.Scene();
+    /* Купол приглушён: если светло со всех сторон, стекло выглядит пластиком.
+       Нужен контраст — светлые полосы на тёмном. */
     envScene.add(new THREE.Mesh(
       new THREE.SphereGeometry(60, 48, 32),
-      new THREE.MeshBasicMaterial({ map: hdr, side: THREE.BackSide })
+      new THREE.MeshBasicMaterial({ map: hdr, color: new THREE.Color(0x24262b), side: THREE.BackSide })
     ));
 
     const panel = (w, h, x, y, z, rx, ry, color, power) => {
@@ -102,9 +104,15 @@ export class BarScene {
       envScene.add(m);
       return m;
     };
-    panel(1.7, 16, -7, 1, 2, 0, Math.PI / 2, '#ffffff', 7);
-    panel(1.2, 13, 7, 0.5, 1, 0, -Math.PI / 2, '#dceaff', 5.5);
-    panel(12, 3, 0, 8, -2, Math.PI / 2, 0, '#ffffff', 3);
+    /* узкие яркие полосы дают чёткий блик по стенке */
+    panel(0.9, 18, -6.2, 1, 1.5, 0, Math.PI / 2, '#ffffff', 16);
+    panel(0.55, 15, -7.4, 0, -1, 0, Math.PI / 2, '#eaf2ff', 10);
+    panel(0.7, 16, 6.6, 0.5, 1, 0, -Math.PI / 2, '#dceaff', 12);
+    panel(9, 2.2, 0, 7.5, -1, Math.PI / 2, 0, '#ffffff', 5);
+    /* тёмные экраны — от них в стекле появляются глубокие тени */
+    panel(6, 18, -3.2, 0, 5.5, 0, 0, '#000000', 1);
+    panel(6, 18, 3.2, 0, 5.5, 0, 0, '#000000', 1);
+    panel(20, 20, 0, -7.5, 0, -Math.PI / 2, 0, '#000000', 1);
     this.accentPanel = panel(7, 6, 0, -1, -10, 0, 0, '#e0492c', 2.4);
 
     this.pmrem = new THREE.PMREMGenerator(this.renderer);
@@ -129,15 +137,15 @@ export class BarScene {
 
     const hi = this.quality === 'high';
     this.glassMat = new THREE.MeshPhysicalMaterial({
-      color: 0xf4f8fb,
+      color: 0xeef4f8,
       metalness: 0,
-      roughness: 0.03,
+      roughness: 0.015,
       ior: 1.52,
       transmission: hi ? 1 : 0,
       thickness: 0.3,
       clearcoat: 1,
       clearcoatRoughness: 0.02,
-      envMapIntensity: 2.4,
+      envMapIntensity: 3.2,
       transparent: true,
       opacity: hi ? 1 : 0.32,
       side: THREE.DoubleSide,
