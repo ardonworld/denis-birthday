@@ -1,4 +1,6 @@
-import { BarScene, canRun3D } from './scene3d.js';
+import * as __THREE from 'three';
+import { BarScene, detectQuality } from './scene3d.js';
+window.__THREE = __THREE;
 
 /* =========================================================
    3 РЕЗИДЕНЦИЯ — бар, кухня, табак
@@ -228,7 +230,7 @@ function glassHurricane(id, top, bottom) {
 /* ---------- данные бара ---------- */
 const COCKTAILS = [
   {
-    id: 'negroni', name: 'Негрони', accent: '#e0492c', kind: 'rocks', liquid: '#b3231c', garnish: 'citrus',
+    id: 'negroni', name: 'Негрони', accent: '#e0492c', kind: 'rocks', liquid: '#7d0f0b', garnish: 'citrus',
     art: glassRocks, top: '#f0603a', bottom: '#96150f',
     lead: 'Горький классик на троих равных. Тот случай, когда простая формула держит весь вечер.',
     base: 'Джин', abv: '24%', vol: '90 мл', serve: 'Рокс, крупный лёд',
@@ -238,7 +240,7 @@ const COCKTAILS = [
     pairing: 'Оливки, вяленое мясо, твёрдый сыр.',
   },
   {
-    id: 'mojito', name: 'Мохито', accent: '#63c94f', kind: 'highball', liquid: '#bfe89a', garnish: 'mint',
+    id: 'mojito', name: 'Мохито', accent: '#63c94f', kind: 'highball', liquid: '#8fce62', garnish: 'mint',
     art: glassHighball, top: '#c9f5a8', bottom: '#4d9c3a',
     lead: 'Мята, лайм и лёд. Освежает и не даёт вечеру провалиться в тяжесть.',
     base: 'Белый ром', abv: '12%', vol: '320 мл', serve: 'Хайбол, дроблёный лёд',
@@ -248,7 +250,7 @@ const COCKTAILS = [
     pairing: 'Севиче, лёгкие закуски, всё острое.',
   },
   {
-    id: 'aperol', name: 'Шприц', accent: '#ff8a1f', kind: 'wine', liquid: '#ff8a1f', garnish: 'citrus',
+    id: 'aperol', name: 'Шприц', accent: '#ff8a1f', kind: 'wine', liquid: '#e35f05', garnish: 'citrus',
     art: glassSpritz, top: '#ffb648', bottom: '#e8590c',
     lead: 'Аперитив, с которого начинают. Пузырьки, апельсин и лёгкая горчинка.',
     base: 'Апероль', abv: '9%', vol: '250 мл', serve: 'Бокал для вина, много льда',
@@ -268,7 +270,7 @@ const COCKTAILS = [
     pairing: 'Тирамису, шоколад, орехи.',
   },
   {
-    id: 'lagoon', name: 'Лагуна', accent: '#2fb6e8', kind: 'hurricane', liquid: '#1f9be0', garnish: 'lime',
+    id: 'lagoon', name: 'Лагуна', accent: '#2fb6e8', kind: 'hurricane', liquid: '#0a72c4', garnish: 'lime',
     art: glassHurricane, top: '#7ee0ff', bottom: '#1273c4',
     lead: 'Голубой цитрус со льдом. Самый заметный бокал в зале — берут глазами.',
     base: 'Водка', abv: '11%', vol: '280 мл', serve: 'Харрикейн, лёд, трубочка',
@@ -390,7 +392,7 @@ function paint(i, animate) {
     glassWrap.classList.add('swap');
   }
   switcher.querySelectorAll('.chip').forEach((b, k) => b.classList.toggle('is-active', k === i));
-  if (scene) { scene.setAccent(c.accent); scene.build(c.kind, c.liquid, c.garnish); }
+  if (scene) scene.build(c.kind, c.liquid, c.accent);
 }
 
 function buildSwitcher() {
@@ -536,19 +538,21 @@ drinksScene.addEventListener('pointerleave', () => {
 
 /* ---------- настоящее 3D, если железо тянет ---------- */
 let scene = null;
-/* 3D пока черновик: качество ниже рисованной версии, поэтому включается
-   только вручную — ?3d=1 в адресе. Основным гостям отдаём SVG. */
-const want3D = new URLSearchParams(location.search).has('3d');
-if (want3D && canRun3D()) {
-  try {
-    scene = new BarScene(document.getElementById('scene3d'));
-    scene.init();
-    document.body.classList.add('has3d');
-  } catch (err) {
-    console.warn('3D не поднялось, остаёмся на рисованных бокалах:', err);
-    scene = null;
-    document.body.classList.remove('has3d');
-  }
+const quality = detectQuality();
+if (quality !== 'off' && !new URLSearchParams(location.search).has('no3d')) {
+  scene = new BarScene(document.getElementById('scene3d'));
+  scene.init({ quality })
+    .then(() => {
+      document.body.classList.add('has3d');
+      window.__scene = scene;
+      const c = COCKTAILS[current];
+      scene.build(c.kind, c.liquid, c.accent);
+    })
+    .catch((err) => {
+      console.warn('3D не поднялось, остаёмся на рисованных бокалах:', err);
+      scene = null;
+      document.body.classList.remove('has3d');
+    });
 }
 
 /* ---------- старт ---------- */

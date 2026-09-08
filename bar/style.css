@@ -534,3 +534,17 @@ body.has3d .glass-wrap{ filter: none; }
   .switcher{ bottom: 56px; }
   .jump{ height: 56px; }
 }
+
+/* ================= УКАЗАНИЕ АВТОРОВ ================= */
+.credits{
+  position: absolute;
+  left: clamp(16px, 4vw, 56px);
+  right: clamp(16px, 4vw, 56px);
+  bottom: 74px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(243,245,244,0.34);
+  z-index: 6;
+}
+.credits a{ color: rgba(243,245,244,0.55); }

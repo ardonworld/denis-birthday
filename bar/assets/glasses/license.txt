@@ -1,0 +1,11 @@
+Model Information:
+* title:	Glass Collection
+* source:	https://sketchfab.com/3d-models/glass-collection-0ff8fc5007dd4e9da675109fe7c443d6
+* author:	RagingCow (https://sketchfab.com/marcussamiran)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Glass Collection" (https://sketchfab.com/3d-models/glass-collection-0ff8fc5007dd4e9da675109fe7c443d6) by RagingCow (https://sketchfab.com/marcussamiran) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
