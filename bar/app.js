@@ -249,13 +249,13 @@ const COCKTAILS = [
     pairing: 'Севиче, креветки, лёгкие салаты.',
   },
   {
-    id: 'aperol', act: 1, name: 'Апероль Шприц', accent: '#ff8a1f',
-    kind: 'wine', liquid: '#e35f05', fizz: true, ice: true,
-    lead: 'Аперитив, с которого начинают. Пузырьки, апельсин и лёгкая горчинка.',
-    base: 'Апероль', abv: '9%', vol: '250 мл', serve: 'Бокал для вина, много льда',
-    recipe: ['Апероль — 60 мл', 'Просекко — 90 мл', 'Содовая — 30 мл', 'Долька апельсина'],
-    taste: ['лёгкий', 'цитрус', 'сладко-горький', 'игристый'],
-    pairing: 'Брускетта, прошутто, сырная тарелка.',
+    id: 'sunrise', act: 1, name: 'Текила Санрайз', accent: '#ff7a2f',
+    kind: 'highball', liquid: '#ff9e2c', deep: '#c1121f', ice: true,
+    lead: 'Гренадин оседает на дно, апельсин остаётся сверху — в бокале получается рассвет.',
+    base: 'Текила', abv: '11%', vol: '200 мл', serve: 'Хайбол, много льда',
+    recipe: ['Текила бланко — 50 мл', 'Апельсиновый сок — 100 мл', 'Гренадин — 15 мл', 'Долька апельсина'],
+    taste: ['апельсин', 'сладкий', 'мягкий', 'гранат'],
+    pairing: 'Тако, начос, фрукты.',
   },
   {
     id: 'paloma', act: 1, name: 'Палома', accent: '#f2557d',
@@ -318,8 +318,9 @@ const COCKTAILS = [
     kind: 'hurricane', liquid: '#4a0d18',
     lead: 'Секретная позиция карты. В меню его нет — просто назовите бармену три буквы.',
     base: 'Не разглашается', abv: '35%', vol: '90 мл', serve: 'Под дымом, под колпаком',
-    recipe: ['Ржаной виски — 45 мл', 'Вишнёвый ликёр — 20 мл', 'Биттер на чёрной вишне', 'Дым вишнёвой щепы'],
-    taste: ['дымный', 'вишня', 'крепкий', 'терпкий'],
+    recipe: [],
+    redacted: [66, 44, 74, 38],
+    taste: ['дымный', 'крепкий', 'терпкий', 'не для всех'],
     pairing: 'Тишина и хорошая компания.',
   },
 ];
@@ -372,7 +373,7 @@ const DISHES = [
   { pair: 'к мохито', name: 'Севиче из окуня', art: 'ceviche', accent: '#63c94f',
     note: 'Окунь в соке лайма, красный лук, кинза, чили и хрустящий батат.',
     weight: '180 г', price: '1 190 ₽' },
-  { pair: 'к шприцу', name: 'Брускетты с томатом', art: 'brusch', accent: '#ff8a1f',
+  { pair: 'к санрайзу', name: 'Брускетты с томатом', art: 'brusch', accent: '#ff8a1f',
     note: 'Хрустящая чиабатта, томаты конфи, страчателла и базилик.',
     weight: '3 шт · 210 г', price: '890 ₽' },
   { pair: 'к эспрессо', name: 'Тирамису', art: 'dessert', accent: '#c08b4e',
@@ -405,7 +406,7 @@ const TOBACCO = [
   { name: 'Мятный лёд', accent: '#63c94f', strength: 'лёгкая',
     note: 'Свежая мята и зелёное яблоко. Освежает, не забивает вкус коктейля.', mix: 'Mint · Green Apple' },
   { name: 'Апельсиновый закат', accent: '#ff8a1f', strength: 'лёгкая',
-    note: 'Апельсин, грейпфрут и щепотка ванили. Идёт со шприцем.', mix: 'Orange · Grapefruit · Vanilla' },
+    note: 'Апельсин, грейпфрут и щепотка ванили. Идёт с санрайзом.', mix: 'Orange · Grapefruit · Vanilla' },
   { name: 'Тёмная обжарка', accent: '#c08b4e', strength: 'крепкая',
     note: 'Кофе, какао и чуть табачной сладости. Для второй половины вечера.', mix: 'Coffee · Cacao' },
   { name: 'Голубая волна', accent: '#2fb6e8', strength: 'средняя',
@@ -451,7 +452,11 @@ function fillStage(c) {
   $('fact-vol').textContent = c.vol;
   $('fact-serve').textContent = c.serve;
   $('pairing-text').textContent = c.pairing;
-  $('recipe-list').innerHTML = c.recipe.map((r) => `<li>${r}</li>`).join('');
+  /* у секретной позиции состав закрашен: её и заказывают вслепую */
+  $('recipe-list').innerHTML = c.redacted
+    ? c.redacted.map((w) => `<li class="redacted"><i style="--w:${w}%"></i></li>`).join('')
+      + '<li class="redact-note">назовите бармену три буквы</li>'
+    : c.recipe.map((r) => `<li>${r}</li>`).join('');
   $('taste-row').innerHTML = c.taste.map((t) => `<span class="taste">${t}</span>`).join('');
 }
 
@@ -496,7 +501,7 @@ function paint(i, animate) {
   setTimeout(() => document.documentElement.style.setProperty('--accent', c.accent),
     animate ? 380 : 0);
   if (scene) {
-    const look = { fizz: c.fizz, foam: c.foam, ice: c.ice };
+    const look = { fizz: c.fizz, foam: c.foam, ice: c.ice, deep: c.deep };
     if (animate) { scene.leave(); setTimeout(() => scene.build(c.kind, c.liquid, c.accent, look), 560); }
     else scene.build(c.kind, c.liquid, c.accent, look);
   }
@@ -700,7 +705,7 @@ if (quality !== 'off' && !new URLSearchParams(location.search).has('no3d')) {
       document.body.classList.add('has3d');
       window.__scene = scene;
       const c = COCKTAILS[current];
-      scene.build(c.kind, c.liquid, c.accent, { fizz: c.fizz, foam: c.foam, ice: c.ice });
+      scene.build(c.kind, c.liquid, c.accent, { fizz: c.fizz, foam: c.foam, ice: c.ice, deep: c.deep });
     })
     .catch((err) => {
       console.warn('3D не поднялось, остаёмся на рисованных бокалах:', err);

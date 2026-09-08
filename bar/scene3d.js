@@ -189,7 +189,8 @@ export class BarScene {
       uWave:  { value: 0.006 },
       uY0:    { value: 0 },
       uY1:    { value: 1 },
-      uDeep:  { value: c.clone().multiplyScalar(0.72) },
+      uDeep:  { value: opts.deep ? new THREE.Color(opts.deep)
+                        : c.clone().multiplyScalar(0.72) },
       uTop:   { value: c.clone().lerp(new THREE.Color(0xffffff), 0.1).multiplyScalar(1.06) },
       uPure:  { value: c.clone() },
       uFizz:  { value: opts.fizz ? 1 : 0 },
@@ -231,7 +232,7 @@ export class BarScene {
       `).replace('#include <color_fragment>', `
         #include <color_fragment>
         /* цвет густеет ко дну */
-        diffuseColor.rgb = mix(uDeep, uTop, smoothstep(0.0, 1.0, vH));
+        diffuseColor.rgb = mix(uDeep, uTop, smoothstep(0.05, 0.95, vH));
         /* пузырьки идут вверх вдоль стенки */
         if (uFizz > 0.5) {
           float b = 0.0;

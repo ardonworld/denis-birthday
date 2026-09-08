@@ -815,6 +815,46 @@ body.is-secret .hero-title{
   background-clip: text;
 }
 
+/* ================= ЗАКРАШЕННЫЙ СОСТАВ =================
+   Секретную позицию заказывают вслепую, поэтому состав замазан. */
+.recipe-list li.redacted{ align-items: center; }
+.recipe-list li.redacted i{
+  display: block;
+  width: var(--w, 60%);
+  min-width: 90px;
+  height: 12px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.14);
+  position: relative;
+  overflow: hidden;
+}
+.recipe-list li.redacted i::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.3) 50%, transparent 66%);
+  transform: translateX(-100%);
+  animation: redact-shine 3.4s ease-in-out infinite;
+}
+.recipe-list li.redacted:nth-child(2) i::after{ animation-delay: .35s; }
+.recipe-list li.redacted:nth-child(3) i::after{ animation-delay: .7s; }
+.recipe-list li.redacted:nth-child(4) i::after{ animation-delay: 1.05s; }
+@keyframes redact-shine{
+  0%, 60%{ transform: translateX(-100%); }
+  100%{ transform: translateX(100%); }
+}
+.recipe-list li.redact-note{
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.recipe-list li.redact-note::before{ display: none; }
+@media (prefers-reduced-motion: reduce){
+  .recipe-list li.redacted i::after{ animation: none; }
+}
+
 /* ================= ШТОРА ПЕРЕХОДА =================
    Три косые полосы акцентного цвета проносятся по экрану —
    ровно под ними меняется и бокал, и текст. */
