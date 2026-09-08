@@ -279,16 +279,16 @@ const COCKTAILS = [
   /* ---------- АКТ ВТОРОЙ: фирменные крепкие ---------- */
   {
     id: 'tvr', act: 2, name: 'TVR', accent: '#c8571f',
-    kind: 'rocks', liquid: '#7a2f0c',
-    lead: 'Фирменный крепкий. Тот, после которого вечер меняет направление.',
-    base: 'Виски', abv: '32%', vol: '100 мл', serve: 'Рокс, крупный лёд',
-    recipe: ['Бурбон — 50 мл', 'Тёмный ром — 20 мл', 'Ликёр амаро — 20 мл', 'Биттер — 2 капли'],
-    taste: ['крепкий', 'дубовый', 'пряный', 'долгий финиш'],
-    pairing: 'Вяленое мясо, тёмный шоколад.',
+    kind: 'tall', liquid: '#b8621d',
+    lead: 'Назван в честь британского спорткара TVR — разгоняет ровно так же. Брутальный микс из английских пабов.',
+    base: 'Текила и водка', abv: '11%', vol: '210 мл', serve: 'Хайбол, много льда',
+    recipe: ['Серебряная текила — 30 мл', 'Водка — 30 мл', 'Энергетик — 150 мл', 'Лёд'],
+    taste: ['резкий', 'агава', 'сладкий', 'бодрящий'],
+    pairing: 'Максимальный эффект минимумом ингредиентов.',
   },
   {
     id: 'chuparosa', act: 2, name: 'Нуэво-Параисо', accent: '#e0a02c',
-    kind: 'coupe', liquid: '#d9922a',
+    kind: 'footed', liquid: '#d9922a',
     lead: 'Текила Chuparosa в чистом виде — с дымком и перцем. Для тех, кто понимает.',
     base: 'Текила', abv: '38%', vol: '70 мл', serve: 'Купе, долька лайма',
     recipe: ['Chuparosa Tequila — 60 мл', 'Агавовый сироп — 10 мл', 'Дым можжевельника', 'Перечная соль'],
@@ -298,20 +298,20 @@ const COCKTAILS = [
   {
     id: 'jager', act: 2, name: 'Атомный Егерь', accent: '#4fae5a',
     kind: 'highball', liquid: '#2f6b2f',
-    lead: 'Турбо-егербомба. Шот падает в стакан, и обратной дороги уже нет.',
-    base: 'Егермейстер', abv: '16%', vol: '330 мл', serve: 'Хайбол, шот падает внутрь',
-    recipe: ['Егермейстер — 50 мл', 'Энергетик — 250 мл', 'Лёд', 'Подаётся с шотом сверху'],
-    taste: ['травяной', 'сладкий', 'бодрящий', 'резкий'],
-    pairing: 'Ничего. Просто держитесь.',
+    lead: 'Усиленная егербомба: здесь ликёр не просто сбрасывают в энергетик, здесь правила жёстче.',
+    base: 'Егермейстер и водка', abv: '11%', vol: '210 мл', serve: 'Хайбол, шот внутрь',
+    recipe: ['Водка — 30 мл', 'Jägermeister — 30 мл', 'Red Bull — 150 мл'],
+    taste: ['горько-сладкий', 'травяной', 'медицинский финиш', 'разрушительный'],
+    pairing: 'Водка растворяется незаметно — и в этом весь подвох.',
   },
   {
     id: 'sour', act: 2, name: 'Виски Сауэр', accent: '#d8a24a',
     kind: 'rocks', liquid: '#c98b34',
-    lead: 'Виски, лимон и плотная белая шапка. Кислое, крепкое и очень взрослое.',
-    base: 'Бурбон', abv: '24%', vol: '140 мл', serve: 'Рокс, пенная шапка',
-    recipe: ['Бурбон — 50 мл', 'Сок лимона — 25 мл', 'Сахарный сироп — 20 мл', 'Белок — 15 мл'],
-    taste: ['кислый', 'плотный', 'ваниль', 'бархатный'],
-    pairing: 'Орехи, твёрдый сыр.',
+    lead: 'Бурбон, лимон и та самая легендарная кремовая пенка. Кислое, крепкое и очень взрослое.',
+    base: 'Бурбон', abv: '20%', vol: '100 мл', serve: 'Рокс, пенная шапка',
+    recipe: ['Бурбон Jim Beam или Bulleit — 50 мл', 'Свежий сок лимона — 25 мл', 'Сахарный сироп 1:1 — 15 мл', 'Яичный белок — для пенки'],
+    taste: ['кислый', 'кремовый', 'кукурузная сладость', 'плотный'],
+    pairing: 'Орехи, твёрдый сыр, тёмный шоколад.',
   },
   {
     id: 'rdr', act: 2, secret: true, name: 'RDR', accent: '#8e1f2f',
@@ -429,10 +429,22 @@ const revealEls = () => [...document.querySelectorAll('.reveal')];
 function clearStage() {
   revealEls().forEach((el) => { el.classList.remove('on'); el.classList.add('out'); });
   document.querySelectorAll('.recipe-list li, .taste').forEach((el) => el.classList.remove('on'));
+  /* имя уходит буквами в обратном порядке — как будто его сдувает */
+  const chars = [...document.querySelectorAll('#drink-title .ch')].reverse();
+  chars.forEach((el, i) => setTimeout(() => el.classList.remove('on'), i * 26));
+}
+
+/* Имя коктейля собираем по буквам — каждая встаёт на место отдельно */
+function setTitle(name) {
+  const box = $('drink-title');
+  box.innerHTML = [...name].map((ch) =>
+    ch === ' ' ? '<i class="ch sp"> </i>' : `<i class="ch">${ch}</i>`).join('');
+  const chars = [...box.querySelectorAll('.ch')];
+  chars.forEach((el, i) => setTimeout(() => el.classList.add('on'), 60 + i * 42));
 }
 
 function fillStage(c) {
-  $('drink-title').textContent = c.name;
+  setTitle(c.name);
   $('drink-lead').textContent = c.lead;
   $('fact-base').textContent = c.base;
   $('fact-abv').textContent = c.abv;
@@ -446,7 +458,7 @@ function fillStage(c) {
 /* расписание появления блоков внутри одного коктейля */
 function playStage() {
   const seq = [
-    [120,  '#drink-title'],
+    [0,    '#drink-title'],
     [700,  '#drink-lead'],
     [1300, '.facts .fact:nth-child(1)'],
     [1500, '.facts .fact:nth-child(2)'],
@@ -467,11 +479,26 @@ function playStage() {
     setTimeout(() => t.classList.add('on'), 4400 + i * 160));
 }
 
+/* Цветная штора проносится по экрану — под неё меняется всё остальное */
+function runWipe() {
+  const w = $('wipe');
+  if (!w) return;
+  w.classList.remove('run');
+  void w.offsetWidth;            // перезапуск анимации
+  w.classList.add('run');
+}
+
 function paint(i, animate) {
   const c = COCKTAILS[i];
   current = i;
-  document.documentElement.style.setProperty('--accent', c.accent);
-  if (scene) scene.build(c.kind, c.liquid, c.accent);
+  if (animate) runWipe();
+  /* цвет всей страницы переключаем в момент, когда штора закрывает экран */
+  setTimeout(() => document.documentElement.style.setProperty('--accent', c.accent),
+    animate ? 380 : 0);
+  if (scene) {
+    if (animate) { scene.leave(); setTimeout(() => scene.build(c.kind, c.liquid, c.accent), 560); }
+    else scene.build(c.kind, c.liquid, c.accent);
+  }
   const num = document.getElementById('show-num');
   const inAct = COCKTAILS.filter((x) => x.act === c.act);
   const idx = inAct.indexOf(c) + 1;
@@ -484,7 +511,7 @@ function paint(i, animate) {
 
   if (animate) {
     clearStage();
-    setTimeout(() => { fillStage(c); playStage(); }, 480);
+    setTimeout(() => { fillStage(c); playStage(); }, 620);
   } else {
     fillStage(c);
     playStage();

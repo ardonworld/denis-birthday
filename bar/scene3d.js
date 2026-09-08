@@ -13,13 +13,18 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-/* какой меш из набора под какой коктейль и как наливать жидкость */
+/* какой меш из набора под какой коктейль и как наливать жидкость.
+   Меш 5 не используем: у него ручка, тело вращения по нему не строится. */
 const GLASSES = {
-  rocks:     { mesh: 2, liquid: 'cyl',  fill: 0.5,  inset: 0.86, floor: 0.14 },
-  highball:  { mesh: 7, liquid: 'cyl',  fill: 0.78, inset: 0.86, floor: 0.06 },
-  wine:      { mesh: 8, liquid: 'bowl', fill: 0.3,  inset: 0.86, floor: 0.52 },
-  coupe:     { mesh: 9, liquid: 'cone', fill: 0.28, inset: 0.8,  floor: 0.52 },
-  hurricane: { mesh: 3, liquid: 'cyl',  fill: 0.55, inset: 0.8,  floor: 0.3 },
+  rocks:     { mesh: 2, fill: 0.55 },
+  highball:  { mesh: 7, fill: 0.8 },
+  wine:      { mesh: 8, fill: 0.5 },
+  coupe:     { mesh: 9, fill: 0.55 },
+  hurricane: { mesh: 3, fill: 0.6 },
+  tall:      { mesh: 0, fill: 0.82 },
+  tumbler:   { mesh: 4, fill: 0.7 },
+  footed:    { mesh: 1, fill: 0.5 },
+  shot:      { mesh: 6, fill: 0.8 },
 };
 
 export class BarScene {
@@ -154,6 +159,69 @@ export class BarScene {
     this.ready = true;
   }
 
+  /* Снимаем профиль бокала: на каждой высоте — максимальный радиус.
+     По нему строим жидкость, тогда она физически не может вылезти. */
+  profileOf(geometry, bins = 96) {
+    if (geometry.userData._prof) return geometry.userData._prof;
+    const pos = geometry.attributes.position;
+    geometry.computeBoundingBox();
+    const bb = geometry.boundingBox;
+    const y0 = bb.min.y, y1 = bb.max.y, h = y1 - y0;
+    /* ось бокала — середина габарита, а не ноль: часть мешей смещена */
+    const cx = (bb.min.x + bb.max.x) / 2, cz = (bb.min.z + bb.max.z) / 2;
+    const r = new Float32Array(bins).fill(0);
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i) - cx, y = pos.getY(i), z = pos.getZ(i) - cz;
+      const k = Math.min(bins - 1, Math.max(0, Math.floor(((y - y0) / h) * bins)));
+      const rad = Math.hypot(x, z);
+      if (rad > r[k]) r[k] = rad;
+    }
+    for (let i = 1; i < bins; i++) if (r[i] === 0) r[i] = r[i - 1];
+    for (let i = bins - 2; i >= 0; i--) if (r[i] === 0) r[i] = r[i + 1];
+    let rMax = 0;
+    for (let i = 0; i < bins; i++) if (r[i] > rMax) rMax = r[i];
+    const prof = { r, y0, y1, h, bins, rMax, cx, cz };
+    geometry.userData._prof = prof;
+    return prof;
+  }
+
+  /* Где начинается чаша: ниже — ножка, туда наливать нельзя */
+  bowlBottom(prof) {
+    const { r, bins, rMax } = prof;
+    /* идём сверху вниз по чаше и останавливаемся там, где она сужается:
+       ниже начинается ножка, дальше спускаться нельзя */
+    let i = bins - 1;
+    while (i > 0 && r[i] > rMax * 0.3) i--;
+    return Math.min(i + 1, bins - 6);
+  }
+
+  /* Жидкость — тело вращения по профилю бокала с зазором от стенки */
+  liquidGeometry(prof, fill, gap = 0.92) {
+    const { r, y0, h, bins, cx, cz } = prof;
+    const from = this.bowlBottom(prof);
+    const to = Math.min(bins - 3, Math.round(from + (bins - from) * fill));
+    const yAt = (i) => y0 + (i / bins) * h;
+    const pts = [new THREE.Vector2(0, yAt(from))];
+    for (let i = from; i <= to; i++) pts.push(new THREE.Vector2(Math.max(r[i] * gap, 0.001), yAt(i)));
+    pts.push(new THREE.Vector2(0, yAt(to)));
+    const g = new THREE.LatheGeometry(pts, 96);
+    g.translate(cx, 0, cz);
+    return g;
+  }
+
+
+  /* бокал уходит с разворотом — потом на его место прилетает следующий */
+  leave() {
+    if (this.group) this.leaveFrom = performance.now();
+  }
+
+  /* сторона, с которой прилетит следующий бокал: чередуем, чтобы
+     показ не выглядел одинаково от коктейля к коктейлю */
+  nextSide() {
+    this.side = this.side === 1 ? -1 : 1;
+    return this.side;
+  }
+
   build(kind, liquidColor, accent) {
     if (!this.ready) { this.pending = [kind, liquidColor, accent]; return; }
     if (this.group) {
@@ -169,29 +237,9 @@ export class BarScene {
     glass.renderOrder = 3;
     g.add(glass);
 
-    src.geometry.computeBoundingBox();
-    const bb = src.geometry.boundingBox;
-    const size = new THREE.Vector3(); bb.getSize(size);
-    const ctr = new THREE.Vector3(); bb.getCenter(ctr);
-
-    const rLiq = (Math.max(size.x, size.z) / 2) * cfg.inset;
-    const yBase = bb.min.y + size.y * cfg.floor;
-    const hLiq = size.y * cfg.fill;
-
-    let geo;
-    if (cfg.liquid === 'cone') {
-      geo = new THREE.ConeGeometry(rLiq, hLiq, 64, 1, false);
-      geo.rotateX(Math.PI);
-      geo.translate(0, yBase + hLiq / 2, 0);
-    } else if (cfg.liquid === 'bowl') {
-      geo = new THREE.SphereGeometry(rLiq, 64, 32, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-      geo.scale(1, hLiq / rLiq, 1);
-      geo.translate(0, yBase + hLiq, 0);
-    } else {
-      geo = new THREE.CylinderGeometry(rLiq, rLiq * 0.94, hLiq, 64, 1);
-      geo.translate(0, yBase + hLiq / 2, 0);
-    }
-    geo.translate(ctr.x, 0, ctr.z);
+    const prof = this.profileOf(src.geometry);
+    const geo = this.liquidGeometry(prof, cfg.fill);
+    const yBase = prof.y0 + (this.bowlBottom(prof) / prof.bins) * prof.h;
 
     const liquid = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({
       color: new THREE.Color(liquidColor),
@@ -222,6 +270,10 @@ export class BarScene {
     this.group = g;
     this.scene.add(g);
     this.enterFrom = performance.now();
+    this.enterSide = this.nextSide();
+    this.leaveFrom = 0;
+    this.flashFrom = performance.now();   // вспышка света на приходе
+    this.dollyFrom = performance.now();   // камера подъезжает и отходит
     if (accent) this.refreshEnvironment(accent);
   }
 
@@ -256,24 +308,58 @@ export class BarScene {
       this.group.position.z = -away * 3;
       this.camera.position.z = 6.4 + away * 1.6;
       this.canvas.style.opacity = String(Math.max(0, 1 - away * 1.7));
-      if (this.enterFrom) {
-        const k = Math.min((performance.now() - this.enterFrom) / 1100, 1);
-        const e = 1 - Math.pow(1 - k, 3);
-        this.group.scale.setScalar(this.fitScale * (0.82 + e * 0.18));
-        /* бокал прилетает с разворотом и мягко останавливается */
-        this.group.rotation.y += (1 - e) * 3.4;
-        this.group.position.y += (1 - e) * 1.2;
-        if (k >= 1) this.enterFrom = 0;
+      /* УХОД: бокал заваливается набок, уносится по дуге и схлопывается */
+      if (this.leaveFrom) {
+        const lk = Math.min((performance.now() - this.leaveFrom) / 620, 1);
+        const le = lk * lk;
+        const s = this.side || 1;
+        this.group.rotation.y += le * 5.2;
+        this.group.rotation.z = -s * le * 1.1;
+        this.group.position.x += s * le * 4.2;
+        this.group.position.y += le * 0.9 - le * le * 2.6;
+        this.group.position.z -= le * 4.4;
+        this.group.scale.setScalar(this.fitScale * Math.max(1 - le * 1.15, 0.001));
       }
-      /* напиток наливается на глазах */
+      /* ПРИХОД: влетает сбоку снизу, доворачивается и слегка перелетает */
+      if (this.enterFrom) {
+        const k = Math.min((performance.now() - this.enterFrom) / 1250, 1);
+        const e = 1 - Math.pow(1 - k, 3);
+        /* мягкий перелёт по масштабу — бокал «дышит», встав на место */
+        const ov = Math.sin(Math.min(k, 1) * Math.PI) * 0.07 * (1 - k);
+        this.group.scale.setScalar(this.fitScale * (0.55 + e * 0.45 + ov));
+        const s = -(this.enterSide || 1);
+        this.group.rotation.y += (1 - e) * 6.2 * s;
+        this.group.rotation.z = s * (1 - e) * 0.85;
+        this.group.position.x += s * (1 - e) * 3.6;
+        this.group.position.y -= (1 - e) * 1.5;
+        this.group.position.z -= (1 - e) * 2.4;
+        if (k >= 1) { this.enterFrom = 0; this.group.rotation.z = 0; }
+      }
+      /* напиток наливается на глазах и чуть плещется у стенки */
       if (this.liquid && this.pourFrom) {
         const pk = Math.min(Math.max((performance.now() - this.pourFrom) / 1300, 0), 1);
         const pe = pk < 0.5 ? 4 * pk * pk * pk : 1 - Math.pow(-2 * pk + 2, 3) / 2;
         const kk = Math.max(pe, 0.001);
         this.liquid.scale.y = kk;
         this.liquid.position.y = this.liquidBase * (1 - kk);
-        if (pk >= 1) this.pourFrom = 0;
+        /* волна: как только налили, жидкость коротко качается */
+        const w = pk > 0.55 ? Math.sin((pk - 0.55) * 26) * (1 - pk) * 0.09 : 0;
+        this.liquid.rotation.z = w;
+        if (pk >= 1) { this.pourFrom = 0; this.liquid.rotation.z = 0; }
       }
+    }
+    /* камера подъезжает на смене коктейля и плавно отходит */
+    if (this.dollyFrom) {
+      const dk = Math.min((performance.now() - this.dollyFrom) / 1600, 1);
+      const de = 1 - Math.pow(1 - dk, 3);
+      this.camera.position.z -= (1 - de) * 1.15;
+      if (dk >= 1) this.dollyFrom = 0;
+    }
+    /* короткая вспышка света — как будто включили софит на новую подачу */
+    if (this.flashFrom) {
+      const fk = Math.min((performance.now() - this.flashFrom) / 900, 1);
+      this.renderer.toneMappingExposure = 1.05 + (1 - fk) * (1 - fk) * 0.75;
+      if (fk >= 1) { this.flashFrom = 0; this.renderer.toneMappingExposure = 1.05; }
     }
     this.camera.lookAt(0, 0, 0);
     if (this.composer) this.composer.render();

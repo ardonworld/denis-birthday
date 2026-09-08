@@ -814,3 +814,77 @@ body.is-secret .hero-title{
   -webkit-background-clip: text;
   background-clip: text;
 }
+
+/* ================= ШТОРА ПЕРЕХОДА =================
+   Три косые полосы акцентного цвета проносятся по экрану —
+   ровно под ними меняется и бокал, и текст. */
+.wipe{
+  position: fixed;
+  inset: -12vh -10vw;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+}
+.wipe span{
+  position: absolute;
+  left: -70vw;
+  width: 62vw;
+  height: 42vh;
+  transform: skewX(-14deg) translateX(0);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.wipe span:nth-child(1){ top: -4vh;  background: color-mix(in srgb, var(--accent) 92%, #000); }
+.wipe span:nth-child(2){ top: 38vh;  background: color-mix(in srgb, var(--accent) 70%, #0a0c0e); }
+.wipe span:nth-child(3){ top: 80vh;  background: color-mix(in srgb, var(--accent) 45%, #05070a); }
+.wipe.run span{ animation: wipe-run .95s cubic-bezier(.66,0,.2,1) forwards; }
+.wipe.run span:nth-child(2){ animation-delay: .06s; }
+.wipe.run span:nth-child(3){ animation-delay: .12s; }
+@keyframes wipe-run{
+  0%{ transform: skewX(-14deg) translateX(0); opacity: 0; }
+  12%{ opacity: 1; }
+  70%{ opacity: 1; }
+  100%{ transform: skewX(-14deg) translateX(210vw); opacity: 0; }
+}
+
+/* ================= ИМЯ КОКТЕЙЛЯ ПО БУКВАМ =================
+   Градиент держит каждая буква сама: если оставить его на заголовке,
+   трансформация букв заставляет браузер рисовать фон прямоугольником. */
+.hero-title{ background: none; }
+.hero-title .ch{
+  display: inline-block;
+  font-style: normal;
+  background-image: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.7) 62%, rgba(255,255,255,0.34) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+  /* перспектива внутри самой трансформации, а не на заголовке */
+  transform: perspective(700px) translateY(0.42em) rotateX(-72deg) scale(.86);
+  transform-origin: 50% 100%;
+  transition: opacity .5s cubic-bezier(.2,.8,.25,1),
+              transform .62s cubic-bezier(.16,1.02,.3,1);
+}
+.hero-title .ch.sp{ width: 0.28em; }
+.hero-title .ch.on{ opacity: 1; transform: perspective(700px); }
+body.is-secret .hero-title .ch{
+  background-image: linear-gradient(180deg, #ffd9d9 0%, rgba(224,130,130,0.55) 70%, rgba(150,45,45,0.3) 100%);
+}
+
+/* заголовок анимируем только буквами: размытие на нём ломает градиент */
+.hero-title.reveal,
+.hero-title.reveal.out{ filter: none; transform: none; opacity: 1; }
+
+/* текст уходит в сторону хода шторы, а не просто гаснет */
+.reveal.out{
+  opacity: 0;
+  transform: translateX(-26px) translateY(-8px);
+  filter: blur(7px);
+  transition: opacity .38s ease, transform .38s ease, filter .38s ease;
+}
+.hero-col-right .reveal.out{ transform: translateX(26px) translateY(-8px); }
+
+@media (prefers-reduced-motion: reduce){
+  .wipe{ display: none; }
+  .hero-title .ch{ transition: opacity .2s linear; transform: none; filter: none; }
+}
