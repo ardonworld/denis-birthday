@@ -157,18 +157,20 @@ body.has3d .glass-wrap{ filter: none; }
 .hero{ position: relative; }
 .hero-title{
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   top: clamp(6px, 3.4vw, 86px);
-  transform: translateX(-50%);
+  text-align: center;
   margin: 0;
   z-index: 1;
-  font-size: clamp(58px, 15.5vw, 230px);
-  line-height: 0.86;
+  font-size: clamp(42px, 10.5vw, 158px);
+  line-height: 0.9;
+  max-width: 92vw;
   font-weight: 800;
   letter-spacing: -0.045em;
   white-space: nowrap;
   color: transparent;
-  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.62) 58%, rgba(255,255,255,0.12) 100%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.42) 58%, rgba(255,255,255,0.08) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   pointer-events: none;
@@ -183,7 +185,12 @@ body.has3d .glass-wrap{ filter: none; }
   gap: clamp(12px, 3vw, 48px);
   min-height: clamp(330px, 56vh, 620px);
 }
-.hero-col{ display: flex; flex-direction: column; gap: 16px; }
+.hero-col{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-shadow: 0 2px 16px rgba(4,7,9,0.92), 0 0 40px rgba(4,7,9,0.7);
+}
 .hero-col-right{ align-items: flex-end; text-align: right; }
 .hero-lead{
   margin: 0;
@@ -515,7 +522,7 @@ body.has3d .glass-wrap{ filter: none; }
     gap: 14px;
     min-height: 0;
   }
-  .hero-title{ position: relative; left: auto; transform: none; text-align: center; top: 0; }
+  .hero-title{ position: relative; text-align: center; top: 0; }
   .glass-wrap{ width: clamp(150px, 46vw, 250px); margin-top: -18px; }
   .hero-col-left{ order: 3; align-items: center; text-align: center; }
   .hero-col-left .btn{ align-self: center; }
@@ -603,3 +610,120 @@ body.has3d .glass-wrap{ filter: none; }
   text-transform: uppercase;
 }
 .titles-skip:hover{ color: var(--ink); }
+
+/* ================= ПРЕЗЕНТАЦИЯ ================= */
+/* Каждый блок появляется по очереди — карта рассказывает себя сама */
+.reveal{
+  opacity: 0;
+  transform: translateY(16px);
+  filter: blur(5px);
+  transition: opacity .8s cubic-bezier(.2,.8,.25,1),
+              transform .8s cubic-bezier(.2,.8,.25,1),
+              filter .8s ease;
+}
+.reveal.on{ opacity: 1; transform: none; filter: blur(0); }
+.reveal.out{
+  opacity: 0;
+  transform: translateY(-14px);
+  filter: blur(4px);
+  transition: opacity .45s ease, transform .45s ease, filter .45s ease;
+}
+
+.col-label{
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 8px;
+}
+
+.recipe{ margin-top: 4px; }
+.recipe-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.recipe-list li{
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: var(--ink);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity .5s ease, transform .5s ease;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.recipe-list li.on{ opacity: 1; transform: none; }
+.recipe-list li::before{
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: 0 0 auto;
+  transition: background .5s ease;
+}
+
+.facts{ display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
+.taste-block{ margin-top: 20px; }
+.taste-block .col-label{ text-align: right; }
+.taste-row{ justify-content: flex-end; }
+.taste{
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--ink);
+  opacity: 0;
+  transform: scale(.9);
+  transition: opacity .45s ease, transform .45s ease;
+}
+.taste.on{ opacity: 1; transform: none; }
+.pairing{ margin-top: 18px; max-width: 26ch; }
+.pairing .col-label{ text-align: right; }
+.pairing-text{
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  text-align: right;
+}
+
+/* полоса хода презентации */
+.show-bar{
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 118px;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  z-index: 7;
+}
+.show-bar::after{
+  content: '';
+  display: block;
+  height: 100%;
+  width: var(--p, 0%);
+  background: var(--accent);
+  transition: width .2s linear, background .6s ease;
+}
+
+@media (max-width: 860px){
+  .facts{
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px 18px;
+  }
+  .taste-block .col-label,
+  .pairing .col-label,
+  .pairing-text{ text-align: center; }
+  .taste-row{ justify-content: center; }
+  .pairing{ max-width: none; }
+  .recipe-list li{ justify-content: center; }
+  .recipe .col-label{ text-align: center; }
+  .show-bar{ bottom: 112px; }
+}

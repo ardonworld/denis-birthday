@@ -374,33 +374,99 @@ let current = 0;
 const glassWrap = document.getElementById('glass-wrap');
 const switcher = document.getElementById('switcher');
 
+/* ---------- движок презентации ----------
+   Карта показывает себя сама: коктейль за коктейлем, блок за блоком.
+   Клик по чипу перехватывает управление и запускает нужный с начала. */
+const SHOW_MS = 11000;          // сколько держится один коктейль
+const show = { timer: 0, raf: 0, startedAt: 0, paused: false };
+
+const $ = (id) => document.getElementById(id);
+const revealEls = () => [...document.querySelectorAll('.reveal')];
+
+function clearStage() {
+  revealEls().forEach((el) => { el.classList.remove('on'); el.classList.add('out'); });
+  document.querySelectorAll('.recipe-list li, .taste').forEach((el) => el.classList.remove('on'));
+}
+
+function fillStage(c) {
+  $('drink-title').textContent = c.name;
+  $('drink-lead').textContent = c.lead;
+  $('fact-base').textContent = c.base;
+  $('fact-abv').textContent = c.abv;
+  $('fact-vol').textContent = c.vol;
+  $('fact-serve').textContent = c.serve;
+  $('pairing-text').textContent = c.pairing;
+  $('recipe-list').innerHTML = c.recipe.map((r) => `<li>${r}</li>`).join('');
+  $('taste-row').innerHTML = c.taste.map((t) => `<span class="taste">${t}</span>`).join('');
+}
+
+/* расписание появления блоков внутри одного коктейля */
+function playStage() {
+  const seq = [
+    [120,  '#drink-title'],
+    [700,  '#drink-lead'],
+    [1300, '.facts .fact:nth-child(1)'],
+    [1500, '.facts .fact:nth-child(2)'],
+    [1700, '.facts .fact:nth-child(3)'],
+    [1900, '.facts .fact:nth-child(4)'],
+    [2500, '#recipe-block'],
+    [4200, '#taste-block'],
+    [5200, '#pairing-block'],
+  ];
+  seq.forEach(([ms, sel]) => setTimeout(() => {
+    const el = document.querySelector(sel);
+    if (el) { el.classList.remove('out'); el.classList.add('on'); }
+  }, ms));
+
+  document.querySelectorAll('#recipe-list li').forEach((li, i) =>
+    setTimeout(() => li.classList.add('on'), 2700 + i * 220));
+  document.querySelectorAll('#taste-row .taste').forEach((t, i) =>
+    setTimeout(() => t.classList.add('on'), 4400 + i * 160));
+}
+
 function paint(i, animate) {
   const c = COCKTAILS[i];
   current = i;
   document.documentElement.style.setProperty('--accent', c.accent);
-  document.getElementById('drink-title').textContent = c.name;
-  document.getElementById('drink-lead').textContent = c.lead;
-  document.getElementById('fact-base').textContent = c.base;
-  document.getElementById('fact-abv').textContent = c.abv;
-  document.getElementById('fact-vol').textContent = c.vol;
-  document.getElementById('fact-serve').textContent = c.serve;
-
-  glassWrap.innerHTML = `<div class="glass-tilt">${c.art(c.id, c.top, c.bottom)}</div>`;
-  if (animate) {
-    glassWrap.classList.remove('swap');
-    void glassWrap.offsetWidth;
-    glassWrap.classList.add('swap');
-  }
-  switcher.querySelectorAll('.chip').forEach((b, k) => b.classList.toggle('is-active', k === i));
   if (scene) scene.build(c.kind, c.liquid, c.accent);
+  switcher.querySelectorAll('.chip').forEach((b, k) => b.classList.toggle('is-active', k === i));
+
+  if (animate) {
+    clearStage();
+    setTimeout(() => { fillStage(c); playStage(); }, 480);
+  } else {
+    fillStage(c);
+    playStage();
+  }
 }
+
+function startShow(i, animate) {
+  clearTimeout(show.timer);
+  paint(i, animate);
+  show.startedAt = performance.now();
+  show.timer = setTimeout(() => startShow((current + 1) % COCKTAILS.length, true), SHOW_MS);
+}
+
+function tickBar() {
+  show.raf = requestAnimationFrame(tickBar);
+  if (show.paused) return;
+  const p = Math.min((performance.now() - show.startedAt) / SHOW_MS, 1) * 100;
+  const bar = $('show-bar');
+  if (bar) bar.style.setProperty('--p', p.toFixed(1) + '%');
+}
+
+/* презентация замирает, когда вкладка не видна или ушли к меню */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { clearTimeout(show.timer); show.paused = true; }
+  else if (show.paused) { show.paused = false; startShow(current, false); }
+});
 
 function buildSwitcher() {
   COCKTAILS.forEach((c, i) => {
     const b = el('button', 'chip');
     b.type = 'button';
     b.innerHTML = `<span class="chip-thumb">${c.art('thumb-' + c.id, c.top, c.bottom)}</span>${c.name}`;
-    b.addEventListener('click', () => paint(i, true));
+    b.addEventListener('click', () => startShow(i, true));
     switcher.appendChild(b);
   });
 }
@@ -427,7 +493,8 @@ document.getElementById('sheet-close').addEventListener('click', closeSheet);
 document.getElementById('sheet-backdrop').addEventListener('click', closeSheet);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) closeSheet(); });
 
-document.getElementById('open-detail').addEventListener('click', () => {
+const openDetailBtn = document.getElementById('open-detail');
+if (openDetailBtn) openDetailBtn.addEventListener('click', () => {
   const c = COCKTAILS[current];
   openSheet(`
     <p class="sheet-eyebrow">Коктейль · ${c.base} · ${c.abv}</p>
@@ -559,13 +626,15 @@ if (quality !== 'off' && !new URLSearchParams(location.search).has('no3d')) {
 const titles = document.getElementById('titles');
 function runTitles() {
   const lines = [...document.querySelectorAll('.title-line')];
-  if (sessionStorage.getItem('seenTitles')) { titles.classList.add('done'); return; }
+  if (sessionStorage.getItem('seenTitles')) { titles.classList.add('done'); startShow(0, false); return; }
   lines.forEach((l, i) => setTimeout(() => l.classList.add('show'), i * 1250));
   setTimeout(endTitles, lines.length * 1250 + 600);
 }
 function endTitles() {
+  if (titles.classList.contains('done')) return;
   titles.classList.add('done');
   sessionStorage.setItem('seenTitles', '1');
+  startShow(0, false);
 }
 document.getElementById('titles-skip').addEventListener('click', endTitles);
 runTitles();
@@ -584,4 +653,4 @@ addEventListener('scroll', () => {
 buildSwitcher();
 buildDishes();
 buildTobacco();
-paint(0, false);
+tickBar();

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=202609080359">
+<link rel="stylesheet" href="style.css?v=202609081359">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>">
 </head>
 <body>
@@ -47,29 +47,44 @@
     <div class="scene-inner">
       <p class="eyebrow">Карта бара · пять позиций</p>
 
-      <div class="hero">
-        <h1 class="hero-title" id="drink-title">Негрони</h1>
+      <div class="hero" id="hero">
+        <h1 class="hero-title reveal" id="drink-title">Негрони</h1>
 
         <div class="hero-stage">
           <div class="hero-col hero-col-left">
-            <p class="hero-lead" id="drink-lead"></p>
-            <button class="btn btn-accent" id="open-detail">
-              Состав и подача <span>→</span>
-            </button>
+            <p class="hero-lead reveal" id="drink-lead"></p>
+
+            <div class="recipe reveal" id="recipe-block">
+              <span class="col-label">Состав</span>
+              <ul class="recipe-list" id="recipe-list"></ul>
+            </div>
           </div>
 
           <div class="glass-wrap" id="glass-wrap"></div>
 
           <div class="hero-col hero-col-right">
-            <div class="fact"><span class="fact-key">База</span><span class="fact-val" id="fact-base"></span></div>
-            <div class="fact"><span class="fact-key">Крепость</span><span class="fact-val" id="fact-abv"></span></div>
-            <div class="fact"><span class="fact-key">Объём</span><span class="fact-val" id="fact-vol"></span></div>
-            <div class="fact"><span class="fact-key">Подача</span><span class="fact-val" id="fact-serve"></span></div>
+            <div class="facts" id="facts">
+              <div class="fact reveal"><span class="fact-key">База</span><span class="fact-val" id="fact-base"></span></div>
+              <div class="fact reveal"><span class="fact-key">Крепость</span><span class="fact-val" id="fact-abv"></span></div>
+              <div class="fact reveal"><span class="fact-key">Объём</span><span class="fact-val" id="fact-vol"></span></div>
+              <div class="fact reveal"><span class="fact-key">Подача</span><span class="fact-val" id="fact-serve"></span></div>
+            </div>
+
+            <div class="taste-block reveal" id="taste-block">
+              <span class="col-label">Вкус</span>
+              <div class="taste-row" id="taste-row"></div>
+            </div>
+
+            <div class="pairing reveal" id="pairing-block">
+              <span class="col-label">Подают с</span>
+              <p class="pairing-text" id="pairing-text"></p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <div class="show-bar" id="show-bar"></div>
     <div class="switcher" id="switcher"></div>
 
     <button class="jump" data-to="kitchen">
@@ -131,6 +146,6 @@
   }
 }
 </script>
-<script type="module" src="app.js?v=202609080359"></script>
+<script type="module" src="app.js?v=202609081359"></script>
 </body>
 </html>
