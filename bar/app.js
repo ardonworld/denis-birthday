@@ -229,55 +229,98 @@ function glassHurricane(id, top, bottom) {
 
 /* ---------- данные бара ---------- */
 const COCKTAILS = [
+  /* ---------- АКТ ПЕРВЫЙ: лёгкие и классика ---------- */
   {
-    id: 'negroni', name: 'Негрони', accent: '#e0492c', kind: 'rocks', liquid: '#7d0f0b', garnish: 'citrus',
-    art: glassRocks, top: '#f0603a', bottom: '#96150f',
-    lead: 'Горький классик на троих равных. Тот случай, когда простая формула держит весь вечер.',
-    base: 'Джин', abv: '24%', vol: '90 мл', serve: 'Рокс, крупный лёд',
-    recipe: ['Джин — 30 мл', 'Кампари — 30 мл', 'Красный вермут — 30 мл', 'Цедра апельсина'],
-    taste: ['горько-сладкий', 'цитрус', 'травы', 'плотный'],
-    notes: 'Сначала горечь кампари, следом сладость вермута, в финале — сухой можжевеловый хвост джина и масло апельсиновой цедры.',
-    pairing: 'Оливки, вяленое мясо, твёрдый сыр.',
+    id: 'bellini', act: 1, name: 'Беллини', accent: '#ff9a6b',
+    kind: 'hurricane', liquid: '#f7a35c',
+    lead: 'Персик и просекко. С него начинают, когда вечер ещё только разгоняется.',
+    base: 'Просекко', abv: '8%', vol: '150 мл', serve: 'Флейта, без льда',
+    recipe: ['Просекко — 100 мл', 'Пюре белого персика — 50 мл', 'Капля персикового ликёра'],
+    taste: ['персик', 'лёгкий', 'игристый', 'сладковатый'],
+    pairing: 'Сырная тарелка, брускетты, лёгкие закуски.',
   },
   {
-    id: 'mojito', name: 'Мохито', accent: '#63c94f', kind: 'highball', liquid: '#8fce62', garnish: 'mint',
-    art: glassHighball, top: '#c9f5a8', bottom: '#4d9c3a',
-    lead: 'Мята, лайм и лёд. Освежает и не даёт вечеру провалиться в тяжесть.',
-    base: 'Белый ром', abv: '12%', vol: '320 мл', serve: 'Хайбол, дроблёный лёд',
-    recipe: ['Белый ром — 50 мл', 'Лайм — половина', 'Мята — 10 листьев', 'Тростниковый сахар — 2 ч. л.', 'Содовая'],
-    taste: ['свежий', 'кислый', 'мятный', 'лёгкий'],
-    notes: 'Холодная мята в носу, кислота лайма по центру, сладость тростника сглаживает финал. Пьётся быстро — в этом и опасность.',
-    pairing: 'Севиче, лёгкие закуски, всё острое.',
+    id: 'cosmo', act: 1, name: 'Космополитен', accent: '#e8456f',
+    kind: 'coupe', liquid: '#c9184a',
+    lead: 'Клюква, лайм и холодный бокал. Тот случай, когда простое выглядит дорого.',
+    base: 'Водка', abv: '20%', vol: '110 мл', serve: 'Мартини, цедра лайма',
+    recipe: ['Водка — 40 мл', 'Куантро — 20 мл', 'Клюквенный морс — 30 мл', 'Сок лайма — 15 мл'],
+    taste: ['кисло-сладкий', 'ягодный', 'цитрус', 'освежающий'],
+    pairing: 'Севиче, креветки, лёгкие салаты.',
   },
   {
-    id: 'aperol', name: 'Шприц', accent: '#ff8a1f', kind: 'wine', liquid: '#e35f05', garnish: 'citrus',
-    art: glassSpritz, top: '#ffb648', bottom: '#e8590c',
+    id: 'aperol', act: 1, name: 'Апероль Шприц', accent: '#ff8a1f',
+    kind: 'wine', liquid: '#e35f05',
     lead: 'Аперитив, с которого начинают. Пузырьки, апельсин и лёгкая горчинка.',
     base: 'Апероль', abv: '9%', vol: '250 мл', serve: 'Бокал для вина, много льда',
     recipe: ['Апероль — 60 мл', 'Просекко — 90 мл', 'Содовая — 30 мл', 'Долька апельсина'],
     taste: ['лёгкий', 'цитрус', 'сладко-горький', 'игристый'],
-    notes: 'Апельсиновая корка и ревень, горечь мягкая и короткая. Просекко держит пузырь до последнего глотка.',
     pairing: 'Брускетта, прошутто, сырная тарелка.',
   },
   {
-    id: 'espresso', name: 'Эспрессо', accent: '#c08b4e', kind: 'coupe', liquid: '#2e1a0f', garnish: 'beans',
-    art: glassCoupe, top: '#8a5a2b', bottom: '#3a1f10',
-    lead: 'Кофе и водка в одном бокале. Тот самый коктейль для второй половины вечера.',
-    base: 'Водка', abv: '18%', vol: '110 мл', serve: 'Купе, три зерна',
-    recipe: ['Водка — 50 мл', 'Свежий эспрессо — 30 мл', 'Кофейный ликёр — 20 мл', 'Сироп — по вкусу'],
-    taste: ['кофе', 'какао', 'плотный', 'сладковатый'],
-    notes: 'Плотная пенка, обжарка и тёмный шоколад. Горечь кофе перекрывает алкоголь — держите себя в руках.',
-    pairing: 'Тирамису, шоколад, орехи.',
+    id: 'paloma', act: 1, name: 'Палома', accent: '#f2557d',
+    kind: 'highball', liquid: '#f06a86',
+    lead: 'Грейпфрут, текила и соль на кромке. Мексика без лишнего пафоса.',
+    base: 'Текила', abv: '12%', vol: '300 мл', serve: 'Хайбол, соляная кромка',
+    recipe: ['Текила бланко — 50 мл', 'Грейпфрутовый содовый — 150 мл', 'Сок лайма — 15 мл', 'Щепотка соли'],
+    taste: ['горьковатый', 'цитрус', 'освежающий', 'солоноватый'],
+    pairing: 'Тако, начос, острое.',
   },
   {
-    id: 'lagoon', name: 'Лагуна', accent: '#2fb6e8', kind: 'hurricane', liquid: '#0a72c4', garnish: 'lime',
-    art: glassHurricane, top: '#7ee0ff', bottom: '#1273c4',
-    lead: 'Голубой цитрус со льдом. Самый заметный бокал в зале — берут глазами.',
-    base: 'Водка', abv: '11%', vol: '280 мл', serve: 'Харрикейн, лёд, трубочка',
-    recipe: ['Водка — 40 мл', 'Ликёр блю кюрасао — 20 мл', 'Лимонад — 200 мл', 'Лимон — долька'],
-    taste: ['сладкий', 'цитрус', 'освежающий', 'лёгкий'],
-    notes: 'Апельсиновый ликёр под маской голубого, кислота лимона в середине и долгий сладкий финал.',
-    pairing: 'Фруктовая тарелка, креветки, лёд.',
+    id: 'margarita', act: 1, name: 'Маргарита', accent: '#b6d94c',
+    kind: 'rocks', liquid: '#cfe08a',
+    lead: 'Классика в чистом виде: текила, лайм и соль. Ничего лишнего.',
+    base: 'Текила', abv: '22%', vol: '120 мл', serve: 'Рокс, соляная кромка',
+    recipe: ['Текила бланко — 50 мл', 'Куантро — 25 мл', 'Сок лайма — 25 мл', 'Соль на кромку'],
+    taste: ['кислый', 'цитрус', 'солёная кромка', 'плотный'],
+    pairing: 'Гуакамоле, тако, севиче.',
+  },
+
+  /* ---------- АКТ ВТОРОЙ: фирменные крепкие ---------- */
+  {
+    id: 'tvr', act: 2, name: 'TVR', accent: '#c8571f',
+    kind: 'rocks', liquid: '#7a2f0c',
+    lead: 'Фирменный крепкий. Тот, после которого вечер меняет направление.',
+    base: 'Виски', abv: '32%', vol: '100 мл', serve: 'Рокс, крупный лёд',
+    recipe: ['Бурбон — 50 мл', 'Тёмный ром — 20 мл', 'Ликёр амаро — 20 мл', 'Биттер — 2 капли'],
+    taste: ['крепкий', 'дубовый', 'пряный', 'долгий финиш'],
+    pairing: 'Вяленое мясо, тёмный шоколад.',
+  },
+  {
+    id: 'chuparosa', act: 2, name: 'Нуэво-Параисо', accent: '#e0a02c',
+    kind: 'coupe', liquid: '#d9922a',
+    lead: 'Текила Chuparosa в чистом виде — с дымком и перцем. Для тех, кто понимает.',
+    base: 'Текила', abv: '38%', vol: '70 мл', serve: 'Купе, долька лайма',
+    recipe: ['Chuparosa Tequila — 60 мл', 'Агавовый сироп — 10 мл', 'Дым можжевельника', 'Перечная соль'],
+    taste: ['дымный', 'перечный', 'агава', 'крепкий'],
+    pairing: 'Лайм, соль, острое мясо.',
+  },
+  {
+    id: 'jager', act: 2, name: 'Атомный Егерь', accent: '#4fae5a',
+    kind: 'highball', liquid: '#2f6b2f',
+    lead: 'Турбо-егербомба. Шот падает в стакан, и обратной дороги уже нет.',
+    base: 'Егермейстер', abv: '16%', vol: '330 мл', serve: 'Хайбол, шот падает внутрь',
+    recipe: ['Егермейстер — 50 мл', 'Энергетик — 250 мл', 'Лёд', 'Подаётся с шотом сверху'],
+    taste: ['травяной', 'сладкий', 'бодрящий', 'резкий'],
+    pairing: 'Ничего. Просто держитесь.',
+  },
+  {
+    id: 'sour', act: 2, name: 'Виски Сауэр', accent: '#d8a24a',
+    kind: 'rocks', liquid: '#c98b34',
+    lead: 'Виски, лимон и плотная белая шапка. Кислое, крепкое и очень взрослое.',
+    base: 'Бурбон', abv: '24%', vol: '140 мл', serve: 'Рокс, пенная шапка',
+    recipe: ['Бурбон — 50 мл', 'Сок лимона — 25 мл', 'Сахарный сироп — 20 мл', 'Белок — 15 мл'],
+    taste: ['кислый', 'плотный', 'ваниль', 'бархатный'],
+    pairing: 'Орехи, твёрдый сыр.',
+  },
+  {
+    id: 'rdr', act: 2, secret: true, name: 'RDR', accent: '#8e1f2f',
+    kind: 'hurricane', liquid: '#4a0d18',
+    lead: 'Секретная позиция карты. В меню его нет — просто назовите бармену три буквы.',
+    base: 'Не разглашается', abv: '35%', vol: '90 мл', serve: 'Под дымом, под колпаком',
+    recipe: ['Ржаной виски — 45 мл', 'Вишнёвый ликёр — 20 мл', 'Биттер на чёрной вишне', 'Дым вишнёвой щепы'],
+    taste: ['дымный', 'вишня', 'крепкий', 'терпкий'],
+    pairing: 'Тишина и хорошая компания.',
   },
 ];
 
@@ -430,7 +473,14 @@ function paint(i, animate) {
   document.documentElement.style.setProperty('--accent', c.accent);
   if (scene) scene.build(c.kind, c.liquid, c.accent);
   const num = document.getElementById('show-num');
-  if (num) num.textContent = String(i + 1).padStart(2, '0');
+  const inAct = COCKTAILS.filter((x) => x.act === c.act);
+  const idx = inAct.indexOf(c) + 1;
+  if (num) num.textContent = String(idx).padStart(2, '0');
+  const total = document.getElementById('show-total');
+  if (total) total.textContent = String(inAct.length).padStart(2, '0');
+  const actLabel = document.getElementById('act-label');
+  if (actLabel) actLabel.textContent = c.act === 1 ? 'Лёгкие' : 'Крепкие';
+  document.body.classList.toggle('is-secret', !!c.secret);
 
   if (animate) {
     clearStage();
@@ -445,7 +495,19 @@ function startShow(i, animate) {
   clearTimeout(show.timer);
   paint(i, animate);
   show.startedAt = performance.now();
-  show.timer = setTimeout(() => startShow((current + 1) % COCKTAILS.length, true), SHOW_MS);
+  show.timer = setTimeout(() => {
+    const next = (current + 1) % COCKTAILS.length;
+    /* смена акта — с отдельной заставкой, как в начале */
+    if (COCKTAILS[next].act !== COCKTAILS[current].act) {
+      clearStage();
+      const intro = COCKTAILS[next].act === 2
+        ? ['Думали, это всё?', 'Фирменные крепкие', 'пять позиций для своих']
+        : ['И по кругу', 'Лёгкая половина', 'снова с начала'];
+      runInterlude(intro, () => startShow(next, false));
+    } else {
+      startShow(next, true);
+    }
+  }, SHOW_MS);
 }
 
 function tickBar() {
@@ -635,6 +697,21 @@ function endTitles() {
 }
 document.getElementById('titles-skip').addEventListener('click', endTitles);
 runTitles();
+
+/* ---------- заставка между актами ---------- */
+function runInterlude(lines, done) {
+  const box = titles.querySelector('.titles-inner');
+  box.innerHTML = lines.map((t, i) =>
+    `<p class="title-line${i === 1 ? ' title-line-big' : ''}">${t}</p>`).join('');
+  titles.classList.remove('done');
+  const els = [...box.querySelectorAll('.title-line')];
+  els.forEach((l, i) => setTimeout(() => l.classList.add('show'), i * 1150));
+  const total = els.length * 1150 + 500;
+  const finish = () => { titles.classList.add('done'); done(); };
+  const t = setTimeout(finish, total);
+  const skip = document.getElementById('titles-skip');
+  skip.onclick = () => { clearTimeout(t); finish(); };
+}
 
 /* ---------- прокрутка управляет сценой ---------- */
 let scrollRaf = 0;

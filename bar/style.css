@@ -33,7 +33,7 @@ body{
   transition: opacity .8s ease;
 }
 body.has3d #scene3d{ opacity: 1; }
-body.has3d .hero-title{ z-index: 0; }
+body.has3d .hero-title{ z-index: 5; }
 body.has3d .hero-col{ position: relative; z-index: 4; }
 body.has3d .scene-inner{ z-index: auto; }
 body.has3d .switcher,
@@ -156,24 +156,19 @@ body.has3d .glass-wrap{ filter: none; }
 /* ================= ГЕРОЙ КОКТЕЙЛЯ ================= */
 .hero{ position: relative; }
 .hero-title{
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: clamp(6px, 3.4vw, 86px);
+  position: relative;
+  z-index: 5;
+  margin: 0 0 clamp(2px, 0.8vw, 12px);
   text-align: center;
-  margin: 0;
-  z-index: 1;
-  font-size: clamp(42px, 10.5vw, 158px);
-  line-height: 0.9;
-  max-width: 92vw;
+  font-size: clamp(36px, 8vw, 120px);
+  line-height: 0.95;
   font-weight: 800;
   letter-spacing: -0.045em;
   white-space: nowrap;
   color: transparent;
-  background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.42) 58%, rgba(255,255,255,0.08) 100%);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.7) 62%, rgba(255,255,255,0.34) 100%);
   -webkit-background-clip: text;
   background-clip: text;
-  pointer-events: none;
   transition: opacity .35s ease;
 }
 .hero-stage{
@@ -810,3 +805,12 @@ body.has3d .glass-wrap{ filter: none; }
 }
 .ending .next-hint{ position: static; transform: none; text-decoration: none; }
 .next-arrow-right{ animation: none; }
+
+/* акт и номер позиции */
+.eyebrow{ display: flex; align-items: baseline; gap: 14px; }
+#act-label{ letter-spacing: 0.24em; }
+body.is-secret .hero-title{
+  background: linear-gradient(180deg, #ffd9d9 0%, rgba(224,130,130,0.55) 70%, rgba(150,45,45,0.3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}

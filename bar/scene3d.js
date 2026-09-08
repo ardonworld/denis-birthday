@@ -199,6 +199,9 @@ export class BarScene {
     liquid.userData.own = true;
     liquid.renderOrder = 1;
     g.add(liquid);
+    this.liquid = liquid;
+    this.liquidBase = yBase;
+    this.pourFrom = performance.now() + 260;   // наливаем чуть позже появления
 
     const box = new THREE.Box3().setFromObject(g);
     const s2 = new THREE.Vector3(); box.getSize(s2);
@@ -246,10 +249,22 @@ export class BarScene {
       this.camera.position.z = 6.4 + away * 1.6;
       this.canvas.style.opacity = String(Math.max(0, 1 - away * 1.7));
       if (this.enterFrom) {
-        const k = Math.min((performance.now() - this.enterFrom) / 800, 1);
+        const k = Math.min((performance.now() - this.enterFrom) / 1100, 1);
         const e = 1 - Math.pow(1 - k, 3);
-        this.group.scale.setScalar(this.fitScale * (0.9 + (1 - Math.pow(1 - k, 3)) * 0.1));
+        this.group.scale.setScalar(this.fitScale * (0.82 + e * 0.18));
+        /* бокал прилетает с разворотом и мягко останавливается */
+        this.group.rotation.y += (1 - e) * 3.4;
+        this.group.position.y += (1 - e) * 1.2;
         if (k >= 1) this.enterFrom = 0;
+      }
+      /* напиток наливается на глазах */
+      if (this.liquid && this.pourFrom) {
+        const pk = Math.min(Math.max((performance.now() - this.pourFrom) / 1300, 0), 1);
+        const pe = pk < 0.5 ? 4 * pk * pk * pk : 1 - Math.pow(-2 * pk + 2, 3) / 2;
+        const kk = Math.max(pe, 0.001);
+        this.liquid.scale.y = kk;
+        this.liquid.position.y = this.liquidBase * (1 - kk);
+        if (pk >= 1) this.pourFrom = 0;
       }
     }
     this.camera.lookAt(0, 0, 0);
