@@ -326,94 +326,6 @@ const COCKTAILS = [
   },
 ];
 
-/* ---------- кухня: по блюду на коктейль ---------- */
-function dishArt(kind, accent) {
-  const plate = `<ellipse cx="150" cy="150" rx="118" ry="86" fill="#ffffff" opacity="0.1"/>
-    <ellipse cx="150" cy="146" rx="112" ry="80" fill="none" stroke="#fff" stroke-opacity="0.28" stroke-width="3"/>`;
-  const art = {
-    board: `<rect x="52" y="92" width="196" height="116" rx="14" fill="#8a5a33"/>
-      <rect x="52" y="92" width="196" height="116" rx="14" fill="none" stroke="#5e3a1e" stroke-width="4"/>
-      <g><ellipse cx="104" cy="132" rx="26" ry="18" fill="#c0392b" transform="rotate(-12 104 132)"/>
-      <ellipse cx="150" cy="126" rx="26" ry="18" fill="#d9534f" transform="rotate(8 150 126)"/>
-      <ellipse cx="196" cy="134" rx="26" ry="18" fill="#b53228" transform="rotate(-6 196 134)"/>
-      <rect x="86" y="160" width="52" height="34" rx="6" fill="#f0d68a"/>
-      <rect x="150" y="158" width="46" height="38" rx="6" fill="#e8c46a"/>
-      <circle cx="216" cy="176" r="12" fill="#5f8d3e"/><circle cx="196" cy="182" r="9" fill="#4c7a30"/></g>`,
-    ceviche: `<ellipse cx="150" cy="150" rx="86" ry="58" fill="${accent}" opacity="0.28"/>
-      <g fill="#ffd9c2"><ellipse cx="122" cy="138" rx="24" ry="15" transform="rotate(-18 122 138)"/>
-      <ellipse cx="166" cy="132" rx="24" ry="15" transform="rotate(12 166 132)"/>
-      <ellipse cx="146" cy="164" rx="26" ry="16" transform="rotate(-4 146 164)"/></g>
-      <circle cx="188" cy="160" r="10" fill="#7ac74f"/><circle cx="108" cy="166" r="8" fill="#7ac74f"/>
-      <path d="M100 120 q16 -14 34 -6" stroke="#e8455f" stroke-width="5" fill="none" stroke-linecap="round"/>`,
-    brusch: `<g transform="rotate(-8 150 150)">
-      <rect x="66" y="128" width="168" height="42" rx="18" fill="#e3b566"/>
-      <rect x="66" y="128" width="168" height="18" rx="9" fill="#f0cd8d"/>
-      <circle cx="104" cy="126" r="17" fill="#d94f3d"/><circle cx="146" cy="120" r="17" fill="#c0392b"/>
-      <circle cx="188" cy="126" r="17" fill="#e05a45"/>
-      <path d="M118 108 q14 -12 28 -4" stroke="#4f9a3a" stroke-width="6" fill="none" stroke-linecap="round"/></g>`,
-    dessert: `<path d="M96 108 h108 l-12 96 a16 16 0 0 1 -16 14 h-52 a16 16 0 0 1 -16 -14 z" fill="#e8dcc8" opacity="0.25"/>
-      <path d="M100 130 h100 l-10 74 a16 16 0 0 1 -16 14 h-48 a16 16 0 0 1 -16 -14 z" fill="#4a2c18"/>
-      <path d="M100 130 h100 l-3 22 h-94 z" fill="#f4e6cd"/>
-      <ellipse cx="150" cy="112" rx="34" ry="12" fill="#fbf3e4"/>
-      <circle cx="150" cy="100" r="9" fill="#7d2b2b"/>
-      <rect x="140" y="212" width="20" height="34" fill="#d8cbb4" opacity="0.4"/>`,
-    fruit: `<circle cx="118" cy="140" r="30" fill="#f2b134"/>
-      <circle cx="170" cy="126" r="26" fill="#e0576c"/>
-      <circle cx="184" cy="172" r="24" fill="#7fc94f"/>
-      <circle cx="126" cy="184" r="22" fill="#f0e14a"/>
-      <circle cx="152" cy="152" r="20" fill="#ff8f4d"/>
-      <path d="M118 106 q6 -14 20 -12" stroke="#4f9a3a" stroke-width="6" fill="none" stroke-linecap="round"/>`,
-  }[kind] || '';
-  return `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">${plate}${art}</svg>`;
-}
-
-const DISHES = [
-  { pair: 'к негрони', name: 'Мясная доска', art: 'board', accent: '#e0492c',
-    note: 'Вяленая говядина, пармская ветчина, твёрдый сыр, вяленые томаты и оливки.',
-    weight: '320 г', price: '1 490 ₽' },
-  { pair: 'к мохито', name: 'Севиче из окуня', art: 'ceviche', accent: '#63c94f',
-    note: 'Окунь в соке лайма, красный лук, кинза, чили и хрустящий батат.',
-    weight: '180 г', price: '1 190 ₽' },
-  { pair: 'к санрайзу', name: 'Брускетты с томатом', art: 'brusch', accent: '#ff8a1f',
-    note: 'Хрустящая чиабатта, томаты конфи, страчателла и базилик.',
-    weight: '3 шт · 210 г', price: '890 ₽' },
-  { pair: 'к эспрессо', name: 'Тирамису', art: 'dessert', accent: '#c08b4e',
-    note: 'Классический, на маскарпоне, с савоярди в кофе и какао сверху.',
-    weight: '160 г', price: '650 ₽' },
-  { pair: 'к лагуне', name: 'Фруктовая тарелка', art: 'fruit', accent: '#2fb6e8',
-    note: 'Сезонные фрукты и ягоды, мята, мёд и лёд.',
-    weight: '600 г', price: '1 250 ₽' },
-];
-
-/* ---------- табачная карта ---------- */
-function tobaccoArt(accent) {
-  return `<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-    <g stroke="${accent}" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.85">
-      <path d="M116 118 c-22 -20 -6 -40 12 -30 c20 12 4 34 -14 46 c-20 14 -8 40 16 34"/>
-      <path d="M164 104 c-20 -18 -4 -38 14 -28 c18 12 2 32 -14 44 c-18 14 -6 38 18 32"/>
-    </g>
-    <ellipse cx="150" cy="196" rx="46" ry="14" fill="${accent}" opacity="0.5"/>
-    <path d="M124 196 h52 l-8 30 h-36 z" fill="#2c3238"/>
-    <path d="M138 226 h24 v18 h-24 z" fill="#20262b"/>
-    <rect x="126" y="244" width="48" height="12" rx="6" fill="#2c3238"/>
-    <path d="M150 256 v22" stroke="#2c3238" stroke-width="10" stroke-linecap="round"/>
-    <ellipse cx="150" cy="284" rx="40" ry="10" fill="#20262b"/>
-  </svg>`;
-}
-
-const TOBACCO = [
-  { name: 'Северный лес', accent: '#5fb98a', strength: 'средняя',
-    note: 'Можжевельник, хвоя и лайм. Сухой и прохладный дым — под негрони.', mix: 'Juniper · Lime · Cool' },
-  { name: 'Мятный лёд', accent: '#63c94f', strength: 'лёгкая',
-    note: 'Свежая мята и зелёное яблоко. Освежает, не забивает вкус коктейля.', mix: 'Mint · Green Apple' },
-  { name: 'Апельсиновый закат', accent: '#ff8a1f', strength: 'лёгкая',
-    note: 'Апельсин, грейпфрут и щепотка ванили. Идёт с санрайзом.', mix: 'Orange · Grapefruit · Vanilla' },
-  { name: 'Тёмная обжарка', accent: '#c08b4e', strength: 'крепкая',
-    note: 'Кофе, какао и чуть табачной сладости. Для второй половины вечера.', mix: 'Coffee · Cacao' },
-  { name: 'Голубая волна', accent: '#2fb6e8', strength: 'средняя',
-    note: 'Черника, лимон и холодок. Самый ароматный микс карты.', mix: 'Blueberry · Lemon · Ice' },
-];
-
 /* ---------- состояние и отрисовка ---------- */
 let current = 0;
 const glassWrap = document.getElementById('glass-wrap');
@@ -552,6 +464,9 @@ function startShow(i, animate) {
     /* смена акта — с отдельной заставкой, как в начале */
     if (COCKTAILS[next].act !== COCKTAILS[current].act) {
       clearStage();
+      /* бокал уходит до заставки: под полупрозрачным затемнением он
+         выглядел тусклым и «терял текстуру», а потом резко подменялся */
+      if (scene) scene.leave();
       const intro = COCKTAILS[next].act === 2
         ? ['Думали, это всё?', 'Фирменные крепкие', 'пять позиций для своих']
         : ['И по кругу', 'Лёгкая половина', 'снова с начала'];
@@ -634,54 +549,20 @@ if (openDetailBtn) openDetailBtn.addEventListener('click', () => {
     </div>`);
 });
 
-/* ---------- кухня и табак ---------- */
-function buildDishes() {
-  const box = document.getElementById('dish-list');
-  DISHES.forEach((d) => {
-    const card = el('button', 'card');
-    card.type = 'button';
-    card.style.setProperty('--card-accent', d.accent);
-    card.innerHTML = `
-      <span class="card-art">${dishArt(d.art, d.accent)}</span>
-      <span class="card-pair">${d.pair}</span>
-      <p class="card-name">${d.name}</p>
-      <p class="card-note">${d.note}</p>
-      <span class="card-meta"><span>${d.weight}</span><span>${d.price}</span></span>`;
-    card.addEventListener('click', () => openSheet(`
-      <p class="sheet-eyebrow">Кухня · ${d.pair}</p>
-      <h3 class="sheet-title">${d.name}</h3>
-      <p class="sheet-sub">${d.note}</p>
-      <div class="sheet-grid">
-        <div class="sheet-block"><h4>Выход</h4><p>${d.weight}</p></div>
-        <div class="sheet-block"><h4>Цена</h4><p>${d.price}</p></div>
-      </div>`));
-    box.appendChild(card);
+/* ---------- кухня и кальяны: появление по скроллу ----------
+   Блоки проявляются, когда до них доскроллили, — по одному,
+   с небольшой задержкой внутри ряда, чтобы коллаж собирался, а не вспыхивал. */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const row = [...el.parentElement.children].filter((n) => n.hasAttribute('data-reveal'));
+    el.style.setProperty('--delay', `${Math.max(row.indexOf(el), 0) * 90}ms`);
+    el.classList.add('in');
+    revealObserver.unobserve(el);
   });
-}
-
-function buildTobacco() {
-  const box = document.getElementById('tobacco-list');
-  TOBACCO.forEach((t) => {
-    const card = el('button', 'card');
-    card.type = 'button';
-    card.style.setProperty('--card-accent', t.accent);
-    card.innerHTML = `
-      <span class="card-art">${tobaccoArt(t.accent)}</span>
-      <span class="card-pair">${t.mix}</span>
-      <p class="card-name">${t.name}</p>
-      <p class="card-note">${t.note}</p>
-      <span class="card-meta"><span>крепость: ${t.strength}</span><span>1 200 ₽</span></span>`;
-    card.addEventListener('click', () => openSheet(`
-      <p class="sheet-eyebrow">Табак · ${t.mix}</p>
-      <h3 class="sheet-title">${t.name}</h3>
-      <p class="sheet-sub">${t.note}</p>
-      <div class="sheet-grid">
-        <div class="sheet-block"><h4>Крепость</h4><p>${t.strength}</p></div>
-        <div class="sheet-block"><h4>Чаша</h4><p>1 200 ₽ · смена — 600 ₽</p></div>
-      </div>`));
-    box.appendChild(card);
-  });
-}
+}, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
 
 /* ---------- переходы между сценами ---------- */
 document.querySelectorAll('.next-hint').forEach((btn) => {
@@ -778,6 +659,4 @@ addEventListener('scroll', () => {
 
 /* ---------- старт ---------- */
 buildSwitcher();
-buildDishes();
-buildTobacco();
 tickBar();

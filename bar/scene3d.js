@@ -18,7 +18,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 const GLASSES = {
   rocks:     { mesh: 2, fill: 0.55 },
   highball:  { mesh: 7, fill: 0.8 },
-  wine:      { mesh: 8, fill: 0.5 },
+  wine:      { mesh: 8, fill: 0.62 },
   coupe:     { mesh: 9, fill: 0.55 },
   hurricane: { mesh: 3, fill: 0.6 },
   tall:      { mesh: 0, fill: 0.82 },
@@ -216,6 +216,8 @@ export class BarScene {
     return {
       uTime:  { value: 0 },
       uWave:  { value: 0.006 },
+      uTilt:  { value: 0 },           // наклон глади, радиан ≈ подъём на единицу радиуса
+      uCx:    { value: 0 },           // ось бокала: вокруг неё и наклоняем
       uY0:    { value: 0 },
       uY1:    { value: 1 },
       uDeep:  { value: opts.deep ? new THREE.Color(opts.deep)
@@ -241,13 +243,16 @@ export class BarScene {
       Object.assign(sh.uniforms, u);
       sh.vertexShader = `
         uniform float uTime; uniform float uWave; uniform float uY0; uniform float uY1;
+        uniform float uTilt; uniform float uCx;
         varying float vH; varying vec2 vLUv;
         ${BarScene.WAVE_GLSL}
       ` + sh.vertexShader.replace('#include <begin_vertex>', `
         #include <begin_vertex>
         vH = clamp((transformed.y - uY0) / max(uY1 - uY0, 0.0001), 0.0, 1.0);
         vLUv = uv;
-        transformed.y += waveAt(transformed, uTime) * uWave * pow(vH, 3.0);
+        /* у дна напиток неподвижен, у кромки ходит вместе с гладью —
+           так объём не может съехать сквозь стенку */
+        transformed.y += (waveAt(transformed, uTime) * uWave + (transformed.x - uCx) * uTilt) * pow(vH, 3.0);
       `);
       sh.fragmentShader = `
         uniform float uTime; uniform vec3 uDeep; uniform vec3 uTop; uniform vec3 uPure; uniform float uFizz;
@@ -299,7 +304,7 @@ export class BarScene {
     m.onBeforeCompile = (sh) => {
       Object.assign(sh.uniforms, u);
       sh.vertexShader = `
-        uniform float uTime; uniform float uWave;
+        uniform float uTime; uniform float uWave; uniform float uTilt; uniform float uCx;
         varying float vR;
         ${BarScene.WAVE_GLSL}
       ` + sh.vertexShader
@@ -308,12 +313,12 @@ export class BarScene {
           /* нормаль гладит волну аналитически — иначе блик стоит на месте */
           float dx = (waveAt(position + vec3(0.02,0.0,0.0), uTime) - waveAt(position - vec3(0.02,0.0,0.0), uTime)) / 0.04;
           float dz = (waveAt(position + vec3(0.0,0.0,0.02), uTime) - waveAt(position - vec3(0.0,0.0,0.02), uTime)) / 0.04;
-          objectNormal = normalize(vec3(-dx * uWave * 9.0, 1.0, -dz * uWave * 9.0));
+          objectNormal = normalize(vec3(-(dx * uWave * 9.0 + uTilt), 1.0, -dz * uWave * 9.0));
         `)
         .replace('#include <begin_vertex>', `
           #include <begin_vertex>
           vR = uv.y;
-          transformed.y += waveAt(transformed, uTime) * uWave;
+          transformed.y += waveAt(transformed, uTime) * uWave + (transformed.x - uCx) * uTilt;
         `);
       sh.fragmentShader = `
         varying float vR;
@@ -439,7 +444,7 @@ export class BarScene {
       d.userData.own = true;
       const a = (i / 7) * Math.PI * 2 + Math.random();
       d.userData.dir = new THREE.Vector2(Math.cos(a), Math.sin(a));
-      d.userData.speed = 0.55 + Math.random() * 0.6;
+      d.userData.speed = 0.3 + Math.random() * 0.42;   // дальше 0.72 радиуса — уже стенка
       d.userData.lift = 0.7 + Math.random() * 0.7;
       grp.add(d);
     }
@@ -639,6 +644,8 @@ export class BarScene {
     const u = this.liquidUniforms(liquidColor, opts);
     u.uY0.value = geo.userData.bottom;
     u.uY1.value = geo.userData.top;
+    u.uCx.value = prof.cx;
+    this.liquidCx = prof.cx;
     this.liquidU = u;
 
     const body = new THREE.Mesh(geo, this.bodyMaterial(liquidColor, opts, u));
@@ -680,6 +687,7 @@ export class BarScene {
 
     this.glassTop = prof.y1;
     this.tilt = 0; this.tiltV = 0; this.prevX = null;
+    this.inertiaTilt = 0; this.pourTilt = 0;
     this.liquidTop = geo.userData.top;
     this.liquidBase = yBase;
     this.pourFrom = performance.now() + 260;   // наливаем чуть позже появления
@@ -770,10 +778,10 @@ export class BarScene {
         this.liquid.scale.y = kk;
         this.liquid.position.y = this.liquidBase * (1 - kk);
         /* волна: как только налили, жидкость коротко качается */
-        const w = pk > 0.55 ? Math.sin((pk - 0.55) * 26) * (1 - pk) * 0.09 : 0;
-        this.liquid.rotation.z = w;
+        const w = pk > 0.55 ? Math.sin((pk - 0.55) * 26) * (1 - pk) * 0.16 : 0;
+        this.pourTilt = w;
         this.pourK = kk;
-        if (pk >= 1) { this.pourFrom = 0; this.liquid.rotation.z = 0; }
+        if (pk >= 1) { this.pourFrom = 0; this.pourTilt = 0; }
       }
       /* СТРУЯ: льётся сверху до уровня напитка и обрывается, когда налито */
       if (this.stream) {
@@ -823,10 +831,14 @@ export class BarScene {
         this.tiltV = (this.tiltV + (x - this.prevX) * 0.5) * 0.86;
         this.prevX = x;
         this.tilt = (this.tilt + this.tiltV) * 0.9;
-        /* больше 0.05 рад нельзя: напиток начнёт выходить за стенку */
-        const lim = Math.max(-0.05, Math.min(0.05, this.tilt));
-        this.liquid.rotation.z = lim;
-        if (this.ice) this.ice.rotation.z = lim;
+        /* раньше тут поворачивался весь объём вокруг дна модели — у бокала
+           на высокой ножке это сносило напиток сквозь стенку. Теперь
+           наклоняется только гладь, объём остаётся в стекле. */
+        this.inertiaTilt = Math.max(-0.14, Math.min(0.14, -this.tilt * 2.2));
+      }
+      if (this.liquidU) {
+        const tilt = (this.inertiaTilt || 0) + (this.pourTilt || 0);
+        this.liquidU.uTilt.value += (tilt - this.liquidU.uTilt.value) * 0.25;
       }
       /* лёд всплывает вместе с уровнем и качается на волне */
       if (this.ice) {
@@ -836,8 +848,9 @@ export class BarScene {
         this.ice.visible = kk > 0.4;
         this.ice.children.forEach((c, i) => {
           const ph = c.userData.phase + t * 1.6;
+          const tiltY = this.liquidU ? (c.position.x - this.liquidCx) * this.liquidU.uTilt.value : 0;
           c.position.y = level - this.ice.userData.size * (0.2 + Math.sin(ph) * 0.06)
-            + Math.sin(ph * 1.3) * amp * 6;
+            + Math.sin(ph * 1.3) * amp * 6 + tiltY;
           c.rotation.z = 0.25 + i * 0.3 + Math.sin(ph * 0.8) * amp * 9;
           c.rotation.x = 0.4 + i * 0.5 + Math.cos(ph * 0.7) * amp * 7;
         });
