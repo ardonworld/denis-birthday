@@ -1,5 +1,6 @@
 import * as __THREE from 'three';
-import { BarScene, detectQuality } from './scene3d.js';
+import { BarScene, detectQuality } from './scene3d.js?v=202609161951';
+import './kitchen.js?v=202609161951';
 window.__THREE = __THREE;
 
 /* =========================================================
@@ -548,21 +549,6 @@ if (openDetailBtn) openDetailBtn.addEventListener('click', () => {
       </div>
     </div>`);
 });
-
-/* ---------- кухня и кальяны: появление по скроллу ----------
-   Блоки проявляются, когда до них доскроллили, — по одному,
-   с небольшой задержкой внутри ряда, чтобы коллаж собирался, а не вспыхивал. */
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach((e) => {
-    if (!e.isIntersecting) return;
-    const el = e.target;
-    const row = [...el.parentElement.children].filter((n) => n.hasAttribute('data-reveal'));
-    el.style.setProperty('--delay', `${Math.max(row.indexOf(el), 0) * 90}ms`);
-    el.classList.add('in');
-    revealObserver.unobserve(el);
-  });
-}, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
-document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
 
 /* ---------- переходы между сценами ---------- */
 document.querySelectorAll('.next-hint').forEach((btn) => {

@@ -742,6 +742,8 @@ export class BarScene {
       this.group.position.z = -away * 3;
       this.camera.position.z = 6.4 + away * 1.6;
       this.canvas.style.opacity = String(Math.max(0, 1 - away * 1.7));
+      /* бар ушёл за экран — не тратим видеокарту, пока внизу крутятся сцены кухни */
+      this.offscreen = away > 0.62;
       /* УХОД: бокал заваливается набок, уносится по дуге и схлопывается */
       if (this.leaveFrom) {
         const lk = Math.min((performance.now() - this.leaveFrom) / 620, 1);
@@ -901,6 +903,7 @@ export class BarScene {
       if (fk >= 1) { this.flashFrom = 0; this.flashBoost = 0; }
     }
     this.camera.lookAt(0, -0.08, 0);
+    if (this.offscreen) return;
     if (this.composer) this.composer.render();
     else this.renderer.render(this.scene, this.camera);
   }
