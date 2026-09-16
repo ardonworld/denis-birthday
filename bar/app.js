@@ -241,7 +241,7 @@ const COCKTAILS = [
   },
   {
     id: 'cosmo', act: 1, name: 'Космополитен', accent: '#e8456f',
-    kind: 'coupe', liquid: '#c9184a',
+    kind: 'coupe', liquid: '#c9184a', garnish: 'lime',
     lead: 'Клюква, лайм и холодный бокал. Тот случай, когда простое выглядит дорого.',
     base: 'Водка', abv: '20%', vol: '110 мл', serve: 'Мартини, цедра лайма',
     recipe: ['Водка — 40 мл', 'Куантро — 20 мл', 'Клюквенный морс — 30 мл', 'Сок лайма — 15 мл'],
@@ -250,7 +250,7 @@ const COCKTAILS = [
   },
   {
     id: 'sunrise', act: 1, name: 'Текила Санрайз', accent: '#ff7a2f',
-    kind: 'highball', liquid: '#ff9e2c', deep: '#c1121f', ice: true,
+    kind: 'highball', liquid: '#ff9e2c', deep: '#c1121f', ice: true, garnish: 'orange', straw: true,
     lead: 'Гренадин оседает на дно, апельсин остаётся сверху — в бокале получается рассвет.',
     base: 'Текила', abv: '11%', vol: '200 мл', serve: 'Хайбол, много льда',
     recipe: ['Текила бланко — 50 мл', 'Апельсиновый сок — 100 мл', 'Гренадин — 15 мл', 'Долька апельсина'],
@@ -259,7 +259,7 @@ const COCKTAILS = [
   },
   {
     id: 'paloma', act: 1, name: 'Палома', accent: '#f2557d',
-    kind: 'highball', liquid: '#f06a86', fizz: true, ice: true,
+    kind: 'highball', liquid: '#f06a86', fizz: true, ice: true, garnish: 'grapefruit', rim: 'salt', straw: true,
     lead: 'Грейпфрут, текила и соль на кромке. Мексика без лишнего пафоса.',
     base: 'Текила', abv: '12%', vol: '300 мл', serve: 'Хайбол, соляная кромка',
     recipe: ['Текила бланко — 50 мл', 'Грейпфрутовый содовый — 150 мл', 'Сок лайма — 15 мл', 'Щепотка соли'],
@@ -280,7 +280,7 @@ const COCKTAILS = [
   /* ---------- АКТ ВТОРОЙ: фирменные крепкие ---------- */
   {
     id: 'tvr', act: 2, name: 'TVR', accent: '#c8571f',
-    kind: 'tall', liquid: '#b8621d', fizz: true, ice: true,
+    kind: 'tall', liquid: '#b8621d', fizz: true, ice: true, straw: true,
     lead: 'Назван в честь британского спорткара TVR — разгоняет ровно так же. Брутальный микс из английских пабов.',
     base: 'Текила и водка', abv: '11%', vol: '210 мл', serve: 'Хайбол, много льда',
     recipe: ['Серебряная текила — 30 мл', 'Водка — 30 мл', 'Энергетик — 150 мл', 'Лёд'],
@@ -289,7 +289,7 @@ const COCKTAILS = [
   },
   {
     id: 'ginfizz', act: 2, name: 'Итальянский Джин-Физз', accent: '#f6c445',
-    kind: 'tumbler', liquid: '#f0b13c', fizz: true, ice: true,
+    kind: 'tumbler', liquid: '#f0b13c', fizz: true, ice: true, garnish: 'lemon', straw: true,
     lead: 'Джин, лимончелло и маракуйя, сверху просекко. Итальянский ответ на вопрос, что пить, когда жарко.',
     base: 'Джин', abv: '16%', vol: '160 мл', serve: 'Хайбол, много льда',
     recipe: ['Джин — 40 мл', 'Лимончелло — 20 мл', 'Сок с маракуйей — 40 мл', 'Просекко брют — 60 мл'],
@@ -504,7 +504,8 @@ function paint(i, animate) {
   setTimeout(() => document.documentElement.style.setProperty('--accent', c.accent),
     animate ? 380 : 0);
   if (scene) {
-    const look = { fizz: c.fizz, foam: c.foam, ice: c.ice, deep: c.deep };
+    const look = { fizz: c.fizz, foam: c.foam, ice: c.ice, deep: c.deep,
+                 garnish: c.garnish, rim: c.rim, straw: c.straw };
     if (animate) { scene.leave(); setTimeout(() => scene.build(c.kind, c.liquid, c.accent, look), 560); }
     else scene.build(c.kind, c.liquid, c.accent, look);
   }
@@ -708,7 +709,8 @@ if (quality !== 'off' && !new URLSearchParams(location.search).has('no3d')) {
       document.body.classList.add('has3d');
       window.__scene = scene;
       const c = COCKTAILS[current];
-      scene.build(c.kind, c.liquid, c.accent, { fizz: c.fizz, foam: c.foam, ice: c.ice, deep: c.deep });
+      scene.build(c.kind, c.liquid, c.accent, { fizz: c.fizz, foam: c.foam, ice: c.ice,
+        deep: c.deep, garnish: c.garnish, rim: c.rim, straw: c.straw });
     })
     .catch((err) => {
       console.warn('3D не поднялось, остаёмся на рисованных бокалах:', err);

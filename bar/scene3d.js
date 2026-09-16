@@ -420,6 +420,100 @@ export class BarScene {
     return grp;
   }
 
+  /* ---------- ГАРНИР ----------
+     Голый бокал — главное, что выдаёт рендер. Долька на кромке,
+     соляная кромка и трубочка возвращают предметность. */
+
+  /* Долька цитруса рисуется на канве: мякоть дольками, кожура кольцом */
+  citrusTexture(peel, flesh) {
+    const key = peel + flesh;
+    this._citrus = this._citrus || {};
+    if (this._citrus[key]) return this._citrus[key];
+    const c = document.createElement('canvas');
+    c.width = c.height = 256;
+    const x = c.getContext('2d');
+    x.clearRect(0, 0, 256, 256);
+    const R = 124;
+    x.fillStyle = peel;
+    x.beginPath(); x.arc(128, 128, R, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#fff6e2';
+    x.beginPath(); x.arc(128, 128, R * 0.88, 0, Math.PI * 2); x.fill();
+    for (let i = 0; i < 9; i++) {
+      const a1 = (i / 9) * Math.PI * 2 + 0.05;
+      const a2 = ((i + 1) / 9) * Math.PI * 2 - 0.05;
+      x.fillStyle = flesh;
+      x.beginPath(); x.moveTo(128, 128);
+      x.arc(128, 128, R * 0.8, a1, a2); x.closePath(); x.fill();
+    }
+    x.fillStyle = 'rgba(255,255,255,0.75)';
+    x.beginPath(); x.arc(128, 128, R * 0.1, 0, Math.PI * 2); x.fill();
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    this._citrus[key] = t;
+    return t;
+  }
+
+  buildCitrus(rTop, yTop, cx, cz, kind) {
+    const tone = {
+      orange:     ['#f08a1c', '#ffb347'],
+      lemon:      ['#e8c72b', '#fbe98a'],
+      lime:       ['#7fb52c', '#c3e08a'],
+      grapefruit: ['#e8703f', '#f4a08a'],
+    }[kind] || ['#f08a1c', '#ffb347'];
+    const r = rTop * 0.62;
+    const g = new THREE.Mesh(
+      new THREE.CircleGeometry(r, 40),
+      new THREE.MeshPhysicalMaterial({
+        map: this.citrusTexture(tone[0], tone[1]),
+        roughness: 0.55, metalness: 0,
+        clearcoat: 0.6, clearcoatRoughness: 0.3,
+        envMapIntensity: 0.9,
+        transparent: true, alphaTest: 0.5,
+        side: THREE.DoubleSide,
+      }));
+    /* сажаем на кромку под наклоном, как надевают дольку на бокал */
+    g.position.set(cx + rTop * 0.88, yTop - r * 0.08, cz + rTop * 0.25);
+    g.rotation.set(0, -0.62, 0.38);
+    g.userData.own = true;
+    g.renderOrder = 4;
+    return g;
+  }
+
+  /* Соляная кромка — крупинки по ободку */
+  buildRimSalt(rTop, yTop, cx, cz) {
+    const g = new THREE.Mesh(
+      new THREE.TorusGeometry(rTop * 1.0, rTop * 0.055, 8, 90),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xf6f9ff, roughness: 0.85, metalness: 0,
+        envMapIntensity: 1.1, flatShading: true,
+      }));
+    g.rotation.x = Math.PI / 2;
+    g.position.set(cx, yTop - rTop * 0.03, cz);
+    g.userData.own = true;
+    g.renderOrder = 4;
+    return g;
+  }
+
+  /* Трубочка: торчит из бокала под углом */
+  buildStraw(rTop, yTop, cx, cz, accent) {
+    const len = rTop * 2.1;
+    const g = new THREE.Mesh(
+      new THREE.CylinderGeometry(rTop * 0.075, rTop * 0.075, len, 12, 1, true),
+      new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(accent),
+        roughness: 0.3, metalness: 0,
+        clearcoat: 1, clearcoatRoughness: 0.15,
+        envMapIntensity: 1.2, side: THREE.DoubleSide,
+      }));
+    /* уводим вбок: торчащая вверх трубочка залезала в заголовок */
+    g.position.set(cx - rTop * 0.5, yTop + len * 0.1, cz + rTop * 0.22);
+    g.rotation.z = 0.5;
+    g.rotation.x = -0.14;
+    g.userData.own = true;
+    g.renderOrder = 4;
+    return g;
+  }
+
   /* Пятно света под бокалом: напиток бросает цвет на стойку.
      Без него бокал висит в пустоте. */
   causticTexture() {
@@ -537,6 +631,12 @@ export class BarScene {
     this.caustic = this.buildCaustic(prof.rMax, prof.y0, prof.cx, prof.cz, liquidColor);
     g.add(this.caustic);
 
+    /* гарнир садится на кромку бокала */
+    const rimR = prof.r[prof.bins - 4];
+    if (opts.garnish) g.add(this.buildCitrus(rimR, prof.y1, prof.cx, prof.cz, opts.garnish));
+    if (opts.rim === 'salt') g.add(this.buildRimSalt(rimR, prof.y1, prof.cx, prof.cz));
+    if (opts.straw) g.add(this.buildStraw(rimR, prof.y1, prof.cx, prof.cz, accent || '#ffffff'));
+
     this.glassTop = prof.y1;
     this.tilt = 0; this.tiltV = 0; this.prevX = null;
     this.liquidTop = geo.userData.top;
@@ -544,7 +644,7 @@ export class BarScene {
     this.pourFrom = performance.now() + 260;   // наливаем чуть позже появления
     this.splashFrom = this.pourFrom;           // и плещем при наливе
 
-    const box = new THREE.Box3().setFromObject(g);
+    const box = new THREE.Box3().setFromObject(glass);
     const s2 = new THREE.Vector3(); box.getSize(s2);
     const c2 = new THREE.Vector3(); box.getCenter(c2);
     this.fitScale = 1.5 / Math.max(s2.y, 0.001);
