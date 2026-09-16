@@ -696,7 +696,8 @@ export class BarScene {
     const box = new THREE.Box3().setFromObject(glass);
     const s2 = new THREE.Vector3(); box.getSize(s2);
     const c2 = new THREE.Vector3(); box.getCenter(c2);
-    this.fitScale = 1.5 / Math.max(s2.y, 0.001);
+    this.glassH = Math.max(s2.y, 0.001);
+    this.fitScale = (this.fitTarget || 1.5) / this.glassH;
     g.scale.setScalar(this.fitScale);
     g.position.set(-c2.x * this.fitScale, -c2.y * this.fitScale, -c2.z * this.fitScale);
     this.baseY = g.position.y;
@@ -711,9 +712,28 @@ export class BarScene {
     if (accent) this.refreshEnvironment(accent);
   }
 
+  /* На телефоне текст идёт колонкой, и бокал в центре экрана ложился
+     на него. Здесь сцена ставит бокал туда, где в вёрстке оставлено
+     место под него: сдвигаем кадр камеры, а не саму модель. */
+  setAnchor(y, fit) {
+    this.anchorY = y;
+    this.fitTarget = fit || 1.5;
+    if (this.glassH) this.fitScale = this.fitTarget / this.glassH;
+    this.applyAnchor();
+  }
+
+  applyAnchor() {
+    if (!this.camera) return;
+    const w = window.innerWidth, h = window.innerHeight;
+    if (this.anchorY == null) this.camera.clearViewOffset();
+    else this.camera.setViewOffset(w, h, 0, -(this.anchorY - h / 2), w, h);
+    this.camera.updateProjectionMatrix();
+  }
+
   resize() {
     if (!this.renderer) return;
     this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.applyAnchor();
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     if (this.composer) this.composer.setSize(window.innerWidth, window.innerHeight);

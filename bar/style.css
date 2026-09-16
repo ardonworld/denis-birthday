@@ -1202,3 +1202,84 @@ body:not(.has3d) .grain{ display: none; }
 @media (prefers-reduced-motion: reduce){
   .kx-in, .hx-card{ opacity: 1 !important; transform: none !important; transition: none !important; }
 }
+
+/* ----- переход от кухни к кальянам ----- */
+.kx .kx-wrap, .hx .hx-wrap{ will-change: transform, opacity, filter; transform-origin: 50% 0; }
+.kx-seam{
+  position: relative; z-index: 3;
+  height: 52vh; height: 52svh;
+  margin: -14vh 0 -10vh;
+  display: grid; place-items: center;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, #060405 42%, #060506 70%, transparent 100%);
+}
+.kx-seam .kx-smoke{
+  z-index: 1;
+  /* края дыма растворяются, а не обрываются линией */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 30%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 30%, #000 72%, transparent 100%);
+}
+.kx-seam-copy{ position: relative; z-index: 2; text-align: center; text-shadow: 0 8px 50px rgba(0,0,0,0.85); }
+.kx-seam-line{ display: block; overflow: hidden; margin: 0; }
+.kx-seam-line > i{
+  display: inline-block; font-style: normal;
+  transform: translate3d(0, 110%, 0); opacity: 0;
+  transition: transform 1.2s cubic-bezier(.16,1,.3,1), opacity 1s ease;
+}
+.kx-seam-line + .kx-seam-line > i{ transition-delay: .15s; }
+.kx-seam.in .kx-seam-line > i{ transform: none; opacity: 1; }
+.kx-seam .eyebrow{ display: block; margin-bottom: 8px; }
+.kx-seam-big{
+  font-size: clamp(48px, 9vw, 150px); line-height: 0.9; font-weight: 800; letter-spacing: -0.055em;
+  padding-bottom: 0.08em;
+}
+.kx-seam-big > i{
+  background: linear-gradient(180deg, #fff 0%, #d7c7ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+@media (prefers-reduced-motion: reduce){
+  .kx-seam-line > i{ transform: none; opacity: 1; transition: none; }
+}
+
+/* ================= БАР НА ТЕЛЕФОНЕ =================
+   Сверху название, под ним место под 3D-бокал (сцена ставит его
+   ровно туда), ниже компактно факты, состав и вкус. Лид и «подают с»
+   прячем — на экран телефона всё сразу не помещается. */
+@media (max-width: 860px){
+  #drinks .scene-inner{ padding-bottom: 92px; justify-content: flex-start; }
+  #drinks .hero-title{ margin-bottom: 0; }
+  #drinks .hero-stage{ display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 0; }
+  #drinks .hero-col{ display: contents; }
+  #drinks .glass-wrap{ order: 1; width: 100%; height: 31svh; margin: 0; animation: none; }
+  #drinks .facts{ order: 2; gap: 6px 16px; }
+  #drinks .fact-key{ font-size: 9.5px; }
+  #drinks .fact-val{ font-size: 13px; }
+  #drinks .recipe{ order: 3; margin: 0; text-align: center; }
+  #drinks .recipe .col-label{ margin-bottom: 4px; }
+  #drinks .recipe-list{ flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 2px 14px; }
+  #drinks .recipe-list li{ font-size: 13px; }
+  #drinks .taste-block{ order: 4; margin: 0; }
+  #drinks .taste-block .col-label{ display: none; }
+  #drinks .taste{ font-size: 11.5px; padding: 3px 10px; }
+  #drinks .hero-lead, #drinks .pairing{ display: none; }
+  #drinks .show-bar{ bottom: 70px; }
+}
+
+/* кухня и кальяны на телефоне — ровно в экран Safari с адресной строкой */
+@media (max-width: 760px){
+  .kx-head .kx-title, .hx-head .kx-title{ font-size: 34px; }
+  .kx-wrap{ padding-bottom: 3vh; }
+  .kx-stage{ aspect-ratio: 1.12; margin: 1.5vh 0 1vh; }
+  .kx-info-badge{ margin-bottom: 8px; padding: 4px 11px; font-size: 10px; }
+  .kx-info-name{ font-size: 26px; margin-bottom: 6px; }
+  .kx-info-note{ font-size: 13px; margin-bottom: 8px; }
+  .kx-dots{ margin-top: 12px; }
+  .hx-wrap{ padding-bottom: 3vh; gap: 1.6vh; }
+  .hx-row{ height: 49svh; }
+  .kx-c1{ left: 9%;  top: 30%; width: 82%; }
+  .kx-c2{ left: 0;   top: 59%; width: 31%; }
+  .kx-c3{ left: 53%; top: 2%;  width: 45%; }
+  .kx-c4{ left: 2%;  top: 4%;  width: 42%; }
+  .kx-c5{ left: 70%; top: 59%; width: 30%; }
+  .kx-c6{ left: 33%; top: 70%; width: 36%; }
+}

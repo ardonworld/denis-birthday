@@ -1,6 +1,6 @@
 import * as __THREE from 'three';
-import { BarScene, detectQuality } from './scene3d.js?v=202609162020';
-import './kitchen.js?v=202609162020';
+import { BarScene, detectQuality } from './scene3d.js?v=202609162038';
+import './kitchen.js?v=202609162038';
 window.__THREE = __THREE;
 
 /* =========================================================
@@ -581,6 +581,16 @@ drinksScene.addEventListener('pointerleave', () => {
   if (tilt) tilt.style.transform = '';
 });
 
+/* На телефоне бокал ставится в оставленное под него место, а не в центр
+   экрана — иначе текст колонкой ложится прямо на него */
+function placeGlass() {
+  if (!scene || !scene.enabled) return;
+  if (innerWidth > 860) { scene.setAnchor(null, 1.5); return; }
+  const r = glassWrap.getBoundingClientRect();
+  scene.setAnchor(r.top + scrollY + r.height * 0.64, 0.9);
+}
+addEventListener('resize', () => requestAnimationFrame(placeGlass));
+
 /* ---------- настоящее 3D, если железо тянет ---------- */
 let scene = null;
 const quality = detectQuality();
@@ -590,6 +600,7 @@ if (quality !== 'off' && !new URLSearchParams(location.search).has('no3d')) {
     .then(() => {
       document.body.classList.add('has3d');
       window.__scene = scene;
+      placeGlass();
       const c = COCKTAILS[current];
       scene.build(c.kind, c.liquid, c.accent, { fizz: c.fizz, foam: c.foam, ice: c.ice,
         deep: c.deep, garnish: c.garnish, rim: c.rim, straw: c.straw });

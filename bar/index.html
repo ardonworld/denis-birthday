@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=202609162020">
+<link rel="stylesheet" href="style.css?v=202609162038">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>">
 </head>
 <body>
@@ -169,6 +169,16 @@
     </div>
   </section>
 
+  <!-- ПЕРЕХОД: кухня затягивается дымкой, со стыка поднимается дым
+       от тёплого кухонного к фиолетовому кальянному -->
+  <div class="kx-seam" id="seam">
+    <canvas class="kx-smoke" data-smoke="seam" aria-hidden="true"></canvas>
+    <div class="kx-seam-copy">
+      <p class="eyebrow kx-seam-line"><i>А после ужина</i></p>
+      <p class="kx-seam-big kx-seam-line"><i>кальяны</i></p>
+    </div>
+  </div>
+
   <!-- ================= КАЛЬЯНЫ =================
        Один экран: все четыре кальяна в ряд и все дымят. Активный
        раскрывается, остальные сжимаются в полосы. Дым из чаш
@@ -237,12 +247,10 @@
 
   <footer class="hx-foot">
     <button class="next-hint next-hint-up" data-to="drinks"><span class="next-arrow">↑</span> К началу</button>
-    <p class="credits">
-      3D-модель посуды — <a href="https://sketchfab.com/3d-models/glass-collection-0ff8fc5007dd4e9da675109fe7c443d6" target="_blank" rel="noopener">«Glass Collection»</a>
-      автора <a href="https://sketchfab.com/marcussamiran" target="_blank" rel="noopener">RagingCow</a>, лицензия CC-BY-4.0.
-      Карта освещения — <a href="https://polyhaven.com/a/studio_small_09" target="_blank" rel="noopener">Poly Haven</a>, CC0.
-      Фото и видео бара, блюд и кальянов сгенерированы в Higgsfield.
-    </p>
+    <!-- Авторство, которое требует лицензия CC-BY-4.0 на 3D-модель посуды:
+         «Glass Collection», автор RagingCow,
+         https://sketchfab.com/3d-models/glass-collection-0ff8fc5007dd4e9da675109fe7c443d6
+         Карта освещения — Poly Haven «Studio Small 09», CC0. -->
   </footer>
 
 </main>
@@ -264,6 +272,6 @@
   }
 }
 </script>
-<script type="module" src="app.js?v=202609162020"></script>
+<script type="module" src="app.js?v=202609162038"></script>
 </body>
 </html>

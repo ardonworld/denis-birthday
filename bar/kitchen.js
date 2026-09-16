@@ -5,7 +5,7 @@
    на мышь, активная позиция меняется сама, как показ коктейлей.
    Наведение или нажатие перехватывает показ.
    ========================================================= */
-import { Smoke, hexToRgb } from './smoke.js?v=202609162020';
+import { Smoke, hexToRgb } from './smoke.js?v=202609162038';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = matchMedia('(hover: hover)').matches;
@@ -141,6 +141,62 @@ function section(root, { frame }) {
     if (!sec.isVisible() || performance.now() < userUntil) return;
     setActive((active + 1) % cards.length);
   }, 4200);
+}());
+
+/* ---------- переход от кухни к кальянам ---------- */
+(function seam() {
+  const root = document.getElementById('seam');
+  const kitchenWrap = document.querySelector('#kitchen .kx-wrap');
+  const hookahWrap = document.querySelector('#tobacco .hx-wrap');
+  if (!root) return;
+  const cv = root.querySelector('[data-smoke="seam"]');
+  const smoke = cv ? new Smoke(cv, { scale: isPhone() ? 0.3 : 0.4 }) : null;
+  if (smoke && !smoke.ok) cv.remove();
+  const clamp = (v) => Math.min(1, Math.max(0, v));
+
+  /* кухня уходит в дымку, кальяны выходят из неё — привязано к прокрутке,
+     но переход короткий: полэкрана, а не отдельная сцена */
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      if (reduce) return;
+      const vh = innerHeight;
+      const k = kitchenWrap.getBoundingClientRect();
+      const out = clamp(-k.top / (k.height * 0.7));
+      kitchenWrap.style.opacity = String(1 - out * 0.75);
+      kitchenWrap.style.filter = out > 0.01 ? `blur(${(out * 10).toFixed(1)}px)` : '';
+      kitchenWrap.style.transform = `scale(${(1 - out * 0.05).toFixed(3)})`;
+      const h = hookahWrap.getBoundingClientRect();
+      const inn = clamp((vh - h.top) / (vh * 0.8));
+      hookahWrap.style.opacity = String(0.25 + inn * 0.75);
+      hookahWrap.style.transform = `translate3d(0, ${((1 - inn) * 60).toFixed(1)}px, 0)`;
+    });
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const tints = [[1, 0.62, 0.3], [1, 0.72, 0.5], [0.72, 0.58, 1], [0.6, 0.48, 1]];
+  let raf = 0;
+  const loop = () => {
+    if (smoke && smoke.ok) {
+      smoke.set({
+        sources: [0.12, 0.38, 0.62, 0.88].map((x, i) => ({
+          src: [x, -0.05], tint: tints[i], amount: 0.85, spread: 0.9, rise: 0.9,
+        })),
+        wind: mouse.x * 0.4,
+      });
+      smoke.frame();
+    }
+    raf = requestAnimationFrame(loop);
+  };
+  new IntersectionObserver(([e]) => {
+    root.classList.toggle('in', e.isIntersecting);
+    if (e.isIntersecting && !reduce) { cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
+    else cancelAnimationFrame(raf);
+  }, { threshold: 0.2 }).observe(root);
 }());
 
 /* ---------- кальяны ---------- */
