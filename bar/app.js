@@ -422,7 +422,14 @@ const switcher = document.getElementById('switcher');  // может отсут�
 /* ---------- движок презентации ----------
    Карта показывает себя сама: коктейль за коктейлем, блок за блоком.
    Клик по чипу перехватывает управление и запускает нужный с начала. */
-const SHOW_MS = 11000;          // сколько держится один коктейль
+/* У каждой половины карты свой характер подачи: лёгкие идут бодро,
+   крепкие — медленнее и тяжелее, секретная позиция — почти в темноте. */
+const MOODS = {
+  light:  { ms: 10000, pace: 1 },
+  strong: { ms: 12500, pace: 1.18 },
+  secret: { ms: 14500, pace: 1.4 },
+};
+const moodOf = (c) => (c.secret ? 'secret' : c.act === 2 ? 'strong' : 'light');
 const show = { timer: 0, raf: 0, startedAt: 0, paused: false };
 
 const $ = (id) => document.getElementById(id);
@@ -464,7 +471,7 @@ function fillStage(c) {
 }
 
 /* расписание появления блоков внутри одного коктейля */
-function playStage() {
+function playStage(pace = 1) {
   const seq = [
     [0,    '#drink-title'],
     [700,  '#drink-lead'],
@@ -479,12 +486,12 @@ function playStage() {
   seq.forEach(([ms, sel]) => setTimeout(() => {
     const el = document.querySelector(sel);
     if (el) { el.classList.remove('out'); el.classList.add('on'); }
-  }, ms));
+  }, ms * pace));
 
   document.querySelectorAll('#recipe-list li').forEach((li, i) =>
-    setTimeout(() => li.classList.add('on'), 2700 + i * 220));
+    setTimeout(() => li.classList.add('on'), (2700 + i * 220) * pace));
   document.querySelectorAll('#taste-row .taste').forEach((t, i) =>
-    setTimeout(() => t.classList.add('on'), 4400 + i * 160));
+    setTimeout(() => t.classList.add('on'), (4400 + i * 160) * pace));
 }
 
 /* Цветная штора проносится по экрану — под неё меняется всё остальное */
@@ -499,15 +506,22 @@ function runWipe() {
 function paint(i, animate) {
   const c = COCKTAILS[i];
   current = i;
+  const mood = moodOf(c);
   if (animate) runWipe();
+  /* настроение страницы меняется под шторой, вместе с цветом */
+  setTimeout(() => {
+    document.body.classList.remove('mood-light', 'mood-strong', 'mood-secret');
+    document.body.classList.add('mood-' + mood);
+  }, animate ? 380 : 0);
   /* цвет всей страницы переключаем в момент, когда штора закрывает экран */
   setTimeout(() => document.documentElement.style.setProperty('--accent', c.accent),
     animate ? 380 : 0);
   if (scene) {
     const look = { fizz: c.fizz, foam: c.foam, ice: c.ice, deep: c.deep,
                  garnish: c.garnish, rim: c.rim, straw: c.straw };
-    if (animate) { scene.leave(); setTimeout(() => scene.build(c.kind, c.liquid, c.accent, look), 560); }
-    else scene.build(c.kind, c.liquid, c.accent, look);
+    const put = () => { scene.setMood(mood); scene.build(c.kind, c.liquid, c.accent, look); };
+    if (animate) { scene.leave(); setTimeout(put, 560); }
+    else put();
   }
   const num = document.getElementById('show-num');
   const inAct = COCKTAILS.filter((x) => x.act === c.act);
@@ -521,16 +535,17 @@ function paint(i, animate) {
 
   if (animate) {
     clearStage();
-    setTimeout(() => { fillStage(c); playStage(); }, 620);
+    setTimeout(() => { fillStage(c); playStage(MOODS[mood].pace); }, 620);
   } else {
     fillStage(c);
-    playStage();
+    playStage(MOODS[mood].pace);
   }
 }
 
 function startShow(i, animate) {
   clearTimeout(show.timer);
   paint(i, animate);
+  show.ms = MOODS[moodOf(COCKTAILS[i])].ms;
   show.startedAt = performance.now();
   show.timer = setTimeout(() => {
     const next = (current + 1) % COCKTAILS.length;
@@ -544,13 +559,13 @@ function startShow(i, animate) {
     } else {
       startShow(next, true);
     }
-  }, SHOW_MS);
+  }, show.ms);
 }
 
 function tickBar() {
   show.raf = requestAnimationFrame(tickBar);
   if (show.paused) return;
-  const p = Math.min((performance.now() - show.startedAt) / SHOW_MS, 1) * 100;
+  const p = Math.min((performance.now() - show.startedAt) / (show.ms || 10000), 1) * 100;
   const bar = $('show-bar');
   if (bar) bar.style.setProperty('--p', p.toFixed(1) + '%');
 }

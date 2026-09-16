@@ -65,6 +65,10 @@ export class BarScene {
     const rim = new THREE.DirectionalLight(0xcfe3ff, 2.2);
     rim.position.set(-2.5, 3.5, -5);
     this.scene.add(rim);
+    this.keyLight = key;
+    this.rimLight = rim;
+    this.setMood('light');
+    this.expo = this.mood.exposure;
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.12));
 
     await this.buildEnvironment();
@@ -560,6 +564,18 @@ export class BarScene {
   }
 
 
+  /* Характер подачи. Лёгкие — светло и бодро; крепкие — темнее,
+     тяжелее, бокал заходит медленно; секретный — выплывает из темноты
+     почти без разворота, горит только контровой свет. */
+  setMood(name) {
+    const M = {
+      light:  { exposure: 1.08, key: 1.4,  rim: 2.2, enterMs: 1150, spin: 6.2, sweep: 1,    flash: 0.75 },
+      strong: { exposure: 0.92, key: 1.05, rim: 2.8, enterMs: 1650, spin: 3.4, sweep: 0.8,  flash: 0.45 },
+      secret: { exposure: 0.66, key: 0.3,  rim: 3.6, enterMs: 2600, spin: 0.9, sweep: 0.08, flash: 0 },
+    };
+    this.mood = M[name] || M.light;
+  }
+
   /* бокал уходит с разворотом — потом на его место прилетает следующий */
   leave() {
     if (this.group) this.leaveFrom = performance.now();
@@ -707,16 +723,17 @@ export class BarScene {
       }
       /* ПРИХОД: влетает сбоку снизу, доворачивается и слегка перелетает */
       if (this.enterFrom) {
-        const k = Math.min((performance.now() - this.enterFrom) / 1250, 1);
+        const k = Math.min((performance.now() - this.enterFrom) / this.mood.enterMs, 1);
         const e = 1 - Math.pow(1 - k, 3);
         /* мягкий перелёт по масштабу — бокал «дышит», встав на место */
         const ov = Math.sin(Math.min(k, 1) * Math.PI) * 0.07 * (1 - k);
         this.group.scale.setScalar(this.fitScale * (0.55 + e * 0.45 + ov));
         const s = -(this.enterSide || 1);
-        this.group.rotation.y += (1 - e) * 6.2 * s;
-        this.group.rotation.z = s * (1 - e) * 0.85;
-        this.group.position.x += s * (1 - e) * 3.6;
-        this.group.position.y -= (1 - e) * 1.5;
+        this.group.rotation.y += (1 - e) * this.mood.spin * s;
+        const sw = this.mood.sweep;
+        this.group.rotation.z = s * (1 - e) * 0.85 * sw;
+        this.group.position.x += s * (1 - e) * 3.6 * sw;
+        this.group.position.y -= (1 - e) * (1.5 - sw * 0.2 + (1 - sw) * 0.6);
         this.group.position.z -= (1 - e) * 2.4;
         if (k >= 1) { this.enterFrom = 0; this.group.rotation.z = 0; }
       }
@@ -815,6 +832,15 @@ export class BarScene {
       amp += Math.abs(this.pointer.x - this.target.x) * 0.06;
       this.liquidU.uWave.value += (amp - this.liquidU.uWave.value) * 0.14;
     }
+    /* свет и экспозиция плавно перетекают к настроению позиции:
+       к секретной свет гаснет постепенно, а не щелчком */
+    if (this.mood) {
+      const f = 0.035;
+      this.expo += (this.mood.exposure - this.expo) * f;
+      this.keyLight.intensity += (this.mood.key - this.keyLight.intensity) * f;
+      this.rimLight.intensity += (this.mood.rim - this.rimLight.intensity) * f;
+      this.renderer.toneMappingExposure = this.expo + (this.flashBoost || 0);
+    }
     /* камера подъезжает на смене коктейля и плавно отходит */
     if (this.dollyFrom) {
       const dk = Math.min((performance.now() - this.dollyFrom) / 1600, 1);
@@ -825,8 +851,8 @@ export class BarScene {
     /* короткая вспышка света — как будто включили софит на новую подачу */
     if (this.flashFrom) {
       const fk = Math.min((performance.now() - this.flashFrom) / 900, 1);
-      this.renderer.toneMappingExposure = 1.05 + (1 - fk) * (1 - fk) * 0.75;
-      if (fk >= 1) { this.flashFrom = 0; this.renderer.toneMappingExposure = 1.05; }
+      this.flashBoost = (1 - fk) * (1 - fk) * this.mood.flash;
+      if (fk >= 1) { this.flashFrom = 0; this.flashBoost = 0; }
     }
     this.camera.lookAt(0, -0.08, 0);
     if (this.composer) this.composer.render();
