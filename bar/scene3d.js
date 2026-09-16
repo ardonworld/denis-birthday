@@ -377,6 +377,84 @@ export class BarScene {
     return grp;
   }
 
+  /* Струя: напиток должен именно наливаться сверху, а не просто
+     подниматься уровнем. Живёт только пока идёт налив. */
+  buildPourStream(rTop, cx, cz, color) {
+    const geo = new THREE.CylinderGeometry(rTop * 0.1, rTop * 0.075, 1, 20, 1, true);
+    const m = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(color),
+      emissive: new THREE.Color(color).multiplyScalar(0.45),
+      roughness: 0.1, metalness: 0,
+      clearcoat: 1, clearcoatRoughness: 0.05,
+      envMapIntensity: 1.1,
+      transmission: 0, transparent: false,
+      side: THREE.DoubleSide,
+    }));
+    m.position.x = cx; m.position.z = cz;
+    m.userData.own = true;
+    m.renderOrder = 2;
+    return m;
+  }
+
+  /* Капли, которые выбивает струя при ударе о поверхность */
+  buildDroplets(rTop, cx, cz, color) {
+    const grp = new THREE.Group();
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(color),
+      emissive: new THREE.Color(color).multiplyScalar(0.35),
+      roughness: 0.08, metalness: 0, clearcoat: 1,
+      envMapIntensity: 1.2, transmission: 0, transparent: false,
+    });
+    for (let i = 0; i < 7; i++) {
+      const d = new THREE.Mesh(new THREE.SphereGeometry(rTop * (0.035 + Math.random() * 0.03), 8, 6), mat);
+      d.userData.own = true;
+      const a = (i / 7) * Math.PI * 2 + Math.random();
+      d.userData.dir = new THREE.Vector2(Math.cos(a), Math.sin(a));
+      d.userData.speed = 0.55 + Math.random() * 0.6;
+      d.userData.lift = 0.7 + Math.random() * 0.7;
+      grp.add(d);
+    }
+    grp.position.set(cx, 0, cz);
+    grp.userData.own = true;
+    grp.userData.r = rTop;
+    return grp;
+  }
+
+  /* Пятно света под бокалом: напиток бросает цвет на стойку.
+     Без него бокал висит в пустоте. */
+  causticTexture() {
+    if (this._caustic) return this._caustic;
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const x = c.getContext('2d');
+    const g = x.createRadialGradient(64, 64, 4, 64, 64, 64);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.35, 'rgba(255,255,255,0.42)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g;
+    x.fillRect(0, 0, 128, 128);
+    this._caustic = new THREE.CanvasTexture(c);
+    return this._caustic;
+  }
+
+  buildCaustic(width, y, cx, cz, color) {
+    const m = new THREE.Mesh(
+      new THREE.PlaneGeometry(width * 2.6, width * 2.6),
+      new THREE.MeshBasicMaterial({
+        map: this.causticTexture(),
+        color: new THREE.Color(color),
+        transparent: true,
+        opacity: 0.55,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      }));
+    m.rotation.x = -Math.PI / 2;
+    m.position.set(cx, y + 0.004, cz);
+    m.userData.own = true;
+    m.renderOrder = 0;
+    return m;
+  }
+
   /* гладь напитка: диск из концентрических колец, чтобы по нему шла волна.
      uv.y идёт от центра к стенке — по нему рисуем мениск. */
   surfaceGeometry(rTop, y, cx, cz, rings = 18) {
@@ -445,11 +523,22 @@ export class BarScene {
     this.liquid = liquid;
 
     /* лёд живёт вне группы напитка: он не должен сплющиваться при наливе */
-    if (this.ice) { g.remove(this.ice); this.ice = null; }
+    this.ice = null;
     if (opts.ice) {
       this.ice = this.buildIce(geo.userData.rTop, prof.cx, prof.cz);
       g.add(this.ice);
     }
+
+    /* струя, капли от удара и пятно света на стойке */
+    this.stream = this.buildPourStream(geo.userData.rTop, prof.cx, prof.cz, liquidColor);
+    g.add(this.stream);
+    this.drops = this.buildDroplets(geo.userData.rTop, prof.cx, prof.cz, liquidColor);
+    g.add(this.drops);
+    this.caustic = this.buildCaustic(prof.rMax, prof.y0, prof.cx, prof.cz, liquidColor);
+    g.add(this.caustic);
+
+    this.glassTop = prof.y1;
+    this.tilt = 0; this.tiltV = 0; this.prevX = null;
     this.liquidTop = geo.userData.top;
     this.liquidBase = yBase;
     this.pourFrom = performance.now() + 260;   // наливаем чуть позже появления
@@ -543,6 +632,59 @@ export class BarScene {
         this.liquid.rotation.z = w;
         this.pourK = kk;
         if (pk >= 1) { this.pourFrom = 0; this.liquid.rotation.z = 0; }
+      }
+      /* СТРУЯ: льётся сверху до уровня напитка и обрывается, когда налито */
+      if (this.stream) {
+        const kk = this.pourK ?? 1;
+        const level = this.liquidTop * kk + this.liquidBase * (1 - kk);
+        const pk = this.pourFrom
+          ? Math.min(Math.max((performance.now() - this.pourFrom) / 1300, 0), 1) : 1;
+        /* струя набирает силу в начале и обрывается к концу налива */
+        const life = pk < 0.08 ? pk / 0.08 : (pk > 0.82 ? Math.max(0, (1 - pk) / 0.18) : 1);
+        this.stream.visible = life > 0.01;
+        if (this.stream.visible) {
+          const top = this.glassTop + 1.1;
+          const h = Math.max(top - level, 0.01);
+          this.stream.scale.set(life, h, life);
+          this.stream.position.y = level + h / 2;
+        }
+      }
+      /* КАПЛИ: струя выбивает их из поверхности */
+      if (this.drops) {
+        const pk = this.pourFrom
+          ? Math.min(Math.max((performance.now() - this.pourFrom) / 1300, 0), 1) : 1;
+        const kk = this.pourK ?? 1;
+        const level = this.liquidTop * kk + this.liquidBase * (1 - kk);
+        const r = this.drops.userData.r;
+        this.drops.visible = pk > 0.1 && pk < 0.95;
+        if (this.drops.visible) {
+          this.drops.children.forEach((d, i) => {
+            /* каждая капля живёт свой короткий цикл и падает обратно */
+            const c = ((pk * 3.2) + i * 0.37) % 1;
+            const dir = d.userData.dir;
+            d.position.set(dir.x * c * r * d.userData.speed, 0, dir.y * c * r * d.userData.speed);
+            d.position.y = level + (Math.sin(c * Math.PI) * d.userData.lift * r * 0.55);
+            const fade = Math.sin(c * Math.PI);
+            d.scale.setScalar(Math.max(fade, 0.001));
+          });
+        }
+      }
+      /* ПЯТНО СВЕТА на стойке дышит вместе с напитком */
+      if (this.caustic) {
+        const kk = this.pourK ?? 1;
+        this.caustic.material.opacity = 0.2 + kk * 0.4 + Math.sin(t * 1.7) * 0.05;
+      }
+      /* ИНЕРЦИЯ: бокал двинулся — напиток качнулся следом с запозданием */
+      if (this.liquid && !this.pourFrom) {
+        const x = this.group.position.x + this.group.rotation.y * 0.35;
+        if (this.prevX === null) this.prevX = x;
+        this.tiltV = (this.tiltV + (x - this.prevX) * 0.5) * 0.86;
+        this.prevX = x;
+        this.tilt = (this.tilt + this.tiltV) * 0.9;
+        /* больше 0.05 рад нельзя: напиток начнёт выходить за стенку */
+        const lim = Math.max(-0.05, Math.min(0.05, this.tilt));
+        this.liquid.rotation.z = lim;
+        if (this.ice) this.ice.rotation.z = lim;
       }
       /* лёд всплывает вместе с уровнем и качается на волне */
       if (this.ice) {

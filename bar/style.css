@@ -160,7 +160,7 @@ body.has3d .glass-wrap{ filter: none; }
   z-index: 5;
   margin: 0 0 clamp(2px, 0.8vw, 12px);
   text-align: center;
-  font-size: clamp(36px, 8vw, 120px);
+  font-size: calc(clamp(36px, 8vw, 120px) * var(--fit, 1));
   line-height: 0.95;
   font-weight: 800;
   letter-spacing: -0.045em;
