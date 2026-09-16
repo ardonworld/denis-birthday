@@ -72,6 +72,7 @@ export class BarScene {
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.12));
 
     await this.buildEnvironment();
+    await this.buildBackdrop();
 
     if (this.quality === 'high' && opts.bloom) {
       const composer = new EffectComposer(renderer);
@@ -135,7 +136,31 @@ export class BarScene {
     this.scene.environment = this.pmrem.fromScene(envScene, 0.02).texture;
   }
 
+  /* Фон бара живёт ВНУТРИ сцены, а не подложкой под страницу:
+     только так стекло преломляет огни стойки, и бокал перестаёт
+     висеть в пустоте. Кадр — Higgsfield Soul 2.0. */
+  async buildBackdrop() {
+    try {
+      const tex = await new THREE.TextureLoader().loadAsync('assets/bar-bg.jpg');
+      tex.colorSpace = THREE.SRGBColorSpace;
+      const m = new THREE.Mesh(
+        new THREE.PlaneGeometry(17.8, 10),
+        new THREE.MeshBasicMaterial({ map: tex, toneMapped: false, depthWrite: false }));
+      m.position.set(0, -0.35, -6);
+      m.renderOrder = -1;
+      this.scene.add(m);
+      this.backdrop = m;
+      this.bgTint = new THREE.Color(0xffffff);
+    } catch (e) {
+      /* без фона сцена остаётся рабочей — просто на чёрном */
+      this.backdrop = null;
+    }
+  }
+
   refreshEnvironment(accent) {
+    /* фон слегка подтягиваем к цвету позиции, иначе янтарная стойка
+       спорит с розовым космополитеном и зелёным егерем */
+    if (accent) this.bgTint = new THREE.Color(0xffffff).lerp(new THREE.Color(accent), 0.22);
     if (!this.accentPanel || !this.pmrem) return;
     this.accentPanel.material.color = new THREE.Color(accent).multiplyScalar(2.4);
     const old = this.scene.environment;
@@ -569,9 +594,9 @@ export class BarScene {
      почти без разворота, горит только контровой свет. */
   setMood(name) {
     const M = {
-      light:  { exposure: 1.08, key: 1.4,  rim: 2.2, enterMs: 1150, spin: 6.2, sweep: 1,    flash: 0.75 },
-      strong: { exposure: 0.92, key: 1.05, rim: 2.8, enterMs: 1650, spin: 3.4, sweep: 0.8,  flash: 0.45 },
-      secret: { exposure: 0.66, key: 0.3,  rim: 3.6, enterMs: 2600, spin: 0.9, sweep: 0.08, flash: 0 },
+      light:  { exposure: 1.08, key: 1.4,  rim: 2.2, enterMs: 1150, spin: 6.2, sweep: 1,    flash: 0.75, bg: 0.5 },
+      strong: { exposure: 0.92, key: 1.05, rim: 2.8, enterMs: 1650, spin: 3.4, sweep: 0.8,  flash: 0.45, bg: 0.32 },
+      secret: { exposure: 0.66, key: 0.3,  rim: 3.6, enterMs: 2600, spin: 0.9, sweep: 0.08, flash: 0,    bg: 0.13 },
     };
     this.mood = M[name] || M.light;
   }
@@ -840,6 +865,14 @@ export class BarScene {
       this.keyLight.intensity += (this.mood.key - this.keyLight.intensity) * f;
       this.rimLight.intensity += (this.mood.rim - this.rimLight.intensity) * f;
       this.renderer.toneMappingExposure = this.expo + (this.flashBoost || 0);
+      /* стойка темнеет вместе с настроением и чуть плывёт за мышью —
+         глубина кадра читается без единого клика */
+      if (this.backdrop) {
+        const target = this.bgTint.clone().multiplyScalar(this.mood.bg);
+        this.backdrop.material.color.lerp(target, f);
+        this.backdrop.position.x += (-this.pointer.x * 0.45 - this.backdrop.position.x) * 0.06;
+        this.backdrop.position.y += (-0.35 + this.pointer.y * 0.2 - this.backdrop.position.y) * 0.06;
+      }
     }
     /* камера подъезжает на смене коктейля и плавно отходит */
     if (this.dollyFrom) {
