@@ -1,6 +1,6 @@
 import * as __THREE from 'three';
-import { BarScene, detectQuality } from './scene3d.js?v=202609161951';
-import './kitchen.js?v=202609161951';
+import { BarScene, detectQuality } from './scene3d.js?v=202609162020';
+import './kitchen.js?v=202609162020';
 window.__THREE = __THREE;
 
 /* =========================================================

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=202609161951">
+<link rel="stylesheet" href="style.css?v=202609162020">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>">
 </head>
 <body>
@@ -96,160 +96,154 @@
   </section>
 
   <!-- ================= КУХНЯ =================
-       Три сцены, которыми управляет прокрутка, как у Apple:
-       1) фирменный шашлык вырастает из карточки на весь экран, над ним дым и искры;
-       2) блюда проходят 3D-лентой, активное крупно, соседние уходят в глубину;
-       3) туман заполняет экран и уводит к кальянам.
-       Фото — Higgsfield Soul 2.0. -->
+       Один экран, одна композиция: все блюда сразу, шашлык в центре.
+       Блюда живые — короткие закольцованные ролики (Higgsfield),
+       композиция плавает и откликается на мышь, над углями искры.
+       Активное блюдо меняется само, как показ коктейлей. -->
   <section class="kx" id="kitchen">
+    <canvas class="kx-smoke" data-smoke="kitchen" aria-hidden="true"></canvas>
+    <div class="kx-wrap">
+      <header class="kx-head">
+        <p class="eyebrow">Кухня</p>
+        <h2 class="kx-title">Что берут<br>под бокал</h2>
+      </header>
 
-    <div class="kx-scene kx-sig" data-scene="sig">
-      <div class="kx-sticky">
-        <header class="kx-intro">
-          <p class="eyebrow">Кухня</p>
-          <h2 class="kx-huge">Что берут<br>под бокал</h2>
-        </header>
-
-        <div class="kx-frame">
-          <img class="kx-frame-img" src="assets/kitchen/shashlik.jpg" width="1800" height="1012" decoding="async"
-               alt="Шашлык на шампурах с луком, зеленью и гранатом на лаваше">
-          <canvas class="kx-smoke" data-smoke="sig" aria-hidden="true"></canvas>
-          <div class="kx-shade"></div>
-        </div>
-
-        <div class="kx-sig-copy">
-          <span class="kx-line kx-badge-line"><i class="k-badge">Фирменное</i></span>
-          <h2 class="kx-sig-name">
-            <span class="kx-line"><i>Шашлык</i></span>
-            <span class="kx-line"><i>от Денчика</i></span>
-          </h2>
-          <p class="kx-sig-note kx-line"><i>Фирменный рецепт именинника: сочное мясо с углей, маринованный лук,
-            зелень, зёрна граната и тонкий лаваш, который пропитывается соком.</i></p>
-          <span class="k-pair kx-line"><i>к TVR и Атомному Егерю</i></span>
-        </div>
+      <div class="kx-stage">
+        <figure class="kx-card kx-c1" style="--i:0" data-depth="1.0" data-badge="Фирменное"
+                data-name="Шашлык от Денчика" data-note="Фирменный рецепт именинника: сочное мясо с углей, маринованный лук, зелень, зёрна граната и тонкий лаваш." data-pair="к TVR и Атомному Егерю">
+          <div class="kx-pop"><div class="kx-in">
+            <video class="kx-media" muted loop playsinline preload="none" poster="assets/kitchen/shashlik.jpg" data-src="assets/kitchen/shashlik.mp4"></video>
+            <span class="kx-glare"></span>
+            <span class="kx-tag">Шашлык</span>
+          </div></div>
+        </figure>
+        <figure class="kx-card kx-c2" style="--i:1" data-depth="1.6"
+                data-name="Пицца пепперони" data-note="Хрустящие колечки пепперони, тянущаяся моцарелла, тонкое тесто." data-pair="к Паломе и Санрайзу">
+          <div class="kx-pop"><div class="kx-in">
+            <video class="kx-media" muted loop playsinline preload="none" poster="assets/kitchen/pizza.jpg" data-src="assets/kitchen/pizza.mp4"></video>
+            <span class="kx-glare"></span>
+            <span class="kx-tag">Пицца</span>
+          </div></div>
+        </figure>
+        <figure class="kx-card kx-c3" style="--i:2" data-depth="0.6"
+                data-name="Чипсы с соусами" data-note="Тонкие и хрустящие, с морской солью и укропом. Два соуса на выбор." data-pair="ко всему, что с энергетиком">
+          <div class="kx-pop"><div class="kx-in">
+            <video class="kx-media" muted loop playsinline preload="none" poster="assets/kitchen/chips.jpg" data-src="assets/kitchen/chips.mp4"></video>
+            <span class="kx-glare"></span>
+            <span class="kx-tag">Чипсы</span>
+          </div></div>
+        </figure>
+        <figure class="kx-card kx-c4" style="--i:3" data-depth="0.7"
+                data-name="Брускетты" data-note="Поджаренная чиабатта, томаты черри, базилик и нежная буррата." data-pair="к Джин-Физзу и Космополитену">
+          <div class="kx-pop"><div class="kx-in">
+            <video class="kx-media" muted loop playsinline preload="none" poster="assets/kitchen/bruschetta.jpg" data-src="assets/kitchen/bruschetta.mp4"></video>
+            <span class="kx-glare"></span>
+            <span class="kx-tag">Брускетты</span>
+          </div></div>
+        </figure>
+        <figure class="kx-card kx-c5" style="--i:4" data-depth="1.5"
+                data-name="Сырная тарелка" data-note="Бри, выдержанный сыр, дор блю, мёд, виноград, инжир и орехи." data-pair="к Беллини и Pornstar Martini">
+          <div class="kx-pop"><div class="kx-in">
+            <video class="kx-media" muted loop playsinline preload="none" poster="assets/kitchen/cheese.jpg" data-src="assets/kitchen/cheese.mp4"></video>
+            <span class="kx-glare"></span>
+            <span class="kx-tag">Сыры</span>
+          </div></div>
+        </figure>
+        <figure class="kx-card kx-c6" style="--i:5" data-depth="1.9"
+                data-name="Мясная тарелка" data-note="Прошутто, салями, оливки, корнишоны и хрустящие гриссини." data-pair="к Виски Сауэру">
+          <div class="kx-pop"><div class="kx-in">
+            <video class="kx-media" muted loop playsinline preload="none" poster="assets/kitchen/meat.jpg" data-src="assets/kitchen/meat.mp4"></video>
+            <span class="kx-glare"></span>
+            <span class="kx-tag">Мясная</span>
+          </div></div>
+        </figure>
       </div>
-    </div>
 
-    <div class="kx-scene kx-reel" data-scene="reel">
-      <div class="kx-sticky">
-        <div class="kx-ambient" aria-hidden="true"></div>
-        <div class="kx-reel-head">
-          <p class="eyebrow">Закуски и горячее</p>
-          <span class="kx-count"><b>01</b><i>/</i><span>05</span></span>
-        </div>
-
-        <div class="kx-ring">
-          <figure class="kx-card" data-name="Пицца пепперони" data-note="Хрустящие колечки пепперони, тянущаяся моцарелла, тонкое тесто." data-pair="к Паломе и Санрайзу">
-            <img src="assets/kitchen/pizza.jpg" width="825" height="1100" decoding="async" alt="Пицца пепперони с тянущейся моцареллой">
-            <span class="kx-glare"></span>
-          </figure>
-          <figure class="kx-card" data-name="Чипсы с соусами" data-note="Тонкие и хрустящие, с морской солью и укропом. Два соуса на выбор." data-pair="ко всему, что с энергетиком">
-            <img src="assets/kitchen/chips.jpg" width="1100" height="825" decoding="async" alt="Тонкие картофельные чипсы с укропом и соусами">
-            <span class="kx-glare"></span>
-          </figure>
-          <figure class="kx-card" data-name="Сырная тарелка" data-note="Бри, выдержанный сыр, дор блю, мёд, виноград, инжир и орехи." data-pair="к Беллини и Pornstar Martini">
-            <img src="assets/kitchen/cheese.jpg" width="825" height="1100" decoding="async" alt="Сырная тарелка с бри, дор блю, мёдом и виноградом">
-            <span class="kx-glare"></span>
-          </figure>
-          <figure class="kx-card" data-name="Брускетты" data-note="Поджаренная чиабатта, томаты черри, базилик и нежная буррата." data-pair="к Джин-Физзу и Космополитену">
-            <img src="assets/kitchen/bruschetta.jpg" width="1100" height="825" decoding="async" alt="Брускетты с томатами, базиликом и бурратой">
-            <span class="kx-glare"></span>
-          </figure>
-          <figure class="kx-card" data-name="Мясная тарелка" data-note="Прошутто, салями, оливки, корнишоны и хрустящие гриссини." data-pair="к Виски Сауэру">
-            <img src="assets/kitchen/meat.jpg" width="1100" height="825" decoding="async" alt="Мясная тарелка с прошутто, салями и оливками">
-            <span class="kx-glare"></span>
-          </figure>
-        </div>
-
-        <div class="kx-info" aria-live="polite">
-          <h3 class="kx-info-name"></h3>
-          <p class="kx-info-note"></p>
-          <span class="k-pair kx-info-pair"></span>
-        </div>
-
-        <div class="kx-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-      </div>
-    </div>
-
-    <div class="kx-scene kx-fog" data-scene="fog">
-      <div class="kx-sticky">
-        <img class="kx-fog-img" src="assets/kitchen/smoke.jpg" width="1800" height="1012" decoding="async" alt="">
-        <canvas class="kx-smoke kx-smoke-full" data-smoke="fog" aria-hidden="true"></canvas>
-        <div class="kx-fog-copy">
-          <p class="eyebrow kx-line"><i>А после ужина</i></p>
-          <h2 class="kx-huge">
-            <span class="kx-line"><i>Кальян</i></span>
-            <span class="kx-line"><i>под напиток</i></span>
-          </h2>
-        </div>
+      <div class="kx-info" aria-live="polite">
+        <span class="k-badge kx-info-badge">Фирменное</span>
+        <h3 class="kx-info-name">Шашлык от Денчика</h3>
+        <p class="kx-info-note">Фирменный рецепт именинника: сочное мясо с углей, маринованный лук, зелень, зёрна граната и тонкий лаваш.</p>
+        <span class="k-pair kx-info-pair">к TVR и Атомному Егерю</span>
+        <div class="kx-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
     </div>
   </section>
 
   <!-- ================= КАЛЬЯНЫ =================
-       Сцена держится на экране, прокрутка переключает вкусы.
-       Дым живой: идёт из чаши, тянется за мышью, на смене вкуса
-       и по тапу по кальяну — выдох. -->
+       Один экран: все четыре кальяна в ряд и все дымят. Активный
+       раскрывается, остальные сжимаются в полосы. Дым из чаш
+       поднимается выше рамок; по нажатию кальян выдыхает. -->
   <section class="hx" id="tobacco">
-    <div class="kx-scene hx-scene" data-scene="hookah">
-      <div class="kx-sticky hx-stage">
-        <div class="hx-media">
-          <figure class="hx-shot" data-bowl="0.5,0.13" data-tint="#b9d86a">
-            <img src="assets/hookah/apple.jpg" decoding="async" alt="Кальян с чашей из зелёного яблока">
-          </figure>
-          <figure class="hx-shot" data-bowl="0.5,0.195" data-tint="#7fe0c4">
-            <img src="assets/hookah/mint.jpg" decoding="async" alt="Кальян с мятой, лаймом и льдом">
-          </figure>
-          <figure class="hx-shot" data-bowl="0.5,0.17" data-tint="#9c7bff">
-            <img src="assets/hookah/berry.jpg" decoding="async" alt="Кальян с черникой и малиной">
-          </figure>
-          <figure class="hx-shot" data-bowl="0.5,0.15" data-tint="#f3a53a">
-            <img src="assets/hookah/citrus.jpg" decoding="async" alt="Кальян с грейпфрутом и апельсином">
-          </figure>
-          <canvas class="kx-smoke hx-smoke" data-smoke="hookah" aria-hidden="true"></canvas>
-          <div class="hx-vignette"></div>
-        </div>
-
-        <div class="hx-side">
+    <div class="hx-wrap">
+      <header class="hx-head">
+        <div>
           <p class="eyebrow">Кальяны</p>
-          <p class="hx-lead">Пара базовых вкусов, которые не спорят с коктейлем, а продолжают его.</p>
-          <ol class="hx-menu">
-            <li class="hx-item" style="--h-accent:#b9d86a">
-              <span class="hx-name">Двойное яблоко</span>
-              <span class="hx-desc">Классика с анисом. Сладкое, плотное, не перебивает виски.</span>
-              <span class="k-pair">к Виски Сауэру и RDR</span>
-            </li>
-            <li class="hx-item" style="--h-accent:#7fe0c4">
-              <span class="hx-name">Мята со льдом</span>
-              <span class="hx-desc">Холодная свежесть, которая гасит сладость энергетика.</span>
-              <span class="k-pair">к TVR, Паломе и Джин-Физзу</span>
-            </li>
-            <li class="hx-item" style="--h-accent:#9c7bff">
-              <span class="hx-name">Черника и ягоды</span>
-              <span class="hx-desc">Мягкий ягодный дым, как будто из той же клюквы.</span>
-              <span class="k-pair">к Космополитену и Беллини</span>
-            </li>
-            <li class="hx-item" style="--h-accent:#f3a53a">
-              <span class="hx-name">Грейпфрут и апельсин</span>
-              <span class="hx-desc">Цитрусовая горчинка поверх сладкого фрукта.</span>
-              <span class="k-pair">к Санрайзу и Pornstar Martini</span>
-            </li>
-          </ol>
-          <span class="hx-tap">коснитесь кальяна — он выдохнет</span>
+          <h2 class="kx-title">Дым<br>под напиток</h2>
         </div>
+        <p class="hx-lead">Пара базовых вкусов, которые не спорят с коктейлем, а продолжают его.</p>
+      </header>
+
+      <div class="hx-row">
+        <canvas class="kx-smoke hx-smoke" data-smoke="hookah" aria-hidden="true"></canvas>
+        <figure class="hx-card" style="--i:0;--h-accent:#b9d86a" data-bowl="0.5,0.13"
+                data-name="Двойное яблоко" data-desc="Классика с анисом. Сладкое, плотное, не перебивает виски." data-pair="к Виски Сауэру и RDR">
+          <video class="hx-media" muted loop playsinline preload="none" poster="assets/hookah/apple.jpg" data-src="assets/hookah/apple.mp4"></video>
+          <span class="hx-vname">Двойное яблоко</span>
+          <figcaption class="hx-cap">
+            <span class="hx-name">Двойное яблоко</span>
+            <span class="hx-desc">Классика с анисом. Сладкое, плотное, не перебивает виски.</span>
+            <span class="k-pair">к Виски Сауэру и RDR</span>
+          </figcaption>
+        </figure>
+        <figure class="hx-card" style="--i:1;--h-accent:#7fe0c4" data-bowl="0.5,0.195"
+                data-name="Мята со льдом" data-desc="Холодная свежесть, которая гасит сладость энергетика." data-pair="к TVR, Паломе и Джин-Физзу">
+          <video class="hx-media" muted loop playsinline preload="none" poster="assets/hookah/mint.jpg" data-src="assets/hookah/mint.mp4"></video>
+          <span class="hx-vname">Мята со льдом</span>
+          <figcaption class="hx-cap">
+            <span class="hx-name">Мята со льдом</span>
+            <span class="hx-desc">Холодная свежесть, которая гасит сладость энергетика.</span>
+            <span class="k-pair">к TVR, Паломе и Джин-Физзу</span>
+          </figcaption>
+        </figure>
+        <figure class="hx-card" style="--i:2;--h-accent:#9c7bff" data-bowl="0.5,0.17"
+                data-name="Черника и ягоды" data-desc="Мягкий ягодный дым, как будто из той же клюквы." data-pair="к Космополитену и Беллини">
+          <video class="hx-media" muted loop playsinline preload="none" poster="assets/hookah/berry.jpg" data-src="assets/hookah/berry.mp4"></video>
+          <span class="hx-vname">Черника и ягоды</span>
+          <figcaption class="hx-cap">
+            <span class="hx-name">Черника и ягоды</span>
+            <span class="hx-desc">Мягкий ягодный дым, как будто из той же клюквы.</span>
+            <span class="k-pair">к Космополитену и Беллини</span>
+          </figcaption>
+        </figure>
+        <figure class="hx-card" style="--i:3;--h-accent:#f3a53a" data-bowl="0.5,0.15"
+                data-name="Грейпфрут и апельсин" data-desc="Цитрусовая горчинка поверх сладкого фрукта." data-pair="к Санрайзу и Pornstar Martini">
+          <video class="hx-media" muted loop playsinline preload="none" poster="assets/hookah/citrus.jpg" data-src="assets/hookah/citrus.mp4"></video>
+          <span class="hx-vname">Грейпфрут и апельсин</span>
+          <figcaption class="hx-cap">
+            <span class="hx-name">Грейпфрут и апельсин</span>
+            <span class="hx-desc">Цитрусовая горчинка поверх сладкого фрукта.</span>
+            <span class="k-pair">к Санрайзу и Pornstar Martini</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="hx-info" aria-live="polite">
+        <span class="hx-name">Двойное яблоко</span>
+        <span class="hx-desc">Классика с анисом. Сладкое, плотное, не перебивает виски.</span>
+        <span class="k-pair">к Виски Сауэру и RDR</span>
       </div>
     </div>
-
-    <footer class="hx-foot">
-      <button class="next-hint next-hint-up" data-to="drinks"><span class="next-arrow">↑</span> К началу</button>
-      <p class="credits">
-        3D-модель посуды — <a href="https://sketchfab.com/3d-models/glass-collection-0ff8fc5007dd4e9da675109fe7c443d6" target="_blank" rel="noopener">«Glass Collection»</a>
-        автора <a href="https://sketchfab.com/marcussamiran" target="_blank" rel="noopener">RagingCow</a>, лицензия CC-BY-4.0.
-        Карта освещения — <a href="https://polyhaven.com/a/studio_small_09" target="_blank" rel="noopener">Poly Haven</a>, CC0.
-        Фото бара, блюд и кальянов сгенерированы в Higgsfield.
-      </p>
-    </footer>
   </section>
+
+  <footer class="hx-foot">
+    <button class="next-hint next-hint-up" data-to="drinks"><span class="next-arrow">↑</span> К началу</button>
+    <p class="credits">
+      3D-модель посуды — <a href="https://sketchfab.com/3d-models/glass-collection-0ff8fc5007dd4e9da675109fe7c443d6" target="_blank" rel="noopener">«Glass Collection»</a>
+      автора <a href="https://sketchfab.com/marcussamiran" target="_blank" rel="noopener">RagingCow</a>, лицензия CC-BY-4.0.
+      Карта освещения — <a href="https://polyhaven.com/a/studio_small_09" target="_blank" rel="noopener">Poly Haven</a>, CC0.
+      Фото и видео бара, блюд и кальянов сгенерированы в Higgsfield.
+    </p>
+  </footer>
 
 </main>
 
@@ -270,6 +264,6 @@
   }
 }
 </script>
-<script type="module" src="app.js?v=202609161951"></script>
+<script type="module" src="app.js?v=202609162020"></script>
 </body>
 </html>
