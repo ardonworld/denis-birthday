@@ -5,7 +5,7 @@
    на мышь, активная позиция меняется сама, как показ коктейлей.
    Наведение или нажатие перехватывает показ.
    ========================================================= */
-import { Smoke, hexToRgb } from './smoke.js?v=202609162048';
+import { Smoke, hexToRgb } from './smoke.js?v=202609162124';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = matchMedia('(hover: hover)').matches;
@@ -109,6 +109,9 @@ function section(root, { frame }) {
       mouse.y += (mouse.ty - mouse.y) * 0.05;
       /* каждая карточка плавает по-своему и сдвигается за мышью
          пропорционально глубине — отсюда объём композиции */
+      /* фон кухни — самый дальний слой: сдвигается меньше всех */
+      const kbg = root.querySelector('.kx-bg-media');
+      if (kbg) kbg.style.transform = `translate3d(${(-mouse.x * 10).toFixed(1)}px, ${(-mouse.y * 7).toFixed(1)}px, 0)`;
       cards.forEach((c, i) => {
         const d = +c.dataset.depth || 1;
         const ph = i * 1.37;
@@ -238,6 +241,8 @@ function section(root, { frame }) {
     frame() {
       mouse.x += (mouse.tx - mouse.x) * 0.05;
       mouse.y += (mouse.ty - mouse.y) * 0.05;
+      const hbg = root.querySelector('.kx-bg-media');
+      if (hbg) hbg.style.transform = `translate3d(${(-mouse.x * 12).toFixed(1)}px, ${(-mouse.y * 8).toFixed(1)}px, 0)`;
       cards.forEach((c) => {
         const m = c.querySelector('.hx-media');
         m.style.transform = `translate3d(${(-mouse.x * 8).toFixed(1)}px, ${(-mouse.y * 6).toFixed(1)}px, 0) scale(1.06)`;
