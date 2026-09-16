@@ -5,7 +5,7 @@
    на мышь, активная позиция меняется сама, как показ коктейлей.
    Наведение или нажатие перехватывает показ.
    ========================================================= */
-import { Smoke, hexToRgb } from './smoke.js?v=202609162038';
+import { Smoke, hexToRgb } from './smoke.js?v=202609162048';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = matchMedia('(hover: hover)').matches;
